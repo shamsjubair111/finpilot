@@ -1,0 +1,41 @@
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ExpenseDonutChart } from "@/components/charts/expense-donut-chart";
+import { CATEGORY_COLORS } from "@/lib/chart-colors";
+import { formatCurrency } from "@/lib/currency";
+import type { BudgetCategory } from "@/types/finance";
+
+export function ExpenseBreakdownSection({ categories }: { categories: BudgetCategory[] }) {
+  const total = categories.reduce((sum, c) => sum + c.spent, 0);
+  const sorted = [...categories].sort((a, b) => b.spent - a.spent);
+
+  return (
+    <Card className="animate-in-up">
+      <CardHeader>
+        <CardTitle>Expense Breakdown</CardTitle>
+      </CardHeader>
+      <CardContent className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:items-center">
+        <ExpenseDonutChart categories={categories} />
+        <ul className="space-y-2.5">
+          {sorted.map((c) => {
+            const pct = total > 0 ? Math.round((c.spent / total) * 100) : 0;
+            return (
+              <li key={c.id} className="flex items-center justify-between gap-2 text-sm">
+                <span className="flex items-center gap-2 min-w-0">
+                  <span
+                    className="size-2.5 shrink-0 rounded-full"
+                    style={{ backgroundColor: CATEGORY_COLORS[c.category] }}
+                  />
+                  <span className="truncate">{c.category}</span>
+                </span>
+                <span className="flex shrink-0 items-center gap-2 tabular-nums">
+                  <span className="font-medium">{formatCurrency(c.spent, { compact: true })}</span>
+                  <span className="w-9 text-right text-xs text-muted-foreground">{pct}%</span>
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      </CardContent>
+    </Card>
+  );
+}

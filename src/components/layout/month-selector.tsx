@@ -1,0 +1,32 @@
+"use client";
+
+import { CalendarDays } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useFinance } from "@/components/providers/finance-provider";
+import { MONTH_OPTIONS } from "@/lib/constants";
+
+export function MonthSelector() {
+  const { selectedMonth, setSelectedMonth } = useFinance();
+
+  return (
+    <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+      <SelectTrigger className="h-8 w-auto gap-1.5 border-none bg-muted px-2.5 text-xs font-medium shadow-none sm:text-sm" size="sm">
+        <CalendarDays className="size-3.5 text-muted-foreground" />
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent align="end">
+        {MONTH_OPTIONS.map((m) => (
+          <SelectItem key={m} value={m}>
+            {m}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+}
