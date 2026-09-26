@@ -1,0 +1,110 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                   String   @id @default(cuid())
+  name                 String
+  email                String   @unique
+  passwordHash         String
+  avatarUrl            String?
+  currency             String   @default("BDT")
+  monthlySalary        Float    @default(0)
+  currentSavings       Float    @default(0)
+  emergencyFundTarget  Float    @default(0)
+  emergencyFundCurrent Float    @default(0)
+  defaultSavingsTarget Float    @default(20)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  transactions Transaction[]
+  budgets      BudgetCategory[]
+  goals        Goal[]
+  purchases    Purchase[]
+  commitments  Commitment[]
+}
+
+model Transaction {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title         String
+  merchant      String   @default("")
+  category      String
+  date          DateTime
+  amount        Float
+  type          String
+  paymentMethod String   @default("card")
+  notes         String?
+  createdAt     DateTime @default(now())
+
+  @@index([userId, date])
+}
+
+model BudgetCategory {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category  String
+  budgeted  Float
+  icon      String   @default("Wallet")
+  color     String   @default("#6366f1")
+  createdAt DateTime @default(now())
+
+  @@unique([userId, category])
+}
+
+model Goal {
+  id                  String   @id @default(cuid())
+  userId              String
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name                String
+  description         String?
+  icon                String   @default("Target")
+  color               String   @default("#6366f1")
+  goalAmount          Float
+  currentAmount       Float    @default(0)
+  targetDate          DateTime
+  monthlyContribution Float    @default(0)
+  priority            String   @default("medium")
+  category            String   @default("other")
+  createdAt           DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Purchase {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  price       Float
+  priority    String   @default("medium")
+  savedAmount Float    @default(0)
+  desiredDate DateTime
+  category    String   @default("Other")
+  notes       String?
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Commitment {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  category  String   @default("Bills")
+  dueDate   DateTime
+  amount    Float
+  icon      String   @default("CalendarClock")
+  recurring Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}

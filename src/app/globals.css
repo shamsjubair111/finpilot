@@ -238,4 +238,64 @@
   .ring-card {
     box-shadow: 0 0 0 1px color-mix(in oklch, var(--foreground), transparent 93%);
   }
+  .bg-aurora {
+    background-color: var(--background);
+    background-image:
+      radial-gradient(40% 50% at 15% 10%, color-mix(in oklch, var(--primary), transparent 80%), transparent 70%),
+      radial-gradient(35% 45% at 85% 15%, color-mix(in oklch, var(--chart-2), transparent 84%), transparent 70%),
+      radial-gradient(45% 55% at 60% 100%, color-mix(in oklch, var(--chart-6, var(--cat-6)), transparent 88%), transparent 70%);
+    background-attachment: fixed;
+  }
+  .glass {
+    background: color-mix(in oklch, var(--card), transparent 25%);
+    backdrop-filter: blur(18px) saturate(160%);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    border: 1px solid color-mix(in oklch, var(--foreground), transparent 92%);
+  }
+  .text-gradient-brand {
+    background-image: linear-gradient(110deg, var(--primary), var(--cat-6) 55%, var(--chart-2));
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+  .bg-gradient-brand {
+    background-image: linear-gradient(135deg, var(--primary), color-mix(in oklch, var(--primary), var(--cat-6) 55%));
+  }
+  .glow-primary {
+    box-shadow: 0 10px 30px -10px color-mix(in oklch, var(--primary), transparent 40%);
+  }
+  .orb {
+    position: absolute;
+    border-radius: 9999px;
+    filter: blur(60px);
+    opacity: 0.55;
+    animation: fp-float 14s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes fp-float {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+    33% { transform: translate3d(30px, -40px, 0) scale(1.08); }
+    66% { transform: translate3d(-25px, 20px, 0) scale(0.95); }
+  }
+  .grid-lines {
+    background-image:
+      linear-gradient(color-mix(in oklch, var(--foreground), transparent 94%) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in oklch, var(--foreground), transparent 94%) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+  }
+  .stagger > * {
+    animation: fp-in-up 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .stagger > *:nth-child(2) { animation-delay: 60ms; }
+  .stagger > *:nth-child(3) { animation-delay: 120ms; }
+  .stagger > *:nth-child(4) { animation-delay: 180ms; }
+  .stagger > *:nth-child(5) { animation-delay: 240ms; }
+  .stagger > *:nth-child(n + 6) { animation-delay: 300ms; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orb, .stagger > *, .animate-in-up {
+    animation: none !important;
+  }
 }

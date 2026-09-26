@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Plus, ArrowDownCircle, ArrowUpCircle, Target, ListChecks } from "lucide-react";
+import { Plus, ArrowDownCircle, ArrowUpCircle, Target, ListChecks, CalendarClock, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -12,8 +12,10 @@ import {
 import { TransactionFormDialog } from "@/components/transactions/transaction-form-dialog";
 import { GoalFormDialog } from "@/components/goals/goal-form-dialog";
 import { PurchaseFormDialog } from "@/components/wishlist/purchase-form-dialog";
+import { CommitmentFormDialog } from "@/components/commitments/commitment-form-dialog";
+import { BudgetEditDialog } from "@/components/budget/budget-edit-dialog";
 
-type QuickAddMode = "expense" | "income" | "goal" | "purchase" | null;
+type QuickAddMode = "expense" | "income" | "goal" | "purchase" | "commitment" | "budget" | null;
 
 export function QuickAdd() {
   const [mode, setMode] = React.useState<QuickAddMode>(null);
@@ -24,7 +26,7 @@ export function QuickAdd() {
         <DropdownMenuTrigger asChild>
           <Button
             size="sm"
-            className="gap-1.5 bg-gradient-to-b from-[color-mix(in_oklch,var(--primary),white_10%)] to-primary shadow-[0_1px_1px_rgba(255,255,255,0.15)_inset,0_4px_12px_-2px_color-mix(in_oklch,var(--primary),transparent_55%)] hover:brightness-110"
+            className="bg-gradient-brand glow-primary gap-1.5 text-white hover:brightness-110"
           >
             <Plus className="size-4" />
             <span className="hidden sm:inline">Quick Add</span>
@@ -45,7 +47,15 @@ export function QuickAdd() {
           </DropdownMenuItem>
           <DropdownMenuItem onSelect={() => setMode("purchase")} className="gap-2">
             <ListChecks className="size-4 text-primary" />
-            Add Purchase
+            Add Wishlist Item
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => setMode("budget")} className="gap-2">
+            <Wallet className="size-4 text-primary" />
+            Add Budget
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => setMode("commitment")} className="gap-2">
+            <CalendarClock className="size-4 text-primary" />
+            Add Commitment
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -65,6 +75,8 @@ export function QuickAdd() {
         open={mode === "purchase"}
         onOpenChange={(o) => setMode(o ? "purchase" : null)}
       />
+      <CommitmentFormDialog open={mode === "commitment"} onOpenChange={(o) => setMode(o ? "commitment" : null)} />
+      <BudgetEditDialog category={null} open={mode === "budget"} onOpenChange={(o) => setMode(o ? "budget" : null)} />
     </>
   );
 }

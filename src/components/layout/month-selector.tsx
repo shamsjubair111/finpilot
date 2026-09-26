@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useFinance } from "@/components/providers/finance-provider";
-import { MONTH_OPTIONS } from "@/lib/constants";
+import { monthOptions } from "@/lib/derive";
 
 export function MonthSelector() {
   const { selectedMonth, setSelectedMonth } = useFinance();
@@ -21,7 +21,7 @@ export function MonthSelector() {
         <SelectValue />
       </SelectTrigger>
       <SelectContent align="end">
-        {MONTH_OPTIONS.map((m) => (
+        {monthOptions().map((m) => (
           <SelectItem key={m} value={m}>
             {m}
           </SelectItem>

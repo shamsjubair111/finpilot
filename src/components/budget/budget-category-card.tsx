@@ -1,8 +1,7 @@
 "use client";
 
-import { Pencil } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { RowActions } from "@/components/shared/row-actions";
 import { Badge } from "@/components/ui/badge";
 import { ProgressBar } from "@/components/finance/progress-bar";
 import { DynamicIcon } from "@/components/shared/dynamic-icon";
@@ -26,16 +25,19 @@ const STATUS_BADGE: Record<ReturnType<typeof getBudgetStatus>, string> = {
 export function BudgetCategoryCard({
   category,
   onEdit,
+  onDelete,
 }: {
   category: BudgetCategory;
   onEdit: () => void;
+  onDelete: () => void;
 }) {
   const status = getBudgetStatus(category.spent, category.budgeted);
   const pct = Math.round((category.spent / category.budgeted) * 100);
   const remaining = category.budgeted - category.spent;
 
   return (
-    <Card className="card-hover animate-in-up gap-3 p-5">
+    <Card className="card-hover relative gap-3 overflow-hidden p-5">
+      <div className="absolute inset-x-0 top-0 h-1" style={{ background: category.color }} />
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-2.5">
           <div
@@ -51,9 +53,7 @@ export function BudgetCategoryCard({
             </Badge>
           </div>
         </div>
-        <Button variant="ghost" size="icon-sm" onClick={onEdit} aria-label={`Edit ${category.category} budget`}>
-          <Pencil className="size-3.5" />
-        </Button>
+        <RowActions label={`${category.category} budget`} onEdit={onEdit} onDelete={onDelete} />
       </div>
 
       <div className="space-y-1.5">

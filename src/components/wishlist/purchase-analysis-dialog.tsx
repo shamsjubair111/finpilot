@@ -2,6 +2,10 @@
 
 import * as React from "react";
 import { format } from "date-fns";
+import { Pencil, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { AddFunds } from "@/components/shared/add-funds";
+import { useFinance } from "@/components/providers/finance-provider";
 import {
   Dialog,
   DialogContent,
@@ -26,13 +30,18 @@ export function PurchaseAnalysisDialog({
   goalMonthlyTotal,
   open,
   onOpenChange,
+  onEdit,
+  onDelete,
 }: {
+  onEdit: () => void;
+  onDelete: () => void;
   purchase: PurchaseGoal | null;
   affordabilityBase: Omit<AffordabilityContext, "price" | "savedAmount" | "priority">;
   goalMonthlyTotal: number;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
+  const { updatePurchase } = useFinance();
   const [selectedStrategy, setSelectedStrategy] = React.useState(1); // default: Balanced
   const [loadedPurchaseId, setLoadedPurchaseId] = React.useState<string | null>(null);
 
@@ -69,7 +78,7 @@ export function PurchaseAnalysisDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
+      <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-lg">
         <DialogHeader>
           <div className="flex items-center justify-between gap-3 pr-6">
             <div>
@@ -157,6 +166,27 @@ export function PurchaseAnalysisDialog({
           <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 text-sm text-foreground">
             <p className="font-medium">Recommendation</p>
             <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{recommendationText}</p>
+          </div>
+
+          {remaining > 0 && (
+            <div className="space-y-2 rounded-xl bg-muted/50 p-3">
+              <p className="text-xs font-medium text-muted-foreground">Put money aside for this item</p>
+              <AddFunds
+                label="Save"
+                onAdd={(amount) =>
+                  updatePurchase(purchase.id, { savedAmount: purchase.savedAmount + amount })
+                }
+              />
+            </div>
+          )}
+
+          <div className="flex gap-2 border-t border-border pt-4">
+            <Button variant="outline" className="flex-1 gap-1.5" onClick={onEdit}>
+              <Pencil className="size-3.5" /> Edit
+            </Button>
+            <Button variant="destructive" className="flex-1 gap-1.5" onClick={onDelete}>
+              <Trash2 className="size-3.5" /> Delete
+            </Button>
           </div>
         </div>
       </DialogContent>

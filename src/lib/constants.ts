@@ -4,6 +4,7 @@ import type {
   PaymentMethod,
   PurchaseCategory,
   GoalPriority,
+  ScenarioInput,
 } from "@/types/finance";
 
 export const EXPENSE_CATEGORIES: ExpenseCategory[] = [
@@ -49,11 +50,6 @@ export const GOAL_PRIORITIES: { value: GoalPriority; label: string }[] = [
   { value: "low", label: "Low" },
 ];
 
-export const MONTH_OPTIONS = [
-  "January 2026", "February 2026", "March 2026", "April 2026", "May 2026", "June 2026",
-  "July 2026", "August 2026", "September 2026", "October 2026", "November 2026", "December 2026",
-];
-
 export const CATEGORY_ICON_MAP: Record<string, string> = {
   Housing: "Home",
   Food: "UtensilsCrossed",
@@ -70,3 +66,37 @@ export const CATEGORY_ICON_MAP: Record<string, string> = {
   Bonus: "Gift",
   Investment: "TrendingUp",
 };
+
+export interface ScenarioPreset {
+  id: string;
+  name: string;
+  description: string;
+  overrides: Partial<ScenarioInput>;
+}
+
+export const scenarioPresets: ScenarioPreset[] = [
+  {
+    id: "preset-raise",
+    name: "Salary Raise",
+    description: "Simulate a ৳15,000/month raise with no lifestyle inflation.",
+    overrides: { salaryIncrease: 15000 },
+  },
+  {
+    id: "preset-pc",
+    name: "Big Purchase",
+    description: "Purchase a ৳120,000 purchase in month 4.",
+    overrides: { purchaseAmount: 120000, purchaseMonth: 4 },
+  },
+  {
+    id: "preset-lifestyle",
+    name: "Lifestyle Inflation",
+    description: "Add ৳5,000/month of new discretionary spending.",
+    overrides: { additionalMonthlyExpense: 5000 },
+  },
+  {
+    id: "preset-bonus",
+    name: "Year-End Bonus",
+    description: "One-time ৳50,000 bonus in month 1.",
+    overrides: { bonus: 50000 },
+  },
+];

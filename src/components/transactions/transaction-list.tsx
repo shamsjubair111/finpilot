@@ -1,3 +1,6 @@
+"use client";
+
+import * as React from "react";
 import { format } from "date-fns";
 import { ArrowDownLeft, ArrowUpRight, Receipt } from "lucide-react";
 import {
@@ -14,18 +17,27 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { formatCurrency } from "@/lib/currency";
 import { CATEGORY_ICON_MAP, PAYMENT_METHODS } from "@/lib/constants";
 import type { Transaction } from "@/types/finance";
+import { RowActions } from "@/components/shared/row-actions";
+import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { TransactionFormDialog } from "./transaction-form-dialog";
+import { useFinance } from "@/components/providers/finance-provider";
 
 function paymentLabel(method: string) {
   return PAYMENT_METHODS.find((m) => m.value === method)?.label ?? method;
 }
 
-export function TransactionList({ transactions }: { transactions: Transaction[] }) {
+export function TransactionList({ transactions, emptyAction }: { transactions: Transaction[]; emptyAction?: React.ReactNode }) {
+  const { deleteTransaction } = useFinance();
+  const [editing, setEditing] = React.useState<Transaction | null>(null);
+  const [deleting, setDeleting] = React.useState<Transaction | null>(null);
+
   if (transactions.length === 0) {
     return (
       <EmptyState
         icon={Receipt}
         title="No transactions found"
         description="Try adjusting your filters, or add a new transaction to get started."
+        action={emptyAction}
       />
     );
   }
@@ -42,6 +54,7 @@ export function TransactionList({ transactions }: { transactions: Transaction[] 
               <TableHead>Date</TableHead>
               <TableHead>Payment</TableHead>
               <TableHead className="text-right">Amount</TableHead>
+              <TableHead className="w-10" />
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -49,7 +62,7 @@ export function TransactionList({ transactions }: { transactions: Transaction[] 
               const isIncome = t.type === "income";
               const iconName = CATEGORY_ICON_MAP[t.category] ?? "Receipt";
               return (
-                <TableRow key={t.id}>
+                <TableRow key={t.id} className="group">
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <div
@@ -61,7 +74,7 @@ export function TransactionList({ transactions }: { transactions: Transaction[] 
                       </div>
                       <div className="min-w-0">
                         <p className="truncate text-sm font-medium">{t.title}</p>
-                        <p className="truncate text-xs text-muted-foreground">{t.merchant}</p>
+                        <p className="truncate text-xs text-muted-foreground">{t.merchant || paymentLabel(t.paymentMethod)}</p>
                       </div>
                     </div>
                   </TableCell>
@@ -86,6 +99,9 @@ export function TransactionList({ transactions }: { transactions: Transaction[] 
                       {formatCurrency(t.amount)}
                     </span>
                   </TableCell>
+                  <TableCell className="text-right">
+                    <RowActions label={t.title} onEdit={() => setEditing(t)} onDelete={() => setDeleting(t)} />
+                  </TableCell>
                 </TableRow>
               );
             })}
@@ -99,7 +115,7 @@ export function TransactionList({ transactions }: { transactions: Transaction[] 
           const isIncome = t.type === "income";
           const iconName = CATEGORY_ICON_MAP[t.category] ?? "Receipt";
           return (
-            <div key={t.id} className="rounded-xl border border-border bg-card p-3.5">
+            <div key={t.id} className="rounded-2xl border border-border bg-card p-3.5 transition-shadow hover:shadow-card">
               <div className="flex items-start gap-3">
                 <div
                   className={`flex size-9 shrink-0 items-center justify-center rounded-full ${
@@ -120,7 +136,7 @@ export function TransactionList({ transactions }: { transactions: Transaction[] 
                       {formatCurrency(t.amount)}
                     </span>
                   </div>
-                  <p className="truncate text-xs text-muted-foreground">{t.merchant}</p>
+                  <p className="truncate text-xs text-muted-foreground">{t.merchant || paymentLabel(t.paymentMethod)}</p>
                   <div className="mt-2 flex flex-wrap items-center gap-1.5">
                     <Badge variant="secondary" className="font-normal">
                       {t.category}
@@ -130,6 +146,9 @@ export function TransactionList({ transactions }: { transactions: Transaction[] 
                       {format(new Date(t.date), "MMM d")}
                     </span>
                     <span className="text-xs text-muted-foreground">· {paymentLabel(t.paymentMethod)}</span>
+                    <span className="ml-auto">
+                      <RowActions label={t.title} onEdit={() => setEditing(t)} onDelete={() => setDeleting(t)} />
+                    </span>
                   </div>
                 </div>
               </div>
@@ -137,6 +156,14 @@ export function TransactionList({ transactions }: { transactions: Transaction[] 
           );
         })}
       </div>
+      <TransactionFormDialog transaction={editing} open={!!editing} onOpenChange={(o) => !o && setEditing(null)} />
+      <ConfirmDialog
+        open={!!deleting}
+        onOpenChange={(o) => !o && setDeleting(null)}
+        title="Delete transaction?"
+        description={`"${deleting?.title}" will be permanently removed and your budgets will update.`}
+        onConfirm={() => deleteTransaction(deleting!.id)}
+      />
     </>
   );
 }

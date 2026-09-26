@@ -1,7 +1,4 @@
-// Core domain types for FinPilot.
-// These types define the contract between mock data (data/) and the UI.
-// When a backend is introduced, API responses should be mapped to these
-// same shapes so components never need to change.
+// Core domain types for FinPilot, shared by the API responses and the UI.
 
 export type Currency = "BDT" | "USD" | "EUR" | "GBP";
 
@@ -194,6 +191,7 @@ export interface Insight {
 }
 
 export interface UserProfile {
+  id: string;
   name: string;
   email: string;
   avatarUrl?: string;

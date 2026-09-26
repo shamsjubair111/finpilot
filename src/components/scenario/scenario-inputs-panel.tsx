@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -13,7 +13,7 @@ import {
 import { SliderField } from "./slider-field";
 import { RotateCcw } from "lucide-react";
 import type { ScenarioInput } from "@/types/finance";
-import { scenarioPresets } from "@/data/mock-scenarios";
+import { scenarioPresets } from "@/lib/constants";
 
 export function ScenarioInputsPanel({
   input,
@@ -26,12 +26,12 @@ export function ScenarioInputsPanel({
 }) {
   return (
     <Card className="animate-in-up">
-      <CardHeader className="flex-row items-center justify-between">
+      <CardHeader>
         <CardTitle>What If?</CardTitle>
-        <Button variant="ghost" size="sm" className="gap-1.5" onClick={onReset}>
+        <CardAction><Button variant="ghost" size="sm" className="gap-1.5" onClick={onReset}>
           <RotateCcw className="size-3.5" />
           Reset
-        </Button>
+        </Button></CardAction>
       </CardHeader>
       <CardContent className="space-y-5">
         <div className="flex flex-wrap gap-2">

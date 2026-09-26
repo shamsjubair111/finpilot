@@ -1,22 +1,27 @@
 import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ProgressBar } from "@/components/finance/progress-bar";
 import { DynamicIcon } from "@/components/shared/dynamic-icon";
 import { getBudgetStatus } from "@/lib/calculations/budget";
 import { formatCurrency } from "@/lib/currency";
 import type { BudgetCategory } from "@/types/finance";
+import { Wallet } from "lucide-react";
+import { EmptyState } from "@/components/shared/empty-state";
 
 export function BudgetProgressSection({ categories }: { categories: BudgetCategory[] }) {
   return (
     <Card className="animate-in-up">
-      <CardHeader className="flex-row items-center justify-between">
+      <CardHeader>
         <CardTitle>Budget Progress</CardTitle>
-        <Button variant="ghost" size="sm" asChild>
+        <CardAction><Button variant="ghost" size="sm" asChild>
           <Link href="/budget">Manage budget</Link>
-        </Button>
+        </Button></CardAction>
       </CardHeader>
       <CardContent className="space-y-4">
+        {categories.length === 0 && (
+          <EmptyState icon={Wallet} title="No budgets yet" description="Set monthly limits per category to track your spending." action={<Button size="sm" asChild><Link href="/budget">Create a budget</Link></Button>} />
+        )}
         {categories.map((c) => {
           const status = getBudgetStatus(c.spent, c.budgeted);
           const pct = Math.round((c.spent / c.budgeted) * 100);

@@ -1,6 +1,10 @@
 "use client";
 
 import { format } from "date-fns";
+import { Pencil, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { AddFunds } from "@/components/shared/add-funds";
+import { useFinance } from "@/components/providers/finance-provider";
 import {
   Dialog,
   DialogContent,
@@ -32,11 +36,16 @@ export function GoalDetailDialog({
   goal,
   open,
   onOpenChange,
+  onEdit,
+  onDelete,
 }: {
   goal: FinancialGoal | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onEdit: () => void;
+  onDelete: () => void;
 }) {
+  const { updateGoal } = useFinance();
   if (!goal) return null;
 
   const progress = calculateGoalProgress(goal.currentAmount, goal.goalAmount);
@@ -48,7 +57,7 @@ export function GoalDetailDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-md">
         <DialogHeader>
           <div className="flex items-center gap-3">
             <div
@@ -74,7 +83,7 @@ export function GoalDetailDialog({
 
           <ProgressBar value={progress} className="h-2" />
 
-          <div className="grid grid-cols-2 gap-4 rounded-lg border border-border p-4">
+          <div className="grid grid-cols-2 gap-4 rounded-xl border border-border p-4">
             <div>
               <p className="text-xs text-muted-foreground">Current Amount</p>
               <p className="text-base font-semibold tabular-nums">{formatCurrency(goal.currentAmount)}</p>
@@ -106,6 +115,26 @@ export function GoalDetailDialog({
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">Priority</span>
             <span className="font-medium capitalize">{goal.priority}</span>
+          </div>
+
+          {status !== "completed" && (
+            <div className="space-y-2 rounded-xl bg-muted/50 p-3">
+              <p className="text-xs font-medium text-muted-foreground">Contribute to this goal</p>
+              <AddFunds
+                onAdd={(amount) =>
+                  updateGoal(goal.id, { currentAmount: goal.currentAmount + amount }, goal.currentAmount + amount >= goal.goalAmount ? `🎉 ${goal.name} reached!` : "Funds added")
+                }
+              />
+            </div>
+          )}
+
+          <div className="flex gap-2 border-t border-border pt-4">
+            <Button variant="outline" className="flex-1 gap-1.5" onClick={onEdit}>
+              <Pencil className="size-3.5" /> Edit
+            </Button>
+            <Button variant="destructive" className="flex-1 gap-1.5" onClick={onDelete}>
+              <Trash2 className="size-3.5" /> Delete
+            </Button>
           </div>
         </div>
       </DialogContent>

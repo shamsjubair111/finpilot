@@ -48,6 +48,9 @@ export function BudgetRecommendations({ categories }: { categories: BudgetCatego
         </CardTitle>
       </CardHeader>
       <CardContent>
+        {recommendations.length === 0 && (
+          <p className="text-sm text-muted-foreground">No recommendations yet — they&apos;ll appear as you record expenses.</p>
+        )}
         <ul className="space-y-2.5">
           {recommendations.map((r, i) => (
             <li key={i} className="flex items-start gap-2.5 text-sm text-muted-foreground">

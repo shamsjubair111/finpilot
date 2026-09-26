@@ -43,21 +43,18 @@ export function SummaryCards({
   const totalSpent = topCategories.reduce((s, c) => s + c.spent, 0) || 1;
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="stagger grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {/* Monthly Income */}
       <Card className="card-hover animate-in-up gap-3 p-5">
         <div className="flex items-start justify-between">
           <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
             <Wallet className="size-[18px]" strokeWidth={2} />
           </div>
-          <span className="inline-flex items-center gap-0.5 rounded-full bg-success/10 px-1.5 py-0.5 text-[11px] font-medium text-success">
-            +12%
-          </span>
         </div>
         <div className="space-y-1">
           <p className="text-xs font-medium text-muted-foreground">Monthly Income</p>
           <p className="text-2xl font-semibold tracking-tight tabular-nums">{formatCurrency(income)}</p>
-          <p className="text-xs text-muted-foreground">Salary + freelance, credited Sep 1</p>
+          <p className="text-xs text-muted-foreground">Income recorded this month (or your set salary)</p>
         </div>
       </Card>
 
@@ -87,7 +84,9 @@ export function SummaryCards({
             ))}
           </div>
           <p className="text-xs text-muted-foreground">
-            Top: {topCategories[0]?.category} ({formatCurrency(topCategories[0]?.spent ?? 0, { compact: true })})
+            {topCategories[0]?.spent
+              ? `Top: ${topCategories[0].category} (${formatCurrency(topCategories[0].spent, { compact: true })})`
+              : "No budgeted spending yet"}
           </p>
         </div>
       </Card>
@@ -98,8 +97,8 @@ export function SummaryCards({
           <div className="flex size-9 items-center justify-center rounded-lg bg-success/10 text-success">
             <PiggyBank className="size-[18px]" strokeWidth={2} />
           </div>
-          <span className="inline-flex items-center gap-0.5 rounded-full bg-success/10 px-1.5 py-0.5 text-[11px] font-medium text-success">
-            +6%
+          <span className={cn("inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[11px] font-medium", savings >= 0 ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive")}>
+            {savings >= 0 ? "Surplus" : "Deficit"}
           </span>
         </div>
         <div className="space-y-1">

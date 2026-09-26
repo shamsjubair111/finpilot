@@ -3,6 +3,8 @@ import { ExpenseDonutChart } from "@/components/charts/expense-donut-chart";
 import { CATEGORY_COLORS } from "@/lib/chart-colors";
 import { formatCurrency } from "@/lib/currency";
 import type { BudgetCategory } from "@/types/finance";
+import { PieChart } from "lucide-react";
+import { EmptyState } from "@/components/shared/empty-state";
 
 export function ExpenseBreakdownSection({ categories }: { categories: BudgetCategory[] }) {
   const total = categories.reduce((sum, c) => sum + c.spent, 0);
@@ -13,6 +15,11 @@ export function ExpenseBreakdownSection({ categories }: { categories: BudgetCate
       <CardHeader>
         <CardTitle>Expense Breakdown</CardTitle>
       </CardHeader>
+      {total === 0 ? (
+        <CardContent>
+          <EmptyState icon={PieChart} title="No spending to break down" description="Expenses in your budget categories for the selected month will appear here." />
+        </CardContent>
+      ) : (
       <CardContent className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:items-center">
         <ExpenseDonutChart categories={categories} />
         <ul className="space-y-2.5">
@@ -36,6 +43,7 @@ export function ExpenseBreakdownSection({ categories }: { categories: BudgetCate
           })}
         </ul>
       </CardContent>
+      )}
     </Card>
   );
 }

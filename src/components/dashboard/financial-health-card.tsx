@@ -19,7 +19,7 @@ export function FinancialHealthCard({ health }: { health: FinancialHealth }) {
 
   return (
     <Card className="animate-in-up h-full gap-4">
-      <CardHeader className="flex-row items-center justify-between">
+      <CardHeader>
         <CardTitle className="flex items-center gap-1.5">
           Financial Health
           <InfoTooltip text={GLOSSARY.financialHealth} />

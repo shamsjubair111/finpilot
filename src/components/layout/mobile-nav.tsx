@@ -7,6 +7,8 @@ import { cn } from "cn";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Logo } from "./logo";
 import { NAV_ITEMS } from "./nav-items";
+import { SidebarUser } from "./sidebar-user";
+import { MonthSelector } from "./month-selector";
 
 const SECTIONS: Array<"Overview" | "Planning"> = ["Overview", "Planning"];
 
@@ -21,13 +23,16 @@ export function MobileNav({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="left" className="w-72 border-sidebar-border bg-sidebar p-0 text-sidebar-foreground">
+      <SheetContent side="left" className="flex w-72 flex-col border-sidebar-border bg-sidebar p-0 text-sidebar-foreground">
         <SheetHeader className="h-16 justify-center border-b border-sidebar-border px-4">
           <SheetTitle asChild className="text-sidebar-foreground">
             <Logo />
           </SheetTitle>
         </SheetHeader>
-        <nav className="space-y-6 overflow-y-auto px-3 py-4">
+        <div className="px-3 pt-4 sm:hidden [&_button]:w-full [&_button]:justify-start">
+          <MonthSelector />
+        </div>
+        <nav className="flex-1 space-y-6 overflow-y-auto px-3 py-4">
           {SECTIONS.map((section) => (
             <div key={section}>
               <p className="px-2.5 pb-1.5 text-[11px] font-medium uppercase tracking-wider text-sidebar-foreground/40">
@@ -60,6 +65,9 @@ export function MobileNav({
             </div>
           ))}
         </nav>
+        <div className="border-t border-sidebar-border p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+          <SidebarUser />
+        </div>
       </SheetContent>
     </Sheet>
   );

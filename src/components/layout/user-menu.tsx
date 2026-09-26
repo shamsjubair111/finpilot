@@ -2,8 +2,7 @@
 
 import Link from "next/link";
 import { LogOut, Settings, User } from "lucide-react";
-import { toast } from "sonner";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,7 +14,7 @@ import {
 import { useFinance } from "@/components/providers/finance-provider";
 
 export function UserMenu() {
-  const { user } = useFinance();
+  const { user, signOut } = useFinance();
   const initials = user.name.slice(0, 2).toUpperCase();
 
   return (
@@ -25,8 +24,9 @@ export function UserMenu() {
           className="flex items-center gap-2 rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
           aria-label="Open profile menu"
         >
-          <Avatar className="size-8 border border-border">
-            <AvatarFallback className="bg-primary text-primary-foreground text-xs font-semibold">
+          <Avatar className="size-8 ring-2 ring-primary/30 ring-offset-2 ring-offset-background transition-shadow hover:ring-primary/60">
+            {user.avatarUrl && <AvatarImage src={user.avatarUrl} alt={user.name} />}
+            <AvatarFallback className="bg-gradient-brand text-xs font-semibold text-white">
               {initials}
             </AvatarFallback>
           </Avatar>
@@ -54,7 +54,7 @@ export function UserMenu() {
         <DropdownMenuItem
           variant="destructive"
           className="gap-2"
-          onSelect={() => toast.info("Sign out is disabled in this demo build.")}
+          onSelect={() => signOut()}
         >
           <LogOut className="size-4" />
           Sign out

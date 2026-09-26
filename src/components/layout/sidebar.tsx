@@ -7,6 +7,7 @@ import { ChevronsLeft, ChevronsRight } from "lucide-react";
 import { cn } from "cn";
 import { Logo } from "./logo";
 import { NAV_ITEMS } from "./nav-items";
+import { SidebarUser } from "./sidebar-user";
 import {
   Tooltip,
   TooltipContent,
@@ -27,15 +28,17 @@ export function Sidebar({
   return (
     <aside
       className={cn(
-        "fixed inset-y-0 left-0 z-40 hidden flex-col border-r border-sidebar-border bg-sidebar transition-[width] duration-200 ease-out lg:flex",
+        "fixed inset-y-0 left-0 z-40 hidden flex-col overflow-hidden border-r border-sidebar-border bg-sidebar transition-[width] duration-200 ease-out lg:flex",
         collapsed ? "w-[72px]" : "w-64"
       )}
     >
-      <div className={cn("flex h-16 shrink-0 items-center px-4", collapsed && "justify-center px-0")}>
+      <div className="orb -left-20 -top-20 size-56 bg-[var(--sidebar-primary)] opacity-25" />
+      <div className="orb -bottom-24 -right-24 size-56 bg-[var(--cat-6)] opacity-15 [animation-delay:-7s]" />
+      <div className={cn("relative flex h-16 shrink-0 items-center px-4", collapsed && "justify-center px-0")}>
         <Logo collapsed={collapsed} />
       </div>
 
-      <nav className="flex-1 space-y-6 overflow-y-auto px-3 py-4 no-scrollbar">
+      <nav className="relative flex-1 space-y-6 overflow-y-auto px-3 py-4 no-scrollbar">
         {SECTIONS.map((section) => (
           <div key={section}>
             {!collapsed && (
@@ -94,7 +97,8 @@ export function Sidebar({
         ))}
       </nav>
 
-      <div className="border-t border-sidebar-border p-3">
+      <div className="relative space-y-2 border-t border-sidebar-border p-3">
+        <SidebarUser collapsed={collapsed} />
         <button
           onClick={onToggle}
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}

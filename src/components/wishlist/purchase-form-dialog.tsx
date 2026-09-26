@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -23,19 +22,24 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useFinance } from "@/components/providers/finance-provider";
+import { SubmitButton } from "@/components/shared/submit-button";
 import { GOAL_PRIORITIES, PURCHASE_CATEGORIES } from "@/lib/constants";
-import type { GoalPriority, PurchaseCategory } from "@/types/finance";
+import type { GoalPriority, PurchaseCategory, PurchaseGoal } from "@/types/finance";
 
 export function PurchaseFormDialog({
+  purchase,
   trigger,
   open: controlledOpen,
   onOpenChange,
 }: {
+  purchase?: PurchaseGoal | null;
   trigger?: React.ReactNode;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }) {
-  const { addPurchase } = useFinance();
+  const { addPurchase, updatePurchase } = useFinance();
+  const isEdit = !!purchase;
+  const [pending, setPending] = React.useState(false);
   const [internalOpen, setInternalOpen] = React.useState(false);
   const open = controlledOpen ?? internalOpen;
   const setOpen = onOpenChange ?? setInternalOpen;
@@ -50,21 +54,25 @@ export function PurchaseFormDialog({
 
   const isValid = name.trim() && price && Number(price) > 0 && desiredDate;
 
-  function resetForm() {
-    setName("");
-    setPrice("");
-    setSavedAmount("");
-    setDesiredDate("");
-    setPriority("medium");
-    setCategory("Electronics");
-    setNotes("");
+  const [wasOpen, setWasOpen] = React.useState(false);
+  if (open && !wasOpen) {
+    setWasOpen(true);
+    setName(purchase?.name ?? "");
+    setPrice(purchase ? String(purchase.price) : "");
+    setSavedAmount(purchase ? String(purchase.savedAmount) : "");
+    setDesiredDate(purchase ? purchase.desiredDate.slice(0, 10) : "");
+    setPriority(purchase?.priority ?? "medium");
+    setCategory(purchase?.category ?? "Electronics");
+    setNotes(purchase?.notes ?? "");
+  } else if (!open && wasOpen) {
+    setWasOpen(false);
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!isValid) return;
-
-    addPurchase({
+    setPending(true);
+    const data = {
       name: name.trim(),
       price: Number(price),
       priority,
@@ -72,11 +80,10 @@ export function PurchaseFormDialog({
       desiredDate,
       category,
       notes: notes.trim() || undefined,
-    });
-
-    toast.success("Added to wishlist", { description: `${name.trim()} — ৳${Number(price).toLocaleString()}` });
-    resetForm();
-    setOpen(false);
+    };
+    const ok = isEdit ? await updatePurchase(purchase!.id, data) : await addPurchase(data);
+    setPending(false);
+    if (ok) setOpen(false);
   }
 
   return (
@@ -84,25 +91,25 @@ export function PurchaseFormDialog({
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Add to Wishlist</DialogTitle>
+          <DialogTitle>{isEdit ? "Edit Wishlist Item" : "Add to Wishlist"}</DialogTitle>
           <DialogDescription>Plan a future purchase and track its affordability.</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="col-span-2 space-y-1.5">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="space-y-1.5 sm:col-span-2">
               <Label htmlFor="purchase-name">Item Name</Label>
               <Input id="purchase-name" placeholder="e.g. Mechanical Keyboard" value={name} onChange={(e) => setName(e.target.value)} required />
             </div>
 
             <div className="space-y-1.5">
               <Label htmlFor="purchase-price">Price (৳)</Label>
-              <Input id="purchase-price" type="number" min={0} value={price} onChange={(e) => setPrice(e.target.value)} required />
+              <Input id="purchase-price" type="number" min={0} step="any" inputMode="decimal" value={price} onChange={(e) => setPrice(e.target.value)} required />
             </div>
 
             <div className="space-y-1.5">
               <Label htmlFor="purchase-saved">Already Saved (৳)</Label>
-              <Input id="purchase-saved" type="number" min={0} value={savedAmount} onChange={(e) => setSavedAmount(e.target.value)} />
+              <Input id="purchase-saved" type="number" min={0} step="any" inputMode="decimal" value={savedAmount} onChange={(e) => setSavedAmount(e.target.value)} />
             </div>
 
             <div className="space-y-1.5">
@@ -124,7 +131,7 @@ export function PurchaseFormDialog({
               </Select>
             </div>
 
-            <div className="col-span-2 space-y-1.5">
+            <div className="space-y-1.5 sm:col-span-2">
               <Label htmlFor="purchase-category">Category</Label>
               <Select value={category} onValueChange={(v) => setCategory(v as PurchaseCategory)}>
                 <SelectTrigger id="purchase-category" className="w-full">
@@ -138,7 +145,7 @@ export function PurchaseFormDialog({
               </Select>
             </div>
 
-            <div className="col-span-2 space-y-1.5">
+            <div className="space-y-1.5 sm:col-span-2">
               <Label htmlFor="purchase-notes">Notes (optional)</Label>
               <Textarea id="purchase-notes" rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} />
             </div>
@@ -146,7 +153,7 @@ export function PurchaseFormDialog({
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-            <Button type="submit" disabled={!isValid}>Add Item</Button>
+            <SubmitButton pending={pending} disabled={!isValid}>{isEdit ? "Save changes" : "Add Item"}</SubmitButton>
           </DialogFooter>
         </form>
       </DialogContent>

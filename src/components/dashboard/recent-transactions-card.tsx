@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowDownLeft, ArrowUpRight, Receipt } from "lucide-react";
 import { format } from "date-fns";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { DynamicIcon } from "@/components/shared/dynamic-icon";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -12,11 +12,11 @@ import type { Transaction } from "@/types/finance";
 export function RecentTransactionsCard({ transactions }: { transactions: Transaction[] }) {
   return (
     <Card className="animate-in-up">
-      <CardHeader className="flex-row items-center justify-between">
+      <CardHeader>
         <CardTitle>Recent Transactions</CardTitle>
-        <Button variant="ghost" size="sm" asChild>
+        <CardAction><Button variant="ghost" size="sm" asChild>
           <Link href="/transactions">View all</Link>
-        </Button>
+        </Button></CardAction>
       </CardHeader>
       <CardContent>
         {transactions.length === 0 ? (
@@ -42,7 +42,7 @@ export function RecentTransactionsCard({ transactions }: { transactions: Transac
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium">{t.title}</p>
                     <p className="truncate text-xs text-muted-foreground">
-                      {t.merchant} · {format(new Date(t.date), "MMM d")}
+                      {t.merchant ? `${t.merchant} · ` : ""}{format(new Date(t.date), "MMM d")}
                     </p>
                   </div>
                   <div className="flex shrink-0 items-center gap-1">
