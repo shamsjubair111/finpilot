@@ -2,17 +2,14 @@ import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { db } from "@/lib/server/db";
 import { ApiError, authed, json } from "@/lib/server/api";
-import { destroySession } from "@/lib/server/session";
+import { destroySession, setLangCookie } from "@/lib/server/session";
 import { toProfile } from "@/lib/server/user";
 import { profileSchema } from "@/lib/validation";
 
 export const PATCH = authed(async ({ userId, req }) => {
   const data = profileSchema.parse(await req.json());
-  if (data.email) {
-    const taken = await db.user.findFirst({ where: { email: data.email, NOT: { id: userId } } });
-    if (taken) throw new ApiError(409, "That email is already used by another account.");
-  }
   const user = await db.user.update({ where: { id: userId }, data });
+  if (data.language) await setLangCookie(data.language);
   return json(toProfile(user));
 });
 

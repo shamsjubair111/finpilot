@@ -1,14 +1,12 @@
 import type { ScenarioInput, ScenarioMonthProjection, ScenarioResult } from "@/types/finance";
-
-const MONTH_LABELS = [
-  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
-];
+import { t } from "@/lib/i18n";
+import { formatCurrency } from "@/lib/currency";
+import { formatDate } from "@/lib/format-date";
 
 function monthLabelFromOffset(offset: number, start = new Date()): string {
   const date = new Date(start);
   date.setMonth(date.getMonth() + offset);
-  return `${MONTH_LABELS[date.getMonth()]} '${String(date.getFullYear()).slice(2)}`;
+  return formatDate(date, "MMM yy");
 }
 
 /**
@@ -123,30 +121,32 @@ function buildScenarioInsights(params: {
   if (input.savingsTarget > 0) {
     if (averageMonthlySurplus >= input.savingsTarget) {
       insights.push(
-        `You're on pace to beat your ${input.savingsTarget.toLocaleString()}/month savings target by about ${Math.round(
-          averageMonthlySurplus - input.savingsTarget
-        ).toLocaleString()}/month.`
+        t("You're on pace to beat your {target}/month savings target by about {extra}/month.", {
+          target: formatCurrency(input.savingsTarget),
+          extra: formatCurrency(Math.round(averageMonthlySurplus - input.savingsTarget)),
+        })
       );
     } else {
       insights.push(
-        `Your average monthly surplus of ${Math.round(averageMonthlySurplus).toLocaleString()} falls short of your ${input.savingsTarget.toLocaleString()}/month savings target.`
+        t("Your average monthly surplus of {surplus} falls short of your {target}/month savings target.", {
+          surplus: formatCurrency(Math.round(averageMonthlySurplus)),
+          target: formatCurrency(input.savingsTarget),
+        })
       );
     }
   }
 
   if (cashFlowStatus === "positive") {
     insights.push(
-      `Your plan remains cash-flow positive for the full ${input.periodMonths}-month period.`
+      t("Your plan remains cash-flow positive for the full {months}-month period.", { months: input.periodMonths })
     );
   } else if (cashFlowStatus === "tight") {
     insights.push(
-      `Your projected balance dips close to your emergency reserve during this ${input.periodMonths}-month period.`
+      t("Your projected balance dips close to your emergency reserve during this {months}-month period.", { months: input.periodMonths })
     );
   } else {
     insights.push(
-      `Your plan goes cash-flow negative at some point, with a projected low of ${Math.round(
-        lowestBalance
-      ).toLocaleString()}.`
+      t("Your plan goes cash-flow negative at some point, with a projected low of {amount}.", { amount: formatCurrency(Math.round(lowestBalance)) })
     );
   }
 
@@ -154,31 +154,31 @@ function buildScenarioInsights(params: {
     const purchaseMonthLabel = monthLabelFromOffset(input.purchaseMonth - 1);
     if (cashFlowStatus !== "positive") {
       insights.push(
-        `Buying in ${purchaseMonthLabel} pulls your reserve below a comfortable threshold — consider delaying.`
+        t("Buying in {month} pulls your reserve below a comfortable threshold — consider delaying.", { month: purchaseMonthLabel })
       );
     } else {
       insights.push(
-        `Purchasing in ${purchaseMonthLabel} keeps your finances stable for the rest of the period.`
+        t("Purchasing in {month} keeps your finances stable for the rest of the period.", { month: purchaseMonthLabel })
       );
     }
   }
 
   if (input.salaryIncrease > 0) {
     insights.push(
-      `A salary increase of ${input.salaryIncrease.toLocaleString()}/month lifts your savings rate to about ${savingsRate}%.`
+      t("A salary increase of {amount}/month lifts your savings rate to about {rate}%.", { amount: formatCurrency(input.salaryIncrease), rate: savingsRate })
     );
   }
 
   if (input.additionalMonthlyExpense > 0) {
     insights.push(
-      `The extra ${input.additionalMonthlyExpense.toLocaleString()}/month expense reduces your long-term savings growth.`
+      t("The extra {amount}/month expense reduces your long-term savings growth.", { amount: formatCurrency(input.additionalMonthlyExpense) })
     );
   }
 
   if (savingsRate >= 30) {
-    insights.push("Your savings rate is excellent under this scenario — well above the recommended 20%.");
+    insights.push(t("Your savings rate is excellent under this scenario — well above the recommended 20%."));
   } else if (savingsRate < 10 && savingsRate >= 0) {
-    insights.push("Your savings rate is thin under this scenario — consider trimming lifestyle spending.");
+    insights.push(t("Your savings rate is thin under this scenario — consider trimming lifestyle spending."));
   }
 
   return insights;

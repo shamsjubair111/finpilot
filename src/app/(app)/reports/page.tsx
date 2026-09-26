@@ -21,6 +21,7 @@ import { useFinance } from "@/components/providers/finance-provider";
 import { monthlyCashflow } from "@/lib/derive";
 import { formatCurrency } from "@/lib/currency";
 import { calculateGoalProgress } from "@/lib/calculations/goals";
+import { t } from "@/lib/i18n";
 
 const RANGE_OPTIONS = [
   { value: "3", label: "3 months" },
@@ -65,8 +66,8 @@ export default function ReportsPage() {
   return (
     <div>
       <PageHeader
-        title="Reports"
-        subtitle="Deeper visual breakdowns of your financial trends."
+        title={t("Reports")}
+        subtitle={t("Deeper visual breakdowns of your financial trends.")}
         actions={
           <Select value={range} onValueChange={setRange}>
             <SelectTrigger className="w-40">
@@ -75,7 +76,7 @@ export default function ReportsPage() {
             <SelectContent>
               {RANGE_OPTIONS.map((o) => (
                 <SelectItem key={o.value} value={o.value}>
-                  {o.label}
+                  {t(o.label)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -85,13 +86,13 @@ export default function ReportsPage() {
 
       {transactions.length === 0 && (
         <div className="mb-6 rounded-2xl border border-dashed border-border bg-muted/30 p-4 text-center text-sm text-muted-foreground">
-          Reports fill in as you record transactions. Add a few income and expense entries to see your trends.
+          {t("Reports fill in as you record transactions. Add a few income and expense entries to see your trends.")}
         </div>
       )}
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         <Card className="animate-in-up min-w-0">
           <CardHeader>
-            <CardTitle>Income vs Expenses</CardTitle>
+            <CardTitle>{t("Income vs Expenses")}</CardTitle>
           </CardHeader>
           <CardContent>
             <IncomeExpenseChart data={rangedData} />
@@ -100,8 +101,8 @@ export default function ReportsPage() {
 
         <Card className="animate-in-up min-w-0">
           <CardHeader>
-            <CardTitle>Savings Growth</CardTitle>
-            <CardDescription>Cumulative savings balance over the selected period</CardDescription>
+            <CardTitle>{t("Savings Growth")}</CardTitle>
+            <CardDescription>{t("Cumulative savings balance over the selected period")}</CardDescription>
           </CardHeader>
           <CardContent>
             <SavingsGrowthChart data={savingsGrowthData} />
@@ -110,7 +111,7 @@ export default function ReportsPage() {
 
         <Card className="animate-in-up min-w-0">
           <CardHeader>
-            <CardTitle>Monthly Spending Trend</CardTitle>
+            <CardTitle>{t("Monthly Spending Trend")}</CardTitle>
           </CardHeader>
           <CardContent>
             <SpendingTrendChart data={rangedData.map((m) => ({ month: m.month, expenses: m.expenses }))} />
@@ -119,8 +120,8 @@ export default function ReportsPage() {
 
         <Card className="animate-in-up min-w-0">
           <CardHeader>
-            <CardTitle>Category Spending</CardTitle>
-            <CardDescription>Current month breakdown by category</CardDescription>
+            <CardTitle>{t("Category Spending")}</CardTitle>
+            <CardDescription>{t("Current month breakdown by category")}</CardDescription>
           </CardHeader>
           <CardContent>
             <CategoryBarChart categories={budgetCategories} />
@@ -129,13 +130,13 @@ export default function ReportsPage() {
 
         <Card className="animate-in-up min-w-0">
           <CardHeader>
-            <CardTitle>Savings Rate</CardTitle>
+            <CardTitle>{t("Savings Rate")}</CardTitle>
           </CardHeader>
           <CardContent>
             <MetricLineChart
               data={savingsRateData}
               dataKey="rate"
-              name="Savings Rate"
+              name={t("Savings Rate")}
               color="var(--chart-1)"
               valueFormatter={(v) => `${v}%`}
             />
@@ -144,7 +145,7 @@ export default function ReportsPage() {
 
         <Card className="animate-in-up min-w-0">
           <CardHeader>
-            <CardTitle>Goal Progress</CardTitle>
+            <CardTitle>{t("Goal Progress")}</CardTitle>
           </CardHeader>
           <CardContent>
             <GoalProgressBarChart data={goalProgressData} />
@@ -153,9 +154,9 @@ export default function ReportsPage() {
 
         <Card className="animate-in-up xl:col-span-2">
           <CardHeader>
-            <CardTitle>Net Cash Flow</CardTitle>
+            <CardTitle>{t("Net Cash Flow")}</CardTitle>
             <CardDescription>
-              Total across period:{" "}
+              {t("Total across period:")}{" "}
               <span className="font-semibold text-foreground">
                 {formatCurrency(rangedData.reduce((s, m) => s + (m.income - m.expenses), 0))}
               </span>

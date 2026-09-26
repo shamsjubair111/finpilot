@@ -10,11 +10,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { EXPENSE_CATEGORIES, INCOME_CATEGORIES } from "@/lib/constants";
+import { useFinance } from "@/components/providers/finance-provider";
+import { t } from "@/lib/i18n";
 
 export interface TransactionFilterState {
   search: string;
   category: string;
   type: string;
+  account: string;
 }
 
 const ALL_CATEGORIES = Array.from(new Set([...EXPENSE_CATEGORIES, ...INCOME_CATEGORIES]));
@@ -26,40 +29,56 @@ export function TransactionFilters({
   filters: TransactionFilterState;
   onChange: (filters: TransactionFilterState) => void;
 }) {
+  const { accounts } = useFinance();
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
       <div className="relative flex-1">
         <Search className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input
-          placeholder="Search transactions..."
+          placeholder={t("Search transactions...")}
           className="pl-8"
           value={filters.search}
           onChange={(e) => onChange({ ...filters, search: e.target.value })}
-          aria-label="Search transactions"
+          aria-label={t("Search transactions")}
         />
       </div>
 
-      <div className="flex gap-3">
+      <div className="grid grid-cols-2 gap-3 sm:flex">
         <Select value={filters.type} onValueChange={(v) => onChange({ ...filters, type: v })}>
-          <SelectTrigger className="w-full sm:w-36" aria-label="Filter by type">
-            <SelectValue placeholder="Type" />
+          <SelectTrigger className="w-full sm:w-36" aria-label={t("Filter by type")}>
+            <SelectValue placeholder={t("Type")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All types</SelectItem>
-            <SelectItem value="income">Income</SelectItem>
-            <SelectItem value="expense">Expense</SelectItem>
+            <SelectItem value="all">{t("All types")}</SelectItem>
+            <SelectItem value="income">{t("Income")}</SelectItem>
+            <SelectItem value="expense">{t("Expense")}</SelectItem>
+            <SelectItem value="transfer">{t("Transfer")}</SelectItem>
           </SelectContent>
         </Select>
 
+        {accounts.length > 0 && (
+          <Select value={filters.account} onValueChange={(v) => onChange({ ...filters, account: v })}>
+            <SelectTrigger className="w-full sm:w-44" aria-label={t("Filter by account")}>
+              <SelectValue placeholder={t("Account")} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t("All accounts")}</SelectItem>
+              {accounts.map((a) => (
+                <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+
         <Select value={filters.category} onValueChange={(v) => onChange({ ...filters, category: v })}>
-          <SelectTrigger className="w-full sm:w-44" aria-label="Filter by category">
-            <SelectValue placeholder="Category" />
+          <SelectTrigger className="w-full sm:w-44" aria-label={t("Filter by category")}>
+            <SelectValue placeholder={t("Category")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All categories</SelectItem>
+            <SelectItem value="all">{t("All categories")}</SelectItem>
             {ALL_CATEGORIES.map((c) => (
               <SelectItem key={c} value={c}>
-                {c}
+                {t(c)}
               </SelectItem>
             ))}
           </SelectContent>

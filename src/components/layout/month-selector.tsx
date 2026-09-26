@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/select";
 import { useFinance } from "@/components/providers/finance-provider";
 import { monthOptions } from "@/lib/derive";
+import { formatDate } from "@/lib/format-date";
 
 export function MonthSelector() {
   const { selectedMonth, setSelectedMonth } = useFinance();
@@ -18,12 +19,12 @@ export function MonthSelector() {
     <Select value={selectedMonth} onValueChange={setSelectedMonth}>
       <SelectTrigger className="h-8 w-auto gap-1.5 border-none bg-muted px-2.5 text-xs font-medium shadow-none sm:text-sm" size="sm">
         <CalendarDays className="size-3.5 text-muted-foreground" />
-        <SelectValue />
+        <SelectValue>{formatDate(selectedMonth, "MMMM yyyy")}</SelectValue>
       </SelectTrigger>
       <SelectContent align="end">
         {monthOptions().map((m) => (
           <SelectItem key={m} value={m}>
-            {m}
+            {formatDate(m, "MMMM yyyy")}
           </SelectItem>
         ))}
       </SelectContent>

@@ -14,6 +14,8 @@ import type {
 import { formatCurrency } from "@/lib/currency";
 import { calculateGoalProgress, getGoalStatus } from "@/lib/calculations/goals";
 import { getBudgetStatus } from "@/lib/calculations/budget";
+import { t } from "@/lib/i18n";
+import { formatDate } from "@/lib/format-date";
 
 const ESSENTIALS = ["Housing", "Bills", "Food", "Health"];
 
@@ -24,14 +26,14 @@ export function monthOptions(count = 12, now = new Date()) {
 export function monthlyCashflow(transactions: Transaction[], months: number, end = new Date()): MonthlyFinancials[] {
   const buckets = Array.from({ length: months }, (_, i) => {
     const d = startOfMonth(subMonths(end, months - 1 - i));
-    return { key: format(d, "yyyy-MM"), month: format(d, months > 12 ? "MMM yy" : "MMM"), income: 0, expenses: 0, savings: 0 };
+    return { key: format(d, "yyyy-MM"), month: formatDate(d, months > 12 ? "MMM yy" : "MMM"), income: 0, expenses: 0, savings: 0 };
   });
   const index = new Map(buckets.map((b, i) => [b.key, i]));
   for (const t of transactions) {
     const i = index.get(format(new Date(t.date), "yyyy-MM"));
     if (i === undefined) continue;
     if (t.type === "income") buckets[i].income += t.amount;
-    else buckets[i].expenses += t.amount;
+    else if (t.type === "expense") buckets[i].expenses += t.amount;
   }
   return buckets.map(({ month, income, expenses }) => ({ month, income, expenses, savings: income - expenses }));
 }
@@ -42,7 +44,7 @@ export function monthTotals(transactions: Transaction[], monthLabel: string) {
   for (const t of transactions) {
     if (format(new Date(t.date), "MMMM yyyy") !== monthLabel) continue;
     if (t.type === "income") income += t.amount;
-    else expenses += t.amount;
+    else if (t.type === "expense") expenses += t.amount;
   }
   return { income, expenses };
 }
@@ -78,8 +80,8 @@ export function buildTimeline(
     items.push({
       id: `goal-${g.id}`,
       date: g.targetDate,
-      title: `${g.name} target`,
-      description: `${calculateGoalProgress(g.currentAmount, g.goalAmount)}% funded — ${formatCurrency(Math.max(0, g.goalAmount - g.currentAmount))} to go.`,
+      title: t("{name} target", { name: g.name }),
+      description: t("{pct}% funded — {amount} to go.", { pct: calculateGoalProgress(g.currentAmount, g.goalAmount), amount: formatCurrency(Math.max(0, g.goalAmount - g.currentAmount)) }),
       type: g.category === "emergency" ? "emergency_fund" : "goal",
       icon: g.icon,
       amount: g.goalAmount,
@@ -89,8 +91,8 @@ export function buildTimeline(
     items.push({
       id: `purchase-${p.id}`,
       date: p.desiredDate,
-      title: `Buy ${p.name}`,
-      description: p.notes || `${formatCurrency(p.savedAmount)} saved of ${formatCurrency(p.price)}.`,
+      title: t("Buy {name}", { name: p.name }),
+      description: p.notes || t("{saved} saved of {price}.", { saved: formatCurrency(p.savedAmount), price: formatCurrency(p.price) }),
       type: "purchase",
       icon: "ShoppingBag",
       amount: p.price,
@@ -101,7 +103,7 @@ export function buildTimeline(
       id: `commit-${c.id}`,
       date: c.dueDate,
       title: c.title,
-      description: `${c.category}${c.recurring ? " · recurring" : ""}`,
+      description: `${t(c.category)}${c.recurring ? ` · ${t("recurring")}` : ""}`,
       type: "contribution",
       icon: c.icon,
       amount: c.amount,
@@ -114,8 +116,8 @@ export function buildTimeline(
       items.push({
         id: "emergency-fund",
         date: addMonths(now, months).toISOString(),
-        title: "Emergency fund fully funded",
-        description: `Projected at your ${user.defaultSavingsTarget}% savings target.`,
+        title: t("Emergency fund fully funded"),
+        description: t("Projected at your {pct}% savings target.", { pct: user.defaultSavingsTarget }),
         type: "emergency_fund",
         icon: "ShieldCheck",
         amount: user.emergencyFundTarget,
@@ -155,8 +157,8 @@ export function generateInsights(args: {
     push({
       category: "spending",
       severity: change > 10 ? "warning" : change < -5 ? "positive" : "neutral",
-      title: change >= 0 ? `Spending up ${change}% vs last month` : `Spending down ${Math.abs(change)}% vs last month`,
-      description: `${formatCurrency(curr.expenses)} so far this month compared with ${formatCurrency(prev.expenses)} last month.`,
+      title: change >= 0 ? t("Spending up {pct}% vs last month", { pct: change }) : t("Spending down {pct}% vs last month", { pct: Math.abs(change) }),
+      description: t("{current} so far this month compared with {previous} last month.", { current: formatCurrency(curr.expenses), previous: formatCurrency(prev.expenses) }),
     });
   }
   const top = [...thisMonth.entries()].sort((a, b) => b[1] - a[1])[0];
@@ -164,8 +166,8 @@ export function generateInsights(args: {
     push({
       category: "spending",
       severity: "neutral",
-      title: `${top[0]} is your biggest expense`,
-      description: `${formatCurrency(top[1])} — ${Math.round((top[1] / curr.expenses) * 100)}% of this month's spending.`,
+      title: t("{category} is your biggest expense", { category: t(top[0]) }),
+      description: t("{amount} — {pct}% of this month's spending.", { amount: formatCurrency(top[1]), pct: Math.round((top[1] / curr.expenses) * 100) }),
     });
   }
   for (const [cat, amt] of thisMonth) {
@@ -174,8 +176,8 @@ export function generateInsights(args: {
       push({
         category: "spending",
         severity: "warning",
-        title: `${cat} jumped ${Math.round(((amt - before) / before) * 100)}%`,
-        description: `${formatCurrency(before)} last month → ${formatCurrency(amt)} this month.`,
+        title: t("{category} jumped {pct}%", { category: t(cat), pct: Math.round(((amt - before) / before) * 100) }),
+        description: t("{before} last month → {after} this month.", { before: formatCurrency(before), after: formatCurrency(amt) }),
       });
   }
 
@@ -186,11 +188,11 @@ export function generateInsights(args: {
     push({
       category: "savings",
       severity: rate >= user.defaultSavingsTarget ? "positive" : rate >= 0 ? "neutral" : "warning",
-      title: `Saving ${rate}% of income this month`,
+      title: t("Saving {pct}% of income this month", { pct: rate }),
       description:
         rate >= user.defaultSavingsTarget
-          ? `You're beating your ${user.defaultSavingsTarget}% savings target. Keep it up!`
-          : `Your target is ${user.defaultSavingsTarget}%. Trimming discretionary spend closes the gap.`,
+          ? t("You're beating your {pct}% savings target. Keep it up!", { pct: user.defaultSavingsTarget })
+          : t("Your target is {pct}%. Trimming discretionary spend closes the gap.", { pct: user.defaultSavingsTarget }),
     });
   }
   if (user.emergencyFundTarget > 0) {
@@ -198,8 +200,8 @@ export function generateInsights(args: {
     push({
       category: "savings",
       severity: pct >= 100 ? "positive" : pct >= 50 ? "neutral" : "warning",
-      title: `Emergency fund ${Math.min(pct, 100)}% funded`,
-      description: `${formatCurrency(user.emergencyFundCurrent)} of ${formatCurrency(user.emergencyFundTarget)}.`,
+      title: t("Emergency fund {pct}% funded", { pct: Math.min(pct, 100) }),
+      description: t("{current} of {target}.", { current: formatCurrency(user.emergencyFundCurrent), target: formatCurrency(user.emergencyFundTarget) }),
     });
   }
 
@@ -210,8 +212,8 @@ export function generateInsights(args: {
     push({
       category: "budget",
       severity: "warning",
-      title: status === "over_budget" ? `${b.category} is over budget` : `${b.category} is near its limit`,
-      description: `${formatCurrency(b.spent)} spent of ${formatCurrency(b.budgeted)} (${Math.round((b.spent / b.budgeted) * 100)}%).`,
+      title: status === "over_budget" ? t("{category} is over budget", { category: t(b.category) }) : t("{category} is near its limit", { category: t(b.category) }),
+      description: t("{spent} spent of {budget} ({pct}%).", { spent: formatCurrency(b.spent), budget: formatCurrency(b.budgeted), pct: Math.round((b.spent / b.budgeted) * 100) }),
     });
   }
   const unbudgeted = [...thisMonth.keys()].filter((c) => !budgets.some((b) => b.category === c));
@@ -219,21 +221,21 @@ export function generateInsights(args: {
     push({
       category: "budget",
       severity: "neutral",
-      title: `${unbudgeted.length} spending categor${unbudgeted.length === 1 ? "y has" : "ies have"} no budget`,
-      description: `Add a budget for ${unbudgeted.slice(0, 3).join(", ")} to track them properly.`,
+      title: t("{count} spending categories have no budget", { count: unbudgeted.length }),
+      description: t("Add a budget for {categories} to track them properly.", { categories: unbudgeted.slice(0, 3).map((c) => t(c)).join(", ") }),
     });
 
   // Goals
   for (const g of goals) {
     const status = getGoalStatus(g);
     if (status === "completed")
-      push({ category: "goals", severity: "positive", title: `${g.name} is complete 🎉`, description: `You reached ${formatCurrency(g.goalAmount)}.` });
+      push({ category: "goals", severity: "positive", title: t("{name} is complete 🎉", { name: g.name }), description: t("You reached {amount}.", { amount: formatCurrency(g.goalAmount) }) });
     else if (status === "behind")
       push({
         category: "goals",
         severity: "warning",
-        title: `${g.name} is behind schedule`,
-        description: `Raise the monthly contribution above ${formatCurrency(g.monthlyContribution)} or move the target date.`,
+        title: t("{name} is behind schedule", { name: g.name }),
+        description: t("Raise the monthly contribution above {amount} or move the target date.", { amount: formatCurrency(g.monthlyContribution) }),
       });
   }
 
@@ -241,20 +243,20 @@ export function generateInsights(args: {
   for (const p of purchases) {
     const remaining = p.price - p.savedAmount;
     if (remaining <= 0)
-      push({ category: "purchases", severity: "positive", title: `${p.name} is fully saved`, description: "You can buy it without touching other savings." });
+      push({ category: "purchases", severity: "positive", title: t("{name} is fully saved", { name: p.name }), description: t("You can buy it without touching other savings.") });
     else if (remaining <= user.currentSavings * 0.2)
       push({
         category: "purchases",
         severity: "positive",
-        title: `${p.name} is within reach`,
-        description: `Only ${formatCurrency(remaining)} left — under 20% of your current savings.`,
+        title: t("{name} is within reach", { name: p.name }),
+        description: t("Only {amount} left — under 20% of your current savings.", { amount: formatCurrency(remaining) }),
       });
     else if (differenceInCalendarDays(new Date(p.desiredDate), now) < 30)
       push({
         category: "purchases",
         severity: "warning",
-        title: `${p.name} is due soon`,
-        description: `${formatCurrency(remaining)} still needed before ${format(new Date(p.desiredDate), "MMM d")}.`,
+        title: t("{name} is due soon", { name: p.name }),
+        description: t("{amount} still needed before {date}.", { amount: formatCurrency(remaining), date: formatDate(p.desiredDate, "MMM d") }),
       });
   }
 

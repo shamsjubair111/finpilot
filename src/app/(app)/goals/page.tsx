@@ -12,6 +12,7 @@ import { GoalFormDialog } from "@/components/goals/goal-form-dialog";
 import { useFinance } from "@/components/providers/finance-provider";
 import { formatCurrency } from "@/lib/currency";
 import type { FinancialGoal } from "@/types/finance";
+import { t } from "@/lib/i18n";
 
 export default function GoalsPage() {
   const { goals, deleteGoal } = useFinance();
@@ -27,18 +28,18 @@ export default function GoalsPage() {
   const addButton = (
     <Button size="sm" className="gap-1.5" onClick={() => setCreating(true)}>
       <Plus className="size-4" />
-      Add Goal
+      {t("Add Goal")}
     </Button>
   );
 
   return (
     <div>
       <PageHeader
-        title="Financial Goals"
+        title={t("Financial Goals")}
         subtitle={
           goals.length
-            ? `${formatCurrency(saved)} saved of ${formatCurrency(target)} across ${goals.length} goal${goals.length > 1 ? "s" : ""}.`
-            : "Track progress toward everything you're saving for."
+            ? t("{saved} saved of {target} across {count} goals.", { saved: formatCurrency(saved), target: formatCurrency(target), count: goals.length })
+            : t("Track progress toward everything you're saving for.")
         }
         actions={goals.length > 0 && addButton}
       />
@@ -46,8 +47,8 @@ export default function GoalsPage() {
       {goals.length === 0 ? (
         <EmptyState
           icon={Target}
-          title="No goals yet"
-          description="Create your first financial goal — an emergency fund, a trip, a new laptop — and watch it grow."
+          title={t("No goals yet")}
+          description={t("Create your first financial goal — an emergency fund, a trip, a new laptop — and watch it grow.")}
           action={addButton}
         />
       ) : (
@@ -76,8 +77,8 @@ export default function GoalsPage() {
       <ConfirmDialog
         open={!!deleting}
         onOpenChange={(o) => !o && setDeleting(null)}
-        title="Delete goal?"
-        description={`"${deleting?.name}" and its progress will be permanently removed.`}
+        title={t("Delete goal?")}
+        description={t("\"{name}\" and its progress will be permanently removed.", { name: deleting?.name ?? "" })}
         onConfirm={() => deleteGoal(deleting!.id)}
       />
     </div>

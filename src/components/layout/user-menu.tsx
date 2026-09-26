@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useFinance } from "@/components/providers/finance-provider";
+import { t } from "@/lib/i18n";
 
 export function UserMenu() {
   const { user, signOut } = useFinance();
@@ -22,7 +23,7 @@ export function UserMenu() {
       <DropdownMenuTrigger asChild>
         <button
           className="flex items-center gap-2 rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-          aria-label="Open profile menu"
+          aria-label={t("Open profile menu")}
         >
           <Avatar className="size-8 ring-2 ring-primary/30 ring-offset-2 ring-offset-background transition-shadow hover:ring-primary/60">
             {user.avatarUrl && <AvatarImage src={user.avatarUrl} alt={user.name} />}
@@ -41,13 +42,13 @@ export function UserMenu() {
         <DropdownMenuItem asChild>
           <Link href="/settings" className="gap-2">
             <User className="size-4" />
-            Profile
+            {t("Profile")}
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link href="/settings" className="gap-2">
             <Settings className="size-4" />
-            Settings
+            {t("Settings")}
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
@@ -57,7 +58,7 @@ export function UserMenu() {
           onSelect={() => signOut()}
         >
           <LogOut className="size-4" />
-          Sign out
+          {t("Sign out")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

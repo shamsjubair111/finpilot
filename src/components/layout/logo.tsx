@@ -1,19 +1,18 @@
-import { Compass } from "lucide-react";
+"use client";
+
 import { cn } from "cn";
+import { LogoMark } from "@/components/brand/logo-mark";
+import { useI18n } from "@/lib/i18n/provider";
+
+export const BRAND = { en: "Sanchay", bn: "সঞ্চয়" } as const;
 
 export function Logo({ collapsed = false, className }: { collapsed?: boolean; className?: string }) {
+  const { lang } = useI18n();
   return (
     <div className={cn("flex items-center gap-2.5", className)}>
-      <div
-        className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[color-mix(in_oklch,var(--sidebar-primary),white_15%)] to-[color-mix(in_oklch,var(--sidebar-primary),black_25%)] text-white"
-        style={{ boxShadow: "0 4px 14px -2px color-mix(in oklch, var(--sidebar-primary), transparent 35%)" }}
-      >
-        <Compass className="size-4.5" strokeWidth={2.25} />
-      </div>
+      <LogoMark className="size-8 shrink-0 drop-shadow-[0_4px_12px_rgba(139,92,246,0.45)]" />
       {!collapsed && (
-        <span className="text-[15px] font-semibold tracking-tight text-sidebar-foreground">
-          FinPilot
-        </span>
+        <span className="text-[17px] font-semibold tracking-tight text-sidebar-foreground">{BRAND[lang]}</span>
       )}
     </div>
   );

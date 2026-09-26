@@ -1,5 +1,6 @@
 import { Info } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { t } from "@/lib/i18n";
 
 export function InfoTooltip({ text }: { text: string }) {
   return (
@@ -8,7 +9,7 @@ export function InfoTooltip({ text }: { text: string }) {
         <button
           type="button"
           className="inline-flex text-muted-foreground/70 outline-none transition-colors hover:text-foreground focus-visible:text-foreground"
-          aria-label="More information"
+          aria-label={t("More information")}
         >
           <Info className="size-3.5" />
         </button>

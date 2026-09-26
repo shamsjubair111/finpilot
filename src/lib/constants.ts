@@ -65,6 +65,7 @@ export const CATEGORY_ICON_MAP: Record<string, string> = {
   Freelance: "Briefcase",
   Bonus: "Gift",
   Investment: "TrendingUp",
+  Transfer: "ArrowLeftRight",
 };
 
 export interface ScenarioPreset {
@@ -78,25 +79,25 @@ export const scenarioPresets: ScenarioPreset[] = [
   {
     id: "preset-raise",
     name: "Salary Raise",
-    description: "Simulate a ৳15,000/month raise with no lifestyle inflation.",
+    description: "Simulate a monthly raise with no lifestyle inflation.",
     overrides: { salaryIncrease: 15000 },
   },
   {
     id: "preset-pc",
     name: "Big Purchase",
-    description: "Purchase a ৳120,000 purchase in month 4.",
+    description: "Make a large one-off purchase in month 4.",
     overrides: { purchaseAmount: 120000, purchaseMonth: 4 },
   },
   {
     id: "preset-lifestyle",
     name: "Lifestyle Inflation",
-    description: "Add ৳5,000/month of new discretionary spending.",
+    description: "Add new monthly discretionary spending.",
     overrides: { additionalMonthlyExpense: 5000 },
   },
   {
     id: "preset-bonus",
     name: "Year-End Bonus",
-    description: "One-time ৳50,000 bonus in month 1.",
+    description: "A one-time bonus in month 1.",
     overrides: { bonus: 50000 },
   },
 ];

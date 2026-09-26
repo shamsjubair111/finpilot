@@ -12,6 +12,7 @@ import { PurchaseFormDialog } from "@/components/wishlist/purchase-form-dialog";
 import { useFinance } from "@/components/providers/finance-provider";
 import { deriveAffordabilityBase } from "@/lib/affordability-context";
 import type { PurchaseGoal } from "@/types/finance";
+import { t } from "@/lib/i18n";
 
 export default function WishlistPage() {
   const { purchases, user, budgetCategories, goals, deletePurchase } = useFinance();
@@ -23,7 +24,7 @@ export default function WishlistPage() {
   const addButton = (
     <Button size="sm" className="gap-1.5" onClick={() => setCreating(true)}>
       <Plus className="size-4" />
-      Add Item
+      {t("Add Item")}
     </Button>
   );
 
@@ -40,16 +41,16 @@ export default function WishlistPage() {
   return (
     <div>
       <PageHeader
-        title="Wishlist"
-        subtitle="Plan future purchases and see how affordable they really are."
+        title={t("Wishlist")}
+        subtitle={t("Plan future purchases and see how affordable they really are.")}
         actions={purchases.length > 0 && addButton}
       />
 
       {purchases.length === 0 ? (
         <EmptyState
           icon={ListChecks}
-          title="Your wishlist is empty"
-          description="Add something you want to buy and we'll help you figure out when you can safely afford it."
+          title={t("Your wishlist is empty")}
+          description={t("Add something you want to buy and we'll help you figure out when you can safely afford it.")}
           action={addButton}
         />
       ) : (
@@ -85,8 +86,8 @@ export default function WishlistPage() {
       <ConfirmDialog
         open={!!deleting}
         onOpenChange={(o) => !o && setDeleting(null)}
-        title="Remove from wishlist?"
-        description={`"${deleting?.name}" will be permanently removed.`}
+        title={t("Remove from wishlist?")}
+        description={t("\"{name}\" will be permanently removed.", { name: deleting?.name ?? "" })}
         onConfirm={() => deletePurchase(deleting!.id)}
       />
     </div>

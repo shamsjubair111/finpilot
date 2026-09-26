@@ -11,8 +11,10 @@ import { BudgetCategoryCard } from "@/components/budget/budget-category-card";
 import { BudgetEditDialog } from "@/components/budget/budget-edit-dialog";
 import { BudgetRecommendations } from "@/components/budget/budget-recommendations";
 import { useFinance } from "@/components/providers/finance-provider";
+import { formatDate } from "@/lib/format-date";
 import { getBudgetTotals } from "@/lib/calculations/budget";
 import type { BudgetCategory } from "@/types/finance";
+import { t } from "@/lib/i18n";
 
 export default function BudgetPage() {
   const { budgetCategories, deleteBudgetCategory, selectedMonth } = useFinance();
@@ -24,23 +26,23 @@ export default function BudgetPage() {
   const addButton = (
     <Button size="sm" className="gap-1.5" onClick={() => setCreating(true)}>
       <Plus className="size-4" />
-      Add Budget
+      {t("Add Budget")}
     </Button>
   );
 
   return (
     <div>
       <PageHeader
-        title="Budget"
-        subtitle={`Plan and track your spending by category for ${selectedMonth}.`}
+        title={t("Budget")}
+        subtitle={t("Plan and track your spending by category for {month}.", { month: formatDate(selectedMonth, "MMMM yyyy") })}
         actions={budgetCategories.length > 0 && addButton}
       />
 
       {budgetCategories.length === 0 ? (
         <EmptyState
           icon={Wallet}
-          title="No budgets yet"
-          description="Create a budget for categories like Food or Transport. Spending is tracked automatically from your expenses."
+          title={t("No budgets yet")}
+          description={t("Create a budget for categories like Food or Transport. Spending is tracked automatically from your expenses.")}
           action={addButton}
         />
       ) : (
@@ -67,8 +69,8 @@ export default function BudgetPage() {
       <ConfirmDialog
         open={!!deleting}
         onOpenChange={(o) => !o && setDeleting(null)}
-        title={`Delete ${deleting?.category} budget?`}
-        description="Your transactions stay untouched — only the monthly limit is removed."
+        title={t("Delete {name} budget?", { name: t(deleting?.category ?? "") })}
+        description={t("Your transactions stay untouched — only the monthly limit is removed.")}
         onConfirm={() => deleteBudgetCategory(deleting!.id)}
       />
     </div>

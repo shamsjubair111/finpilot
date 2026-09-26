@@ -1,5 +1,6 @@
 import { Sparkles } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { t } from "@/lib/i18n";
 
 export function ScenarioInsights({ insights }: { insights: string[] }) {
   return (
@@ -7,7 +8,7 @@ export function ScenarioInsights({ insights }: { insights: string[] }) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Sparkles className="size-4 text-primary" />
-          Scenario Insights
+          {t("Scenario Insights")}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -17,7 +18,7 @@ export function ScenarioInsights({ insights }: { insights: string[] }) {
               <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[10px] font-bold text-primary">
                 {i + 1}
               </span>
-              {insight}
+              {t(insight)}
             </li>
           ))}
         </ul>

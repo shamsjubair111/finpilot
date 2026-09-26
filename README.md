@@ -1,36 +1,33 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sanchay (সঞ্চয়)
 
-## Getting Started
+Personal finance for Bangladesh and the world — track bank accounts, bKash/Nagad/Rocket wallets,
+PayPal/Wise, cash, credit cards and loans; budgets, savings goals, a wishlist with affordability
+scoring, a scenario lab, insights and reports. Fully bilingual (English / বাংলা) and multi-currency.
 
-First, run the development server:
+## Stack
+
+- Next.js 16 (App Router) — UI and API route handlers (`src/app/api`)
+- PostgreSQL (Neon) via Prisma 7 (`prisma/schema.prisma`)
+- Cookie sessions signed with `jose`, passwords hashed with `bcryptjs`
+
+## Setup
 
 ```bash
+npm install
+cp .env.example .env   # then fill in the values
+npx prisma migrate deploy
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`.env` needs:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Variable       | Purpose                                                     |
+| -------------- | ----------------------------------------------------------- |
+| `DATABASE_URL` | Pooled Postgres URL used by the app                         |
+| `DIRECT_URL`   | Direct (non-pooled) Postgres URL used by Prisma migrations  |
+| `AUTH_SECRET`  | Long random string used to sign session cookies             |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Translations
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+UI strings are written in English and wrapped in `t()`; Bengali lives in `src/lib/i18n/bn.ts`,
+keyed by the English text. Missing keys fall back to English.

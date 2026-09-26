@@ -17,10 +17,13 @@ export function serialize(row: Row) {
   return out;
 }
 
+type Check = (data: Row, userId: string, existing?: Row) => Promise<void>;
+
 export function collectionRoutes<S extends ZodRawShape>(
   model: Delegate,
   schema: ZodObject<S>,
-  orderBy: Row
+  orderBy: Row,
+  check?: Check
 ) {
   return {
     GET: authed(async ({ userId }) => {
@@ -28,26 +31,28 @@ export function collectionRoutes<S extends ZodRawShape>(
       return json(rows.map(serialize));
     }),
     POST: authed(async ({ userId, req }) => {
-      const data = schema.parse(await req.json());
+      const data = schema.parse(await req.json()) as Row;
+      await check?.(data, userId);
       const row = await model.create({ data: { ...data, userId } });
       return json(serialize(row), 201);
     }),
   };
 }
 
-export function itemRoutes<S extends ZodRawShape>(model: Delegate, schema: ZodObject<S>, label: string) {
+export function itemRoutes<S extends ZodRawShape>(model: Delegate, schema: ZodObject<S>, check?: Check) {
   const owned = async (id: string, userId: string) => {
     const row = await model.findFirst({ where: { id, userId } });
-    if (!row) throw new ApiError(404, `${label} not found. It may have already been deleted.`);
+    if (!row) throw new ApiError(404, "Not found. It may have already been deleted.");
     return row;
   };
   return {
     GET: authed<{ id: string }>(async ({ userId, params }) => json(serialize(await owned(params.id, userId)))),
     PATCH: authed<{ id: string }>(async ({ userId, req, params }) => {
-      await owned(params.id, userId);
+      const existing = await owned(params.id, userId);
       const body = await req.json();
       const parsed = schema.partial().parse(body) as Row;
       const data = Object.fromEntries(Object.entries(parsed).filter(([k]) => k in body));
+      await check?.(data, userId, existing);
       const row = await model.update({ where: { id: params.id }, data });
       return json(serialize(row));
     }),

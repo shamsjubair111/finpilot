@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { format } from "date-fns";
+import { formatDate } from "@/lib/format-date";
 import { Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AddFunds } from "@/components/shared/add-funds";
@@ -23,6 +23,7 @@ import {
 } from "@/lib/calculations/affordability";
 import type { PurchaseGoal } from "@/types/finance";
 import { cn } from "cn";
+import { t } from "@/lib/i18n";
 
 export function PurchaseAnalysisDialog({
   purchase,
@@ -83,7 +84,7 @@ export function PurchaseAnalysisDialog({
           <div className="flex items-center justify-between gap-3 pr-6">
             <div>
               <DialogTitle>{purchase.name}</DialogTitle>
-              <DialogDescription>{purchase.category} · {purchase.priority} priority</DialogDescription>
+              <DialogDescription>{t(purchase.category)} · {t({ high: "High priority", medium: "Medium priority", low: "Low priority" }[purchase.priority])}</DialogDescription>
             </div>
             <AffordabilityBadge result={result} />
           </div>
@@ -92,26 +93,26 @@ export function PurchaseAnalysisDialog({
         <div className="space-y-6">
           <div className="grid grid-cols-2 gap-4 rounded-lg border border-border p-4 sm:grid-cols-4">
             <div>
-              <p className="text-xs text-muted-foreground">Price</p>
+              <p className="text-xs text-muted-foreground">{t("Price")}</p>
               <p className="text-sm font-semibold tabular-nums">{formatCurrency(purchase.price)}</p>
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Saved</p>
+              <p className="text-xs text-muted-foreground">{t("Saved")}</p>
               <p className="text-sm font-semibold tabular-nums">{formatCurrency(purchase.savedAmount)}</p>
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Remaining</p>
+              <p className="text-xs text-muted-foreground">{t("Remaining")}</p>
               <p className="text-sm font-semibold tabular-nums">{formatCurrency(remaining)}</p>
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Est. Time</p>
-              <p className="text-sm font-semibold">{chosen.estimatedMonths} mo</p>
+              <p className="text-xs text-muted-foreground">{t("Est. Time")}</p>
+              <p className="text-sm font-semibold">{t("{n} months", { n: chosen.estimatedMonths })}</p>
             </div>
           </div>
 
           {result.reasons.length > 0 && (
             <div className="space-y-1.5">
-              <p className="text-xs font-medium text-muted-foreground">Why this score</p>
+              <p className="text-xs font-medium text-muted-foreground">{t("Why this score")}</p>
               <ul className="space-y-1">
                 {result.reasons.map((r, i) => (
                   <li key={i} className="text-xs text-muted-foreground">· {r}</li>
@@ -121,7 +122,7 @@ export function PurchaseAnalysisDialog({
           )}
 
           <div className="space-y-2.5">
-            <p className="text-sm font-semibold">Savings Strategies</p>
+            <p className="text-sm font-semibold">{t("Savings Strategies")}</p>
             <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
               {strategies.map((s, i) => (
                 <button
@@ -134,9 +135,9 @@ export function PurchaseAnalysisDialog({
                       : "border-border hover:bg-muted/50"
                   )}
                 >
-                  <p className="text-xs font-semibold">{s.name}</p>
-                  <p className="mt-1 text-base font-bold tabular-nums">{formatCurrency(s.monthlyContribution, { compact: true })}/mo</p>
-                  <p className="text-xs text-muted-foreground">~{s.estimatedMonths} months</p>
+                  <p className="text-xs font-semibold">{t(s.name)}</p>
+                  <p className="mt-1 text-base font-bold tabular-nums">{formatCurrency(s.monthlyContribution, { compact: true })}{t("/mo")}</p>
+                  <p className="text-xs text-muted-foreground">~{t("{n} months", { n: s.estimatedMonths })}</p>
                 </button>
               ))}
             </div>
@@ -144,35 +145,35 @@ export function PurchaseAnalysisDialog({
 
           <div className="space-y-2 rounded-lg bg-muted/50 p-4 text-sm">
             <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Emergency Fund Impact</span>
+              <span className="text-muted-foreground">{t("Emergency Fund Impact")}</span>
               <span className="max-w-56 text-right text-xs font-medium">{impact.emergencyFundImpact}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Other Goals Delayed</span>
-              <span className="text-xs font-medium">{impact.otherGoalsDelayed ? "Possibly, yes" : "No"}</span>
+              <span className="text-muted-foreground">{t("Other Goals Delayed")}</span>
+              <span className="text-xs font-medium">{impact.otherGoalsDelayed ? t("Possibly, yes") : t("No")}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Free Cash After Contribution</span>
+              <span className="text-muted-foreground">{t("Free Cash After Contribution")}</span>
               <span className="text-xs font-medium tabular-nums">
                 {formatCurrency(impact.remainingFreeCashAfterContribution)}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Target Purchase Date</span>
-              <span className="text-xs font-medium">{format(new Date(purchase.desiredDate), "MMM yyyy")}</span>
+              <span className="text-muted-foreground">{t("Target Purchase Date")}</span>
+              <span className="text-xs font-medium">{formatDate(purchase.desiredDate, "MMM yyyy")}</span>
             </div>
           </div>
 
           <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 text-sm text-foreground">
-            <p className="font-medium">Recommendation</p>
+            <p className="font-medium">{t("Recommendation")}</p>
             <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{recommendationText}</p>
           </div>
 
           {remaining > 0 && (
             <div className="space-y-2 rounded-xl bg-muted/50 p-3">
-              <p className="text-xs font-medium text-muted-foreground">Put money aside for this item</p>
+              <p className="text-xs font-medium text-muted-foreground">{t("Put money aside for this item")}</p>
               <AddFunds
-                label="Save"
+                label={t("Save")}
                 onAdd={(amount) =>
                   updatePurchase(purchase.id, { savedAmount: purchase.savedAmount + amount })
                 }
@@ -182,10 +183,10 @@ export function PurchaseAnalysisDialog({
 
           <div className="flex gap-2 border-t border-border pt-4">
             <Button variant="outline" className="flex-1 gap-1.5" onClick={onEdit}>
-              <Pencil className="size-3.5" /> Edit
+              <Pencil className="size-3.5" /> {t("Edit")}
             </Button>
             <Button variant="destructive" className="flex-1 gap-1.5" onClick={onDelete}>
-              <Trash2 className="size-3.5" /> Delete
+              <Trash2 className="size-3.5" /> {t("Delete")}
             </Button>
           </div>
         </div>

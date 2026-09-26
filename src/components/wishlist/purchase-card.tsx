@@ -1,6 +1,6 @@
 "use client";
 
-import { format } from "date-fns";
+import { formatDate } from "@/lib/format-date";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ProgressBar } from "@/components/finance/progress-bar";
@@ -10,6 +10,7 @@ import { formatCurrency } from "@/lib/currency";
 import { calculateAffordabilityScore, type AffordabilityContext } from "@/lib/calculations/affordability";
 import type { PurchaseGoal } from "@/types/finance";
 import { cn } from "cn";
+import { t } from "@/lib/i18n";
 
 const CATEGORY_ICON: Record<string, string> = {
   Electronics: "Laptop",
@@ -72,7 +73,7 @@ export function PurchaseCard({
           <div>
             <p className="text-sm font-semibold">{purchase.name}</p>
             <Badge className={cn("mt-0.5 font-normal capitalize", PRIORITY_STYLE[purchase.priority])} variant="secondary">
-              {purchase.priority} priority
+              {t({ high: "High priority", medium: "Medium priority", low: "Low priority" }[purchase.priority])}
             </Badge>
           </div>
         </div>
@@ -82,18 +83,18 @@ export function PurchaseCard({
       <div className="space-y-1.5">
         <div className="flex items-baseline justify-between text-sm">
           <span className="font-semibold tabular-nums">{formatCurrency(purchase.savedAmount)}</span>
-          <span className="text-xs text-muted-foreground">of {formatCurrency(purchase.price)}</span>
+          <span className="text-xs text-muted-foreground">{t("of")} {formatCurrency(purchase.price)}</span>
         </div>
         <ProgressBar value={progress} />
       </div>
 
       <div className="flex items-center justify-between border-t border-border pt-3 text-xs text-muted-foreground">
-        <span>{purchase.category}</span>
-        <span>Wanted by {format(new Date(purchase.desiredDate), "MMM yyyy")}</span>
+        <span>{t(purchase.category)}</span>
+        <span>{t("Wanted by {date}", { date: formatDate(purchase.desiredDate, "MMM yyyy") })}</span>
       </div>
 
       <div className="flex items-center justify-between text-xs">
-        <span className="font-medium text-foreground">Affordability Score</span>
+        <span className="font-medium text-foreground">{t("Affordability Score")}</span>
         <span className="font-bold tabular-nums text-foreground">{result.score}/100</span>
       </div>
     </Card>

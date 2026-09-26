@@ -1,5 +1,7 @@
 "use client";
 
+import { t } from "@/lib/i18n";
+
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { ChartTooltip } from "./chart-tooltip";
 import { formatCurrency } from "@/lib/currency";
@@ -30,8 +32,8 @@ export function IncomeExpenseChart({ data }: { data: MonthlyFinancials[] }) {
           )}
         />
         <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12, color: "var(--muted-foreground)", paddingTop: 12 }} />
-        <Bar animationDuration={450} dataKey="income" name="Income" fill={SERIES_COLORS.income} radius={[4, 4, 0, 0]} maxBarSize={22} />
-        <Bar animationDuration={450} dataKey="expenses" name="Expenses" fill={SERIES_COLORS.expenses} radius={[4, 4, 0, 0]} maxBarSize={22} />
+        <Bar animationDuration={450} dataKey="income" name={t("Income")} fill={SERIES_COLORS.income} radius={[4, 4, 0, 0]} maxBarSize={22} />
+        <Bar animationDuration={450} dataKey="expenses" name={t("Expenses")} fill={SERIES_COLORS.expenses} radius={[4, 4, 0, 0]} maxBarSize={22} />
       </BarChart>
     </ResponsiveContainer>
   );

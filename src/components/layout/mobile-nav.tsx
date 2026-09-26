@@ -4,6 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "cn";
+import { t } from "@/lib/i18n";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Logo } from "./logo";
 import { NAV_ITEMS } from "./nav-items";
@@ -36,7 +37,7 @@ export function MobileNav({
           {SECTIONS.map((section) => (
             <div key={section}>
               <p className="px-2.5 pb-1.5 text-[11px] font-medium uppercase tracking-wider text-sidebar-foreground/40">
-                {section}
+                {t(section)}
               </p>
               <ul className="space-y-0.5">
                 {NAV_ITEMS.filter((item) => item.section === section).map((item) => {
@@ -56,7 +57,7 @@ export function MobileNav({
                         )}
                       >
                         <Icon className="size-[18px] shrink-0" strokeWidth={2} />
-                        <span>{item.label}</span>
+                        <span>{t(item.label)}</span>
                       </Link>
                     </li>
                   );

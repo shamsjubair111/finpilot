@@ -2,7 +2,7 @@
 
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
-import { formatCurrency } from "@/lib/currency";
+import { formatCurrency, formatNumber } from "@/lib/currency";
 
 export function SliderField({
   label,
@@ -32,7 +32,7 @@ export function SliderField({
           {label}
         </Label>
         <span className="text-sm font-semibold tabular-nums">
-          {formatAsCurrency ? formatCurrency(value) : value}
+          {formatAsCurrency ? formatCurrency(value) : formatNumber(value)}
         </span>
       </div>
       <Slider

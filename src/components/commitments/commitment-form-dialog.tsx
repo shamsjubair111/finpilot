@@ -1,5 +1,7 @@
 "use client";
 
+import { getCurrencySymbol } from "@/lib/currency";
+
 import * as React from "react";
 import {
   Dialog,
@@ -18,6 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { SubmitButton } from "@/components/shared/submit-button";
 import { useFinance } from "@/components/providers/finance-provider";
 import type { UpcomingCommitment } from "@/types/finance";
+import { t } from "@/lib/i18n";
 
 const KINDS = [
   { value: "Bills", icon: "Receipt" },
@@ -89,47 +92,47 @@ export function CommitmentFormDialog({
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{isEdit ? "Edit Commitment" : "Add Commitment"}</DialogTitle>
-          <DialogDescription>Bills, subscriptions and other payments you know are coming.</DialogDescription>
+          <DialogTitle>{isEdit ? t("Edit Commitment") : t("Add Commitment")}</DialogTitle>
+          <DialogDescription>{t("Bills, subscriptions and other payments you know are coming.")}</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
             <div className="col-span-2 space-y-1.5">
-              <Label htmlFor="cm-title">Title</Label>
-              <Input id="cm-title" placeholder="e.g. Internet bill" value={title} onChange={(e) => setTitle(e.target.value)} required />
+              <Label htmlFor="cm-title">{t("Title")}</Label>
+              <Input id="cm-title" placeholder={t("e.g. Internet bill")} value={title} onChange={(e) => setTitle(e.target.value)} required />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="cm-amount">Amount (৳)</Label>
+              <Label htmlFor="cm-amount">{`${t("Amount")} (${getCurrencySymbol()})`}</Label>
               <Input id="cm-amount" type="number" min={0} step="any" value={amount} onChange={(e) => setAmount(e.target.value)} required />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="cm-date">Due date</Label>
+              <Label htmlFor="cm-date">{t("Due date")}</Label>
               <Input id="cm-date" type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} required />
             </div>
             <div className="col-span-2 space-y-1.5">
-              <Label htmlFor="cm-cat">Type</Label>
+              <Label htmlFor="cm-cat">{t("Type")}</Label>
               <Select value={category} onValueChange={setCategory}>
                 <SelectTrigger id="cm-cat" className="w-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   {KINDS.map((k) => (
-                    <SelectItem key={k.value} value={k.value}>{k.value}</SelectItem>
+                    <SelectItem key={k.value} value={k.value}>{t(k.value)}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
             <label className="col-span-2 flex items-center justify-between rounded-xl border border-border p-3">
               <div>
-                <p className="text-sm font-medium">Recurring monthly</p>
-                <p className="text-xs text-muted-foreground">Repeats every month on the same day.</p>
+                <p className="text-sm font-medium">{t("Recurring monthly")}</p>
+                <p className="text-xs text-muted-foreground">{t("Repeats every month on the same day.")}</p>
               </div>
               <Switch checked={recurring} onCheckedChange={setRecurring} />
             </label>
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-            <SubmitButton pending={pending} disabled={!isValid}>{isEdit ? "Save changes" : "Add commitment"}</SubmitButton>
+            <Button type="button" variant="outline" onClick={() => setOpen(false)}>{t("Cancel")}</Button>
+            <SubmitButton pending={pending} disabled={!isValid}>{isEdit ? t("Save changes") : t("Add commitment")}</SubmitButton>
           </DialogFooter>
         </form>
       </DialogContent>

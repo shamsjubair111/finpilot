@@ -1,5 +1,7 @@
 "use client";
 
+import { t } from "@/lib/i18n";
+
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { ChartTooltip } from "./chart-tooltip";
 import { formatCurrency } from "@/lib/currency";
@@ -38,7 +40,7 @@ export function SavingsGrowthChart({ data }: { data: { month: string; balance: n
           type="monotone"
           animationDuration={450}
           dataKey="balance"
-          name="Savings Balance"
+          name={t("Savings Balance")}
           stroke={SERIES_COLORS.savings}
           strokeWidth={2.5}
           fill="url(#savingsGrowthFill)"

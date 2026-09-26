@@ -1,4 +1,4 @@
-import { format } from "date-fns";
+import { formatDate } from "@/lib/format-date";
 import { DynamicIcon } from "@/components/shared/dynamic-icon";
 import { formatCurrency } from "@/lib/currency";
 import type { TimelineMilestone } from "@/types/finance";
@@ -30,7 +30,7 @@ export function TimelineView({ milestones }: { milestones: TimelineMilestone[] }
           <div className="rounded-xl border border-border bg-card p-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="text-xs font-medium text-muted-foreground">
-                {format(new Date(m.date), "MMMM yyyy")}
+                {formatDate(m.date, "MMMM yyyy")}
               </p>
               {m.amount !== undefined && (
                 <span className="text-sm font-semibold tabular-nums">{formatCurrency(m.amount)}</span>

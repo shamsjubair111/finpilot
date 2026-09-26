@@ -2,4 +2,4 @@ import { db } from "@/lib/server/db";
 import { itemRoutes } from "@/lib/server/crud";
 import { purchaseSchema } from "@/lib/validation";
 
-export const { GET, PATCH, DELETE } = itemRoutes(db.purchase, purchaseSchema, "Wishlist item");
+export const { GET, PATCH, DELETE } = itemRoutes(db.purchase, purchaseSchema);

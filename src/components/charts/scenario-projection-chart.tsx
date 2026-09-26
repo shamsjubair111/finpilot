@@ -1,5 +1,7 @@
 "use client";
 
+import { t } from "@/lib/i18n";
+
 import {
   ComposedChart,
   Area,
@@ -70,7 +72,7 @@ export function ScenarioProjectionChart({ data }: { data: ScenarioChartPoint[] }
           type="monotone"
           animationDuration={450}
           dataKey="scenario"
-          name="Scenario Plan"
+          name={t("Scenario Plan")}
           stroke={SERIES_COLORS.scenario}
           strokeWidth={2.5}
           fill="url(#scenarioFill)"
@@ -81,7 +83,7 @@ export function ScenarioProjectionChart({ data }: { data: ScenarioChartPoint[] }
           type="monotone"
           animationDuration={450}
           dataKey="current"
-          name="Current Plan"
+          name={t("Current Plan")}
           stroke={SERIES_COLORS.current}
           strokeWidth={2}
           strokeDasharray="5 4"

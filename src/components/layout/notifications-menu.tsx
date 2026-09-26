@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useFinance } from "@/components/providers/finance-provider";
 import { generateInsights } from "@/lib/derive";
+import { formatNumber } from "@/lib/currency";
+import { t } from "@/lib/i18n";
 
 const ICON = {
   warning: { icon: AlertTriangle, tone: "text-warning" },
@@ -35,20 +37,20 @@ export function NotificationsMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon" className="relative" aria-label={`Notifications${warnings ? ` (${warnings} alerts)` : ""}`}>
+        <Button variant="outline" size="icon" className="relative" aria-label={t("Notifications")}>
           <Bell className="size-4" />
           {warnings > 0 && (
             <span className="absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-white">
-              {warnings}
+              {formatNumber(warnings)}
             </span>
           )}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[min(20rem,calc(100vw-2rem))]">
-        <DropdownMenuLabel>Notifications</DropdownMenuLabel>
+        <DropdownMenuLabel>{t("Notifications")}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {items.length === 0 ? (
-          <p className="px-3 py-6 text-center text-sm text-muted-foreground">You&apos;re all caught up.</p>
+          <p className="px-3 py-6 text-center text-sm text-muted-foreground">{t("You're all caught up.")}</p>
         ) : (
           <div className="flex flex-col gap-1 p-1">
             {items.map((n) => {
@@ -67,7 +69,7 @@ export function NotificationsMenu() {
         )}
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href="/insights" className="justify-center text-xs font-medium text-primary">View all insights</Link>
+          <Link href="/insights" className="justify-center text-xs font-medium text-primary">{t("View all insights")}</Link>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

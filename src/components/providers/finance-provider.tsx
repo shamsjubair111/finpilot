@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import type {
+  Account,
   BudgetCategory,
   FinancialGoal,
   PurchaseGoal,
@@ -13,6 +14,11 @@ import type {
   UserProfile,
 } from "@/types/finance";
 import { api, ApiClientError } from "@/lib/api-client";
+import { computeBalances, netWorthOf } from "@/lib/accounts";
+import { t } from "@/lib/i18n";
+import { useI18n } from "@/lib/i18n/provider";
+import { formatCurrency, setCurrencyPref } from "@/lib/currency";
+import type { Lang } from "@/lib/i18n";
 import { FullPageLoader } from "@/components/shared/full-page-loader";
 
 type StoredBudget = Omit<BudgetCategory, "spent">;
@@ -22,8 +28,9 @@ interface FinanceContextValue {
   user: UserProfile;
   updateUser: (patch: Partial<UserProfile>, successMessage?: string) => Promise<boolean>;
   changePassword: (currentPassword: string, newPassword: string) => Promise<boolean>;
-  deleteAccount: (password: string) => Promise<boolean>;
+  deleteUserAccount: (password: string) => Promise<boolean>;
   signOut: () => Promise<void>;
+  setLanguage: (lang: Lang) => void;
 
   transactions: Transaction[];
   addTransaction: (txn: Omit<Transaction, "id">) => Promise<boolean>;
@@ -45,6 +52,13 @@ interface FinanceContextValue {
   updatePurchase: (id: string, patch: Partial<PurchaseGoal>) => Promise<boolean>;
   deletePurchase: (id: string) => Promise<boolean>;
 
+  accounts: Account[];
+  accountBalances: Map<string, number>;
+  netWorth: { assets: number; liabilities: number; netWorth: number };
+  addAccount: (a: Omit<Account, "id" | "createdAt">) => Promise<boolean>;
+  updateAccount: (id: string, patch: Partial<Account>) => Promise<boolean>;
+  deleteAccount: (id: string) => Promise<boolean>;
+
   commitments: UpcomingCommitment[];
   addCommitment: (c: Omit<UpcomingCommitment, "id">) => Promise<boolean>;
   updateCommitment: (id: string, patch: Partial<UpcomingCommitment>) => Promise<boolean>;
@@ -62,19 +76,21 @@ const byDateDesc = (a: Transaction, b: Transaction) => new Date(b.date).getTime(
 
 export function FinanceProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const { lang, setLang } = useI18n();
   const [user, setUser] = React.useState<UserProfile | null>(null);
   const [transactions, setTransactions] = React.useState<Transaction[]>([]);
   const [budgets, setBudgets] = React.useState<StoredBudget[]>([]);
   const [goals, setGoals] = React.useState<FinancialGoal[]>([]);
   const [purchases, setPurchases] = React.useState<PurchaseGoal[]>([]);
   const [commitments, setCommitments] = React.useState<UpcomingCommitment[]>([]);
+  const [accounts, setAccounts] = React.useState<Account[]>([]);
   const [selectedMonth, setSelectedMonth] = React.useState(() => monthKey(new Date()));
   const [loadError, setLoadError] = React.useState<string | null>(null);
 
   const handleAuthFailure = React.useCallback(
     (err: unknown) => {
       if (err instanceof ApiClientError && err.status === 401) {
-        toast.error("Session expired", { description: err.message });
+        toast.error(t("Session expired"), { description: err.message });
         router.replace("/login");
         return true;
       }
@@ -94,13 +110,17 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
           goals: FinancialGoal[];
           purchases: PurchaseGoal[];
           commitments: UpcomingCommitment[];
+          accounts: Account[];
         }>("/bootstrap");
       // One quiet retry covers a database that is still waking up.
       const data = await fetchAll().catch((err) => {
         if (err instanceof ApiClientError && err.status === 401) throw err;
         return new Promise<Awaited<ReturnType<typeof fetchAll>>>((r) => setTimeout(() => r(fetchAll()), 1500));
       });
-      const { user: me, transactions: txns, budgets: bgs, goals: gls, purchases: prs, commitments: cms } = data;
+      const { user: me, transactions: txns, budgets: bgs, goals: gls, purchases: prs, commitments: cms, accounts: acs } = data;
+      setAccounts(acs);
+      setCurrencyPref(me.currency);
+      if (me.language !== lang) setLang(me.language);
       setUser(me);
       setTransactions(txns);
       setBudgets(bgs);
@@ -109,10 +129,11 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       setCommitments(cms);
     } catch (err) {
       if (handleAuthFailure(err)) return;
-      const message = err instanceof Error ? err.message : "Could not load your data.";
+      const message = err instanceof Error ? err.message : t("Could not load your data.");
       setLoadError(message);
-      toast.error("Couldn't load your data", { description: message });
+      toast.error(t("Couldn't load your data"), { description: message });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [handleAuthFailure]);
 
   React.useEffect(() => {
@@ -130,13 +151,13 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     ) => {
       try {
         const result = await action();
-        const title = typeof success === "function" ? success(result) : success;
+        const title = t(typeof success === "function" ? success(result) : success);
         const desc = typeof description === "function" ? description(result) : description;
         toast.success(title, desc ? { description: desc } : undefined);
         return true;
       } catch (err) {
         if (handleAuthFailure(err)) return false;
-        toast.error(failure, { description: err instanceof Error ? err.message : undefined });
+        toast.error(t(failure), { description: err instanceof Error ? err.message : undefined });
         return false;
       }
     },
@@ -160,8 +181,8 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
             apply((prev) => [...prev, created]);
             return created;
           },
-          `${label} added`,
-          `Couldn't add ${label.toLowerCase()}`,
+          t("{item} added", { item: t(label) }),
+          t("Couldn't add {item}", { item: t(label).toLowerCase() }),
           describe
         ),
       update: (id: string, patch: Partial<T>, message?: string) =>
@@ -171,8 +192,8 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
             apply((prev) => prev.map((x) => (x.id === id ? updated : x)));
             return updated;
           },
-          message ?? `${label} updated`,
-          `Couldn't update ${label.toLowerCase()}`,
+          message ?? t("{item} updated", { item: t(label) }),
+          t("Couldn't update {item}", { item: t(label).toLowerCase() }),
           describe
         ),
       remove: (id: string) =>
@@ -183,19 +204,23 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
             apply((prev) => prev.filter((x) => x.id !== id));
             return removed;
           },
-          `${label} deleted`,
-          `Couldn't delete ${label.toLowerCase()}`,
+          t("{item} deleted", { item: t(label) }),
+          t("Couldn't delete {item}", { item: t(label).toLowerCase() }),
           (removed) => (removed ? describe(removed) : "")
         ),
     };
   }
 
-  const fmt = (n: number) => `৳${n.toLocaleString()}`;
-  const txnCrud = crud<Transaction, Omit<Transaction, "id">>("/transactions", transactions, setTransactions, "Transaction", (t) => `${t.title} — ${t.type === "income" ? "+" : "-"}${fmt(t.amount)}`, byDateDesc);
-  const budgetCrud = crud<StoredBudget, Omit<StoredBudget, "id">>("/budgets", budgets, setBudgets, "Budget", (b) => `${b.category} — ${fmt(b.budgeted)} / month`);
-  const goalCrud = crud<FinancialGoal, NewOf<FinancialGoal>>("/goals", goals, setGoals, "Goal", (g) => `${g.name} — target ${fmt(g.goalAmount)}`);
+  const fmt = (n: number) => formatCurrency(n);
+  const txnCrud = crud<Transaction, Omit<Transaction, "id">>("/transactions", transactions, setTransactions, "Transaction", (t) => `${t.title} — ${t.type === "income" ? "+" : t.type === "expense" ? "-" : ""}${fmt(t.amount)}`, byDateDesc);
+  const budgetCrud = crud<StoredBudget, Omit<StoredBudget, "id">>("/budgets", budgets, setBudgets, "Budget", (b) => `${t(b.category)} — ${fmt(b.budgeted)} / ${t("month")}`);
+  const goalCrud = crud<FinancialGoal, NewOf<FinancialGoal>>("/goals", goals, setGoals, "Goal", (g) => `${g.name} — ${t("target")} ${fmt(g.goalAmount)}`);
   const purchaseCrud = crud<PurchaseGoal, NewOf<PurchaseGoal>>("/purchases", purchases, setPurchases, "Wishlist item", (p) => `${p.name} — ${fmt(p.price)}`);
   const commitCrud = crud<UpcomingCommitment, Omit<UpcomingCommitment, "id">>("/commitments", commitments, setCommitments, "Commitment", (c) => `${c.title} — ${fmt(c.amount)}`, (a, b) => +new Date(a.dueDate) - +new Date(b.dueDate));
+
+  const accountCrud = crud<Account, Omit<Account, "id" | "createdAt">>("/accounts", accounts, setAccounts, "Account", (a) => a.name);
+  const accountBalances = React.useMemo(() => computeBalances(accounts, transactions), [accounts, transactions]);
+  const netWorth = React.useMemo(() => netWorthOf(accounts, accountBalances), [accounts, accountBalances]);
 
   const budgetCategories = React.useMemo<BudgetCategory[]>(() => {
     const spentBy = new Map<string, number>();
@@ -209,6 +234,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   if (!user) {
     return <FullPageLoader error={loadError} onRetry={load} />;
   }
+  setCurrencyPref(user.currency);
 
   const value: FinanceContextValue = {
     user,
@@ -216,13 +242,19 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       run(async () => setUser(await api<UserProfile>("/profile", { method: "PATCH", body: patch })), message, "Couldn't save changes"),
     changePassword: (currentPassword, newPassword) =>
       run(() => api("/profile/password", { method: "PATCH", body: { currentPassword, newPassword } }), "Password changed", "Couldn't change password"),
-    deleteAccount: async (password) => {
-      const ok = await run(() => api("/profile", { method: "DELETE", body: { password } }), "Account deleted", "Couldn't delete account", "All your data has been permanently removed.");
+    setLanguage: (next) => {
+      setLang(next);
+      setUser((u) => (u ? { ...u, language: next } : u));
+      api("/profile", { method: "PATCH", body: { language: next } }).catch(() => {});
+      toast.success(next === "bn" ? "ভাষা পরিবর্তন করা হয়েছে — বাংলা" : "Language changed — English");
+    },
+    deleteUserAccount: async (password) => {
+      const ok = await run(() => api("/profile", { method: "DELETE", body: { password } }), "Account deleted", "Couldn't delete account", t("All your data has been permanently removed."));
       if (ok) router.replace("/register");
       return ok;
     },
     signOut: async () => {
-      await run(() => api("/auth/logout", { method: "POST" }), "Signed out", "Couldn't sign out", "See you next time!");
+      await run(() => api("/auth/logout", { method: "POST" }), "Signed out", "Couldn't sign out", t("See you next time!"));
       router.replace("/login");
       router.refresh();
     },
@@ -247,6 +279,17 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     updatePurchase: purchaseCrud.update,
     deletePurchase: purchaseCrud.remove,
 
+    accounts,
+    accountBalances,
+    netWorth,
+    addAccount: accountCrud.add,
+    updateAccount: accountCrud.update,
+    deleteAccount: async (id) => {
+      const ok = await accountCrud.remove(id);
+      if (ok) setTransactions((prev) => prev.map((t) => (t.accountId === id || t.toAccountId === id ? { ...t, accountId: t.accountId === id ? null : t.accountId, toAccountId: t.toAccountId === id ? null : t.toAccountId } : t)));
+      return ok;
+    },
+
     commitments,
     addCommitment: commitCrud.add,
     updateCommitment: commitCrud.update,
@@ -256,7 +299,11 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     setSelectedMonth,
   };
 
-  return <FinanceContext.Provider value={value}>{children}</FinanceContext.Provider>;
+  return (
+    <FinanceContext.Provider value={value}>
+      <React.Fragment key={`${lang}-${user.currency}`}>{children}</React.Fragment>
+    </FinanceContext.Provider>
+  );
 }
 
 export function useFinance() {

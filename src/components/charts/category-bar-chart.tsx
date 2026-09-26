@@ -1,5 +1,7 @@
 "use client";
 
+import { t } from "@/lib/i18n";
+
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import type { BudgetCategory } from "@/types/finance";
 import { ChartTooltip } from "./chart-tooltip";
@@ -26,6 +28,7 @@ export function CategoryBarChart({ categories }: { categories: BudgetCategory[] 
           tickLine={false}
           axisLine={false}
           width={100}
+          tickFormatter={(v: string) => t(v)}
           tick={{ fill: "var(--foreground)", fontSize: 12 }}
         />
         <Tooltip

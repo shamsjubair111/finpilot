@@ -14,6 +14,7 @@ import { SliderField } from "./slider-field";
 import { RotateCcw } from "lucide-react";
 import type { ScenarioInput } from "@/types/finance";
 import { scenarioPresets } from "@/lib/constants";
+import { t } from "@/lib/i18n";
 
 export function ScenarioInputsPanel({
   input,
@@ -27,10 +28,10 @@ export function ScenarioInputsPanel({
   return (
     <Card className="animate-in-up">
       <CardHeader>
-        <CardTitle>What If?</CardTitle>
+        <CardTitle>{t("What If?")}</CardTitle>
         <CardAction><Button variant="ghost" size="sm" className="gap-1.5" onClick={onReset}>
           <RotateCcw className="size-3.5" />
-          Reset
+          {t("Reset")}
         </Button></CardAction>
       </CardHeader>
       <CardContent className="space-y-5">
@@ -42,9 +43,9 @@ export function ScenarioInputsPanel({
               size="sm"
               className="h-auto flex-col items-start gap-0.5 py-2 text-left"
               onClick={() => onChange(preset.overrides)}
-              title={preset.description}
+              title={t(preset.description)}
             >
-              <span className="text-xs font-semibold">{preset.name}</span>
+              <span className="text-xs font-semibold">{t(preset.name)}</span>
             </Button>
           ))}
         </div>
@@ -52,7 +53,7 @@ export function ScenarioInputsPanel({
         <Separator />
 
         <div className="space-y-1.5">
-          <label className="text-xs font-medium text-muted-foreground">Scenario Period</label>
+          <label className="text-xs font-medium text-muted-foreground">{t("Scenario Period")}</label>
           <Select
             value={String(input.periodMonths)}
             onValueChange={(v) => onChange({ periodMonths: Number(v) as ScenarioInput["periodMonths"] })}
@@ -61,10 +62,10 @@ export function ScenarioInputsPanel({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="3">3 months</SelectItem>
-              <SelectItem value="6">6 months</SelectItem>
-              <SelectItem value="12">12 months</SelectItem>
-              <SelectItem value="24">24 months</SelectItem>
+              <SelectItem value="3">{t("3 months")}</SelectItem>
+              <SelectItem value="6">{t("6 months")}</SelectItem>
+              <SelectItem value="12">{t("12 months")}</SelectItem>
+              <SelectItem value="24">{t("24 months")}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -72,10 +73,10 @@ export function ScenarioInputsPanel({
         <Separator />
 
         <div className="space-y-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Income</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t("Income")}</p>
           <SliderField
             id="salary"
-            label="Monthly Salary"
+            label={t("Monthly Salary")}
             value={input.monthlySalary}
             onChange={(v) => onChange({ monthlySalary: v })}
             min={20000}
@@ -84,7 +85,7 @@ export function ScenarioInputsPanel({
           />
           <SliderField
             id="salary-increase"
-            label="Expected Salary Increase"
+            label={t("Expected Salary Increase")}
             value={input.salaryIncrease}
             onChange={(v) => onChange({ salaryIncrease: v })}
             min={0}
@@ -93,7 +94,7 @@ export function ScenarioInputsPanel({
           />
           <SliderField
             id="bonus"
-            label="Optional Bonus (month 1)"
+            label={t("Optional Bonus (month 1)")}
             value={input.bonus}
             onChange={(v) => onChange({ bonus: v })}
             min={0}
@@ -105,10 +106,10 @@ export function ScenarioInputsPanel({
         <Separator />
 
         <div className="space-y-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Spending</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t("Spending")}</p>
           <SliderField
             id="essentials"
-            label="Monthly Essential Expenses"
+            label={t("Monthly Essential Expenses")}
             value={input.essentialExpenses}
             onChange={(v) => onChange({ essentialExpenses: v })}
             min={5000}
@@ -117,7 +118,7 @@ export function ScenarioInputsPanel({
           />
           <SliderField
             id="lifestyle"
-            label="Lifestyle Spending"
+            label={t("Lifestyle Spending")}
             value={input.lifestyleSpending}
             onChange={(v) => onChange({ lifestyleSpending: v })}
             min={0}
@@ -126,7 +127,7 @@ export function ScenarioInputsPanel({
           />
           <SliderField
             id="additional-expense"
-            label="Additional Monthly Expense"
+            label={t("Additional Monthly Expense")}
             value={input.additionalMonthlyExpense}
             onChange={(v) => onChange({ additionalMonthlyExpense: v })}
             min={0}
@@ -138,10 +139,10 @@ export function ScenarioInputsPanel({
         <Separator />
 
         <div className="space-y-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Savings &amp; Reserves</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t("Savings & Reserves")}</p>
           <SliderField
             id="savings-target"
-            label="Monthly Savings Target"
+            label={t("Monthly Savings Target")}
             value={input.savingsTarget}
             onChange={(v) => onChange({ savingsTarget: v })}
             min={0}
@@ -150,7 +151,7 @@ export function ScenarioInputsPanel({
           />
           <SliderField
             id="current-savings"
-            label="Current Savings"
+            label={t("Current Savings")}
             value={input.currentSavings}
             onChange={(v) => onChange({ currentSavings: v })}
             min={0}
@@ -159,7 +160,7 @@ export function ScenarioInputsPanel({
           />
           <SliderField
             id="emergency-fund"
-            label="Emergency Fund"
+            label={t("Emergency Fund")}
             value={input.emergencyFund}
             onChange={(v) => onChange({ emergencyFund: v })}
             min={0}
@@ -171,10 +172,10 @@ export function ScenarioInputsPanel({
         <Separator />
 
         <div className="space-y-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Purchase Plan</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t("Purchase Plan")}</p>
           <SliderField
             id="purchase-amount"
-            label="Potential Purchase Amount"
+            label={t("Potential Purchase Amount")}
             value={input.purchaseAmount}
             onChange={(v) => onChange({ purchaseAmount: v })}
             min={0}
@@ -183,7 +184,7 @@ export function ScenarioInputsPanel({
           />
           <SliderField
             id="purchase-month"
-            label="Purchase Month"
+            label={t("Purchase Month")}
             value={input.purchaseMonth}
             onChange={(v) => onChange({ purchaseMonth: v })}
             min={1}

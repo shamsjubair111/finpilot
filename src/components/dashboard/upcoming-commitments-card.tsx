@@ -1,7 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { format, differenceInCalendarDays } from "date-fns";
+import { differenceInCalendarDays } from "date-fns";
+import { formatDate } from "@/lib/format-date";
 import { CalendarClock, Plus, Repeat } from "lucide-react";
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,7 @@ import { useFinance } from "@/components/providers/finance-provider";
 import { formatCurrency } from "@/lib/currency";
 import type { UpcomingCommitment } from "@/types/finance";
 import { cn } from "cn";
+import { t } from "@/lib/i18n";
 
 export function UpcomingCommitmentsCard() {
   const { commitments, deleteCommitment } = useFinance();
@@ -24,18 +26,18 @@ export function UpcomingCommitmentsCard() {
   return (
     <Card className="animate-in-up">
       <CardHeader>
-        <CardTitle>Upcoming Commitments</CardTitle>
+        <CardTitle>{t("Upcoming Commitments")}</CardTitle>
         <CardAction><Button variant="ghost" size="sm" className="gap-1" onClick={() => setAdding(true)}>
-          <Plus className="size-3.5" /> Add
+          <Plus className="size-3.5" /> {t("Add")}
         </Button></CardAction>
       </CardHeader>
       <CardContent>
         {commitments.length === 0 ? (
           <EmptyState
             icon={CalendarClock}
-            title="Nothing scheduled"
-            description="Add rent, bills or subscriptions so you're never caught off guard."
-            action={<Button size="sm" onClick={() => setAdding(true)}>Add commitment</Button>}
+            title={t("Nothing scheduled")}
+            description={t("Add rent, bills or subscriptions so you're never caught off guard.")}
+            action={<Button size="sm" onClick={() => setAdding(true)}>{t("Add commitment")}</Button>}
           />
         ) : (
           <ul className="space-y-1">
@@ -53,13 +55,13 @@ export function UpcomingCommitmentsCard() {
                       {c.title}
                       {c.recurring && <Repeat className="size-3 shrink-0 text-muted-foreground" />}
                     </p>
-                    <p className="text-xs text-muted-foreground">{c.category}</p>
+                    <p className="text-xs text-muted-foreground">{t(c.category)}</p>
                   </div>
                   <div className="shrink-0 text-right">
                     <p className="text-sm font-semibold tabular-nums">{formatCurrency(c.amount)}</p>
                     <p className={cn("text-xs", overdue ? "text-destructive" : soon ? "text-warning" : "text-muted-foreground")}>
-                      {overdue ? "Overdue · " : ""}
-                      {format(new Date(c.dueDate), "MMM d")}
+                      {overdue ? `${t("Overdue")} · ` : ""}
+                      {formatDate(c.dueDate, "MMM d")}
                     </p>
                   </div>
                   <RowActions label={c.title} onEdit={() => setEditing(c)} onDelete={() => setDeleting(c)} />
@@ -75,8 +77,8 @@ export function UpcomingCommitmentsCard() {
       <ConfirmDialog
         open={!!deleting}
         onOpenChange={(o) => !o && setDeleting(null)}
-        title="Delete commitment?"
-        description={`"${deleting?.title}" will be removed permanently.`}
+        title={t("Delete commitment?")}
+        description={t("\"{name}\" will be removed permanently.", { name: deleting?.title ?? "" })}
         onConfirm={() => deleteCommitment(deleting!.id)}
       />
     </Card>

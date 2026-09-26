@@ -1,10 +1,11 @@
 import { AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "cn";
+import { t } from "@/lib/i18n";
 
 export function ErrorState({
-  title = "Something went wrong",
-  description = "We couldn't load this data. Please try again.",
+  title,
+  description,
   onRetry,
   className,
 }: {
@@ -25,12 +26,12 @@ export function ErrorState({
         <AlertTriangle className="size-6 text-destructive" strokeWidth={1.75} />
       </div>
       <div className="space-y-1">
-        <p className="text-sm font-medium text-foreground">{title}</p>
-        <p className="mx-auto max-w-sm text-sm text-muted-foreground">{description}</p>
+        <p className="text-sm font-medium text-foreground">{title ?? t("Something went wrong")}</p>
+        <p className="mx-auto max-w-sm text-sm text-muted-foreground">{description ?? t("We couldn't load this data. Please try again.")}</p>
       </div>
       {onRetry && (
         <Button variant="outline" size="sm" onClick={onRetry}>
-          Try again
+          {t("Try again")}
         </Button>
       )}
     </div>

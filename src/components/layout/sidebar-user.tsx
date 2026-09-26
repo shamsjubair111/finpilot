@@ -4,6 +4,7 @@ import { LogOut } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useFinance } from "@/components/providers/finance-provider";
 import { cn } from "cn";
+import { t } from "@/lib/i18n";
 
 export function SidebarUser({ collapsed = false }: { collapsed?: boolean }) {
   const { user, signOut } = useFinance();
@@ -21,7 +22,7 @@ export function SidebarUser({ collapsed = false }: { collapsed?: boolean }) {
           </div>
           <button
             onClick={signOut}
-            aria-label="Sign out"
+            aria-label={t("Sign out")}
             className="rounded-lg p-1.5 text-sidebar-foreground/60 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
           >
             <LogOut className="size-4" />

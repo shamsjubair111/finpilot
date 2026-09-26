@@ -1,7 +1,9 @@
 "use client";
 
 import { ArrowDownRight, ArrowUpRight, Wallet2, TrendingDown, PiggyBank } from "lucide-react";
-import { formatCurrency } from "@/lib/currency";
+import { formatCurrency, formatNumber } from "@/lib/currency";
+import { formatDate } from "@/lib/format-date";
+import { t } from "@/lib/i18n";
 
 function getGreeting() {
   const hour = new Date().getHours();
@@ -17,7 +19,9 @@ export function BalanceHero({
   expenses,
   savingsRate,
   monthLabel,
+  assetsLabel,
 }: {
+  assetsLabel?: string;
   name: string;
   totalAssets: number;
   income: number;
@@ -35,28 +39,27 @@ export function BalanceHero({
         <div className="space-y-5">
           <div className="space-y-1">
             <p className="text-sm font-medium text-muted-foreground">
-              {getGreeting()}, {name}
+              {t(getGreeting())}, {name}
             </p>
-            <p className="text-xs text-muted-foreground/80">Here&apos;s how your money looks in {monthLabel}.</p>
+            <p className="text-xs text-muted-foreground/80">{t("Here's how your money looks in {month}.", { month: formatDate(monthLabel, "MMMM yyyy") })}</p>
           </div>
 
           <div>
-            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground/70">Total Assets</p>
+            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground/70">{assetsLabel ?? t("Total Assets")}</p>
             <p className="mt-1 text-4xl font-semibold tracking-tight tabular-nums text-gradient-primary sm:text-[2.75rem]">
               {formatCurrency(totalAssets)}
             </p>
             <p className={`mt-1.5 flex items-center gap-1 text-xs font-medium ${net >= 0 ? "text-success" : "text-destructive"}`}>
               {net >= 0 ? <ArrowUpRight className="size-3.5" /> : <ArrowDownRight className="size-3.5" />}
-              {net >= 0 ? "Net +" : "Net "}
-              {formatCurrency(net, { compact: true })} this month
+              {t("Net {amount} this month", { amount: formatCurrency(net, { compact: true, signDisplay: "always" }) })}
             </p>
           </div>
         </div>
 
         <div className="grid grid-cols-3 gap-2 sm:gap-4">
-          <HeroStat icon={Wallet2} label="Income" value={formatCurrency(income, { compact: true })} tone="primary" />
-          <HeroStat icon={TrendingDown} label="Spending" value={formatCurrency(expenses, { compact: true })} tone="destructive" />
-          <HeroStat icon={PiggyBank} label="Savings Rate" value={`${Math.round(savingsRate)}%`} tone="success" />
+          <HeroStat icon={Wallet2} label={t("Income")} value={formatCurrency(income, { compact: true })} tone="primary" />
+          <HeroStat icon={TrendingDown} label={t("Spending")} value={formatCurrency(expenses, { compact: true })} tone="destructive" />
+          <HeroStat icon={PiggyBank} label={t("Savings Rate")} value={`${formatNumber(Math.round(savingsRate))}%`} tone="success" />
         </div>
       </div>
     </div>

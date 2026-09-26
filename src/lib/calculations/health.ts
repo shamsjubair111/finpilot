@@ -1,3 +1,4 @@
+import { t } from "@/lib/i18n";
 import type { FinancialHealth, FinancialHealthFactor } from "@/types/finance";
 import { calculateSavingsRate, calculateEmergencyFundCoverage } from "./savings";
 
@@ -23,19 +24,19 @@ export function calculateFinancialHealth(inputs: HealthInputs): FinancialHealth 
       label: "Savings Rate",
       score: Math.min(100, (savingsRate / 30) * 100),
       weight: 0.3,
-      detail: `You save ${savingsRate.toFixed(0)}% of your income each month.`,
+      detail: t("You save {rate}% of your income each month.", { rate: Math.round(savingsRate) }),
     },
     {
       label: "Emergency Fund",
       score: emergencyCoverage,
       weight: 0.25,
-      detail: `Emergency fund is ${emergencyCoverage}% complete.`,
+      detail: t("Emergency fund is {pct}% complete.", { pct: emergencyCoverage }),
     },
     {
       label: "Budget Discipline",
       score: Math.max(0, 100 - Math.max(0, inputs.budgetUtilization - 80) * 3),
       weight: 0.2,
-      detail: `Overall budget utilization is ${inputs.budgetUtilization.toFixed(0)}%.`,
+      detail: t("Overall budget utilization is {pct}%.", { pct: Math.round(inputs.budgetUtilization) }),
     },
     {
       label: "Debt Load",
@@ -43,14 +44,14 @@ export function calculateFinancialHealth(inputs: HealthInputs): FinancialHealth 
       weight: 0.1,
       detail:
         inputs.debtToIncomeRatio === 0
-          ? "You carry no active debt."
-          : `Debt-to-income ratio is ${(inputs.debtToIncomeRatio * 100).toFixed(0)}%.`,
+          ? t("You carry no active debt.")
+          : t("Debt-to-income ratio is {pct}%.", { pct: Math.round(inputs.debtToIncomeRatio * 100) }),
     },
     {
       label: "Goal Progress",
       score: inputs.goalProgressAverage,
       weight: 0.15,
-      detail: `Average goal progress is ${inputs.goalProgressAverage.toFixed(0)}%.`,
+      detail: t("Average goal progress is {pct}%.", { pct: Math.round(inputs.goalProgressAverage) }),
     },
   ];
 
@@ -74,21 +75,21 @@ function buildHealthInsights(
   const insights: string[] = [];
 
   if (savingsRate >= 25) {
-    insights.push("Your savings rate is strong.");
+    insights.push(t("Your savings rate is strong."));
   } else if (savingsRate < 15) {
-    insights.push("Your savings rate could use improvement.");
+    insights.push(t("Your savings rate could use improvement."));
   }
 
-  insights.push(`Emergency fund is ${emergencyCoverage}% complete.`);
+  insights.push(t("Emergency fund is {pct}% complete.", { pct: emergencyCoverage }));
 
   const budgetFactor = factors.find((f) => f.label === "Budget Discipline");
   if (budgetFactor && budgetFactor.score < 70) {
-    insights.push("One or more budget categories are close to their limit.");
+    insights.push(t("One or more budget categories are close to their limit."));
   }
 
   const goalFactor = factors.find((f) => f.label === "Goal Progress");
   if (goalFactor && goalFactor.score >= 50) {
-    insights.push("Your financial goals are progressing well.");
+    insights.push(t("Your financial goals are progressing well."));
   }
 
   return insights;

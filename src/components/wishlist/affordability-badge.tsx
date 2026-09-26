@@ -1,6 +1,8 @@
 import { CheckCircle2, Clock, AlertTriangle, XCircle } from "lucide-react";
 import type { AffordabilityResult } from "@/types/finance";
 import { cn } from "cn";
+import { t } from "@/lib/i18n";
+import { formatNumber } from "@/lib/currency";
 
 const STATUS_META: Record<
   AffordabilityResult["status"],
@@ -24,7 +26,7 @@ export function AffordabilityBadge({ result, compact }: { result: AffordabilityR
       )}
     >
       <Icon className="size-3.5" />
-      {compact ? `${result.score}/100` : result.label}
+      {compact ? `${formatNumber(result.score)}/${formatNumber(100)}` : t(result.label)}
     </span>
   );
 }

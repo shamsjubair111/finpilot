@@ -9,6 +9,7 @@ import { getBudgetStatus } from "@/lib/calculations/budget";
 import { formatCurrency } from "@/lib/currency";
 import type { BudgetCategory } from "@/types/finance";
 import { cn } from "cn";
+import { t } from "@/lib/i18n";
 
 const STATUS_LABEL: Record<ReturnType<typeof getBudgetStatus>, string> = {
   on_track: "On track",
@@ -49,23 +50,23 @@ export function BudgetCategoryCard({
           <div>
             <p className="text-sm font-semibold">{category.category}</p>
             <Badge className={cn("mt-0.5 font-normal", STATUS_BADGE[status])} variant="secondary">
-              {STATUS_LABEL[status]}
+              {t(STATUS_LABEL[status])}
             </Badge>
           </div>
         </div>
-        <RowActions label={`${category.category} budget`} onEdit={onEdit} onDelete={onDelete} />
+        <RowActions label={t("{name} budget", { name: t(category.category) })} onEdit={onEdit} onDelete={onDelete} />
       </div>
 
       <div className="space-y-1.5">
         <div className="flex items-baseline justify-between text-sm">
           <span className="font-semibold tabular-nums">{formatCurrency(category.spent)}</span>
-          <span className="text-xs text-muted-foreground">of {formatCurrency(category.budgeted)}</span>
+          <span className="text-xs text-muted-foreground">{t("of")} {formatCurrency(category.budgeted)}</span>
         </div>
         <ProgressBar value={pct} status={status} />
         <p className={cn("text-xs", remaining < 0 ? "text-destructive" : "text-muted-foreground")}>
           {remaining >= 0
-            ? `${formatCurrency(remaining)} remaining`
-            : `${formatCurrency(Math.abs(remaining))} over budget`}
+            ? t("{amount} remaining", { amount: formatCurrency(remaining) })
+            : t("{amount} over budget", { amount: formatCurrency(Math.abs(remaining)) })}
         </p>
       </div>
     </Card>

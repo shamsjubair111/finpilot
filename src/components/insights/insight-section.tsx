@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/shared/empty-state";
 import type { Insight } from "@/types/finance";
 import { cn } from "cn";
+import { t } from "@/lib/i18n";
 
 const SEVERITY_ICON: Record<Insight["severity"], LucideIcon> = {
   positive: CheckCircle2,
@@ -37,7 +38,7 @@ export function InsightSection({
       </CardHeader>
       <CardContent>
         {insights.length === 0 ? (
-          <EmptyState icon={Icon} title="Nothing to report" description={emptyLabel} className="py-8" />
+          <EmptyState icon={Icon} title={t("Nothing to report")} description={emptyLabel} className="py-8" />
         ) : (
           <ul className="space-y-3">
             {insights.map((insight) => {

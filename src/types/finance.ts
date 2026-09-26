@@ -1,8 +1,8 @@
-// Core domain types for FinPilot, shared by the API responses and the UI.
+// Core domain types for Sanchay, shared by the API responses and the UI.
 
-export type Currency = "BDT" | "USD" | "EUR" | "GBP";
+export type Currency = "BDT" | "USD" | "EUR" | "GBP" | "INR" | "CAD" | "AUD" | "AED" | "SAR" | "MYR" | "SGD" | "JPY";
 
-export type TransactionType = "income" | "expense";
+export type TransactionType = "income" | "expense" | "transfer";
 
 export type PaymentMethod =
   | "cash"
@@ -35,6 +35,36 @@ export interface Transaction {
   type: TransactionType;
   paymentMethod: PaymentMethod;
   notes?: string;
+  accountId?: string | null;
+  toAccountId?: string | null;
+}
+
+export type AccountType =
+  | "bank"
+  | "bkash"
+  | "nagad"
+  | "rocket"
+  | "upay"
+  | "cash"
+  | "credit_card"
+  | "loan"
+  | "savings"
+  | "e_wallet"
+  | "investment"
+  | "other";
+
+export interface Account {
+  id: string;
+  name: string;
+  type: AccountType;
+  institution?: string | null;
+  accountNumber?: string | null;
+  openingBalance: number;
+  creditLimit?: number | null;
+  interestRate?: number | null;
+  color: string;
+  archived?: boolean;
+  createdAt?: string;
 }
 
 export interface BudgetCategory {
@@ -202,6 +232,7 @@ export interface UserProfile {
   emergencyFundCurrent: number;
   defaultSavingsTarget: number;
   memberSince: string;
+  language: "en" | "bn";
 }
 
 export interface UpcomingCommitment {

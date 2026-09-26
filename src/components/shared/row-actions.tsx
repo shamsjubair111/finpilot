@@ -9,22 +9,23 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { t } from "@/lib/i18n";
 
 export function RowActions({ label, onEdit, onDelete }: { label: string; onEdit: () => void; onDelete: () => void }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon-sm" aria-label={`Actions for ${label}`} onClick={(e) => e.stopPropagation()}>
+        <Button variant="ghost" size="icon-sm" aria-label={t("Actions for {name}", { name: label })} onClick={(e) => e.stopPropagation()}>
           <MoreHorizontal className="size-4" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-40" onClick={(e) => e.stopPropagation()}>
         <DropdownMenuItem onSelect={onEdit} className="gap-2">
-          <Pencil className="size-3.5" /> Edit
+          <Pencil className="size-3.5" /> {t("Edit")}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem variant="destructive" onSelect={onDelete} className="gap-2">
-          <Trash2 className="size-3.5" /> Delete
+          <Trash2 className="size-3.5" /> {t("Delete")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Plus, ArrowUpRight, ArrowDownRight, Wallet } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
@@ -13,13 +14,24 @@ import { TransactionList } from "@/components/transactions/transaction-list";
 import { TransactionFormDialog } from "@/components/transactions/transaction-form-dialog";
 import { useFinance } from "@/components/providers/finance-provider";
 import { formatCurrency } from "@/lib/currency";
+import { t as tr } from "@/lib/i18n";
 
 export default function TransactionsPage() {
+  return (
+    <Suspense>
+      <TransactionsView />
+    </Suspense>
+  );
+}
+
+function TransactionsView() {
+  const params = useSearchParams();
   const { transactions } = useFinance();
   const [filters, setFilters] = useState<TransactionFilterState>({
     search: "",
     category: "all",
     type: "all",
+    account: params.get("account") ?? "all",
   });
 
   const filtered = useMemo(() => {
@@ -27,6 +39,7 @@ export default function TransactionsPage() {
       .filter((t) => {
         if (filters.type !== "all" && t.type !== filters.type) return false;
         if (filters.category !== "all" && t.category !== filters.category) return false;
+        if (filters.account !== "all" && t.accountId !== filters.account && t.toAccountId !== filters.account) return false;
         if (filters.search) {
           const q = filters.search.toLowerCase();
           if (!t.title.toLowerCase().includes(q) && !t.merchant.toLowerCase().includes(q)) return false;
@@ -42,14 +55,14 @@ export default function TransactionsPage() {
   return (
     <div>
       <PageHeader
-        title="Transactions"
-        subtitle="Every income and expense, all in one place."
+        title={tr("Transactions")}
+        subtitle={tr("Every income and expense, all in one place.")}
         actions={
           <TransactionFormDialog
             trigger={
               <Button size="sm" className="gap-1.5">
                 <Plus className="size-4" />
-                Add Transaction
+                {tr("Add Transaction")}
               </Button>
             }
           />
@@ -63,8 +76,8 @@ export default function TransactionsPage() {
               <Wallet className="size-[18px]" />
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Showing</p>
-              <p className="text-lg font-semibold tabular-nums">{filtered.length} transactions</p>
+              <p className="text-xs text-muted-foreground">{tr("Showing")}</p>
+              <p className="text-lg font-semibold tabular-nums">{tr("{count} transactions", { count: filtered.length })}</p>
             </div>
           </div>
         </Card>
@@ -74,7 +87,7 @@ export default function TransactionsPage() {
               <ArrowUpRight className="size-[18px]" />
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Total Income</p>
+              <p className="text-xs text-muted-foreground">{tr("Total Income")}</p>
               <p className="text-lg font-semibold tabular-nums text-success">{formatCurrency(totalIncome)}</p>
             </div>
           </div>
@@ -85,7 +98,7 @@ export default function TransactionsPage() {
               <ArrowDownRight className="size-[18px]" />
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Total Expenses</p>
+              <p className="text-xs text-muted-foreground">{tr("Total Expenses")}</p>
               <p className="text-lg font-semibold tabular-nums">{formatCurrency(totalExpense)}</p>
             </div>
           </div>
@@ -99,7 +112,7 @@ export default function TransactionsPage() {
             transactions={filtered}
             emptyAction={
               transactions.length === 0 ? (
-                <TransactionFormDialog trigger={<Button size="sm" className="gap-1.5"><Plus className="size-4" />Add your first transaction</Button>} />
+                <TransactionFormDialog trigger={<Button size="sm" className="gap-1.5"><Plus className="size-4" />{tr("Add your first transaction")}</Button>} />
               ) : undefined
             }
           />

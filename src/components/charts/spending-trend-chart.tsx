@@ -1,5 +1,7 @@
 "use client";
 
+import { t } from "@/lib/i18n";
+
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { ChartTooltip } from "./chart-tooltip";
 import { formatCurrency } from "@/lib/currency";
@@ -37,7 +39,7 @@ export function SpendingTrendChart({ data }: { data: { month: string; expenses: 
           type="monotone"
           animationDuration={450}
           dataKey="expenses"
-          name="Expenses"
+          name={t("Expenses")}
           stroke={SERIES_COLORS.expenses}
           strokeWidth={2.5}
           dot={{ r: 3, fill: SERIES_COLORS.expenses, strokeWidth: 0 }}

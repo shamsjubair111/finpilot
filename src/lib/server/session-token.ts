@@ -1,6 +1,6 @@
 import { SignJWT, jwtVerify } from "jose";
 
-export const SESSION_COOKIE = "finpilot_session";
+export const SESSION_COOKIE = "sanchay_session";
 export const SESSION_MAX_AGE = 60 * 60 * 24 * 7;
 
 function secretKey() {

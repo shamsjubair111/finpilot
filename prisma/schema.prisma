@@ -14,6 +14,7 @@ model User {
   passwordHash         String
   avatarUrl            String?
   currency             String   @default("BDT")
+  language             String   @default("en")
   monthlySalary        Float    @default(0)
   currentSavings       Float    @default(0)
   emergencyFundTarget  Float    @default(0)
@@ -27,6 +28,28 @@ model User {
   goals        Goal[]
   purchases    Purchase[]
   commitments  Commitment[]
+  accounts     Account[]
+}
+
+model Account {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name           String
+  type           String
+  institution    String?
+  accountNumber  String?
+  openingBalance Float    @default(0)
+  creditLimit    Float?
+  interestRate   Float?
+  color          String   @default("#6366f1")
+  archived       Boolean  @default(false)
+  createdAt      DateTime @default(now())
+
+  transactions         Transaction[] @relation("TxnAccount")
+  incomingTransfers    Transaction[] @relation("TxnToAccount")
+
+  @@index([userId])
 }
 
 model Transaction {
@@ -41,6 +64,10 @@ model Transaction {
   type          String
   paymentMethod String   @default("card")
   notes         String?
+  accountId     String?
+  account       Account? @relation("TxnAccount", fields: [accountId], references: [id], onDelete: SetNull)
+  toAccountId   String?
+  toAccount     Account? @relation("TxnToAccount", fields: [toAccountId], references: [id], onDelete: SetNull)
   createdAt     DateTime @default(now())
 
   @@index([userId, date])

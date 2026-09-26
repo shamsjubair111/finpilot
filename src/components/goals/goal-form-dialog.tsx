@@ -1,5 +1,7 @@
 "use client";
 
+import { getCurrencySymbol } from "@/lib/currency";
+
 import * as React from "react";
 import {
   Dialog,
@@ -25,6 +27,7 @@ import { useFinance } from "@/components/providers/finance-provider";
 import { SubmitButton } from "@/components/shared/submit-button";
 import { GOAL_PRIORITIES } from "@/lib/constants";
 import type { FinancialGoal, GoalPriority } from "@/types/finance";
+import { t } from "@/lib/i18n";
 
 const GOAL_CATEGORY_OPTIONS: { value: "emergency" | "purchase" | "education" | "travel" | "other"; label: string; icon: string; color: string }[] = [
   { value: "emergency", label: "Emergency Fund", icon: "ShieldCheck", color: "var(--chart-1)" },
@@ -104,74 +107,74 @@ export function GoalFormDialog({
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{isEdit ? "Edit Goal" : "Add Financial Goal"}</DialogTitle>
-          <DialogDescription>Set a savings target and track your progress over time.</DialogDescription>
+          <DialogTitle>{isEdit ? t("Edit Goal") : t("Add Financial Goal")}</DialogTitle>
+          <DialogDescription>{t("Set a savings target and track your progress over time.")}</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="space-y-1.5 sm:col-span-2">
-              <Label htmlFor="goal-name">Goal Name</Label>
-              <Input id="goal-name" placeholder="e.g. New Camera Fund" value={name} onChange={(e) => setName(e.target.value)} required />
+              <Label htmlFor="goal-name">{t("Goal Name")}</Label>
+              <Input id="goal-name" placeholder={t("e.g. New Camera Fund")} value={name} onChange={(e) => setName(e.target.value)} required />
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="goal-amount">Target Amount (৳)</Label>
+              <Label htmlFor="goal-amount">{`${t("Target Amount")} (${getCurrencySymbol()})`}</Label>
               <Input id="goal-amount" type="number" min={0} step="any" inputMode="decimal" value={goalAmount} onChange={(e) => setGoalAmount(e.target.value)} required />
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="goal-current">Current Saved (৳)</Label>
+              <Label htmlFor="goal-current">{`${t("Current Saved")} (${getCurrencySymbol()})`}</Label>
               <Input id="goal-current" type="number" min={0} step="any" inputMode="decimal" value={currentAmount} onChange={(e) => setCurrentAmount(e.target.value)} />
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="goal-monthly">Monthly Contribution (৳)</Label>
+              <Label htmlFor="goal-monthly">{`${t("Monthly Contribution")} (${getCurrencySymbol()})`}</Label>
               <Input id="goal-monthly" type="number" min={0} step="any" inputMode="decimal" value={monthlyContribution} onChange={(e) => setMonthlyContribution(e.target.value)} />
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="goal-date">Target Date</Label>
+              <Label htmlFor="goal-date">{t("Target Date")}</Label>
               <Input id="goal-date" type="date" value={targetDate} onChange={(e) => setTargetDate(e.target.value)} required />
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="goal-priority">Priority</Label>
+              <Label htmlFor="goal-priority">{t("Priority")}</Label>
               <Select value={priority} onValueChange={(v) => setPriority(v as GoalPriority)}>
                 <SelectTrigger id="goal-priority" className="w-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   {GOAL_PRIORITIES.map((p) => (
-                    <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>
+                    <SelectItem key={p.value} value={p.value}>{t(p.label)}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="goal-category">Category</Label>
+              <Label htmlFor="goal-category">{t("Category")}</Label>
               <Select value={category} onValueChange={(v) => setCategory(v as typeof category)}>
                 <SelectTrigger id="goal-category" className="w-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   {GOAL_CATEGORY_OPTIONS.map((c) => (
-                    <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+                    <SelectItem key={c.value} value={c.value}>{t(c.label)}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-1.5 sm:col-span-2">
-              <Label htmlFor="goal-description">Description (optional)</Label>
+              <Label htmlFor="goal-description">{t("Description (optional)")}</Label>
               <Textarea id="goal-description" rows={2} value={description} onChange={(e) => setDescription(e.target.value)} />
             </div>
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-            <SubmitButton pending={pending} disabled={!isValid}>{isEdit ? "Save changes" : "Create Goal"}</SubmitButton>
+            <Button type="button" variant="outline" onClick={() => setOpen(false)}>{t("Cancel")}</Button>
+            <SubmitButton pending={pending} disabled={!isValid}>{isEdit ? t("Save changes") : t("Create Goal")}</SubmitButton>
           </DialogFooter>
         </form>
       </DialogContent>

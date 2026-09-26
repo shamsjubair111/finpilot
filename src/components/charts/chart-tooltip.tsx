@@ -1,3 +1,4 @@
+import { t } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/currency";
 
 interface TooltipPayloadItem {
@@ -33,7 +34,7 @@ export function ChartTooltip({ active, label, payload, formatter }: ChartTooltip
                 className="size-2 shrink-0 rounded-full"
                 style={{ backgroundColor: item.color }}
               />
-              {item.name}
+              {t(String(item.name))}
             </span>
             <span className="font-semibold tabular-nums text-foreground">{format(item.value)}</span>
           </div>

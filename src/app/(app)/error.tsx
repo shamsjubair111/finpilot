@@ -1,5 +1,7 @@
 "use client";
 
+import { t } from "@/lib/i18n";
+
 import { useEffect } from "react";
 import { ErrorState } from "@/components/shared/error-state";
 
@@ -16,8 +18,8 @@ export default function GlobalError({
 
   return (
     <ErrorState
-      title="Something went wrong"
-      description="An unexpected error occurred while loading this page. This won't happen once connected to a real backend with proper error handling."
+      title={t("Something went wrong")}
+      description={t("An unexpected error occurred while loading this page. Please try again.")}
       onRetry={reset}
     />
   );

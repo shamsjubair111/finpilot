@@ -1,5 +1,6 @@
 "use client";
 
+import { t } from "@/lib/i18n";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import type { BudgetCategory } from "@/types/finance";
 import { CATEGORY_COLORS } from "@/lib/chart-colors";
@@ -8,7 +9,7 @@ import { ChartTooltip } from "./chart-tooltip";
 
 export function ExpenseDonutChart({
   categories,
-  totalLabel = "Total Spent",
+  totalLabel,
 }: {
   categories: BudgetCategory[];
   totalLabel?: string;
@@ -51,7 +52,7 @@ export function ExpenseDonutChart({
         </PieChart>
       </ResponsiveContainer>
       <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-        <p className="text-xs text-muted-foreground">{totalLabel}</p>
+        <p className="text-xs text-muted-foreground">{totalLabel ?? t("Total Spent")}</p>
         <p className="text-xl font-semibold tabular-nums">{formatCurrency(total, { compact: true })}</p>
       </div>
     </div>

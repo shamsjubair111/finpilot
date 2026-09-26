@@ -3,8 +3,10 @@
 import { RefreshCw, WifiOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/layout/logo";
+import { useI18n } from "@/lib/i18n/provider";
 
 export function FullPageLoader({ error, onRetry }: { error?: string | null; onRetry?: () => void }) {
+  const { t } = useI18n();
   return (
     <div className="bg-aurora relative flex min-h-dvh flex-col items-center justify-center gap-6 overflow-hidden px-6 text-center">
       <div className="relative">
@@ -20,7 +22,7 @@ export function FullPageLoader({ error, onRetry }: { error?: string | null; onRe
           </div>
           <p className="text-sm text-muted-foreground">{error}</p>
           <Button onClick={onRetry} className="gap-2">
-            <RefreshCw className="size-4" /> Try again
+            <RefreshCw className="size-4" /> {t("Try again")}
           </Button>
         </div>
       ) : (
@@ -28,7 +30,7 @@ export function FullPageLoader({ error, onRetry }: { error?: string | null; onRe
           <span className="size-2 animate-bounce rounded-full bg-primary [animation-delay:-0.3s]" />
           <span className="size-2 animate-bounce rounded-full bg-primary [animation-delay:-0.15s]" />
           <span className="size-2 animate-bounce rounded-full bg-primary" />
-          <span className="ml-2">Loading your finances…</span>
+          <span className="ml-2">{t("Loading your finances…")}</span>
         </div>
       )}
     </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import { t } from "@/lib/i18n";
 import { useFinance } from "@/components/providers/finance-provider";
 import { BalanceHero } from "@/components/dashboard/balance-hero";
 import { SummaryCards } from "@/components/dashboard/summary-cards";
@@ -11,6 +12,7 @@ import { FinancialHealthCard } from "@/components/dashboard/financial-health-car
 import { RecentTransactionsCard } from "@/components/dashboard/recent-transactions-card";
 import { UpcomingCommitmentsCard } from "@/components/dashboard/upcoming-commitments-card";
 import { GettingStarted } from "@/components/dashboard/getting-started";
+import { AccountsStrip } from "@/components/dashboard/accounts-strip";
 import {
   calculateSavingsRate,
   calculateAvailableToSpend,
@@ -22,7 +24,7 @@ import { calculateGoalProgress } from "@/lib/calculations/goals";
 import { monthlyCashflow, monthTotals } from "@/lib/derive";
 
 export default function DashboardPage() {
-  const { user, budgetCategories, goals, transactions, selectedMonth } = useFinance();
+  const { user, budgetCategories, goals, transactions, selectedMonth, accounts, netWorth } = useFinance();
 
   const { income, expenses } = useMemo(() => {
     const totals = monthTotals(transactions, selectedMonth);
@@ -61,7 +63,8 @@ export default function DashboardPage() {
       <GettingStarted />
       <BalanceHero
         name={user.name.split(" ")[0]}
-        totalAssets={user.currentSavings + user.emergencyFundCurrent}
+        totalAssets={accounts.length ? netWorth.netWorth : user.currentSavings + user.emergencyFundCurrent}
+        assetsLabel={t(accounts.length ? "Net Worth" : "Total Assets")}
         income={income}
         expenses={expenses}
         savingsRate={savingsRate}
@@ -69,6 +72,7 @@ export default function DashboardPage() {
       />
 
       <div className="space-y-6">
+        <AccountsStrip />
         <SummaryCards
           income={income}
           expenses={expenses}

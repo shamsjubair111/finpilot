@@ -5,15 +5,17 @@ import { Check, ChevronRight, Rocket } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { useFinance } from "@/components/providers/finance-provider";
 import { cn } from "cn";
+import { t } from "@/lib/i18n";
 
 export function GettingStarted() {
-  const { user, transactions, budgetCategories, goals, commitments } = useFinance();
+  const { user, transactions, budgetCategories, goals, commitments, accounts } = useFinance();
   const steps = [
-    { done: user.monthlySalary > 0, label: "Set your monthly income & savings", href: "/settings" },
-    { done: transactions.length > 0, label: "Record your first transaction", href: "/transactions" },
-    { done: budgetCategories.length > 0, label: "Create a budget category", href: "/budget" },
-    { done: goals.length > 0, label: "Add a savings goal", href: "/goals" },
-    { done: commitments.length > 0, label: "Add an upcoming bill", href: "/#commitments" },
+    { done: user.monthlySalary > 0, label: t("Set your monthly income & savings"), href: "/settings" },
+    { done: accounts.length > 0, label: t("Add your bank, bKash or card"), href: "/accounts" },
+    { done: transactions.length > 0, label: t("Record your first transaction"), href: "/transactions" },
+    { done: budgetCategories.length > 0, label: t("Create a budget category"), href: "/budget" },
+    { done: goals.length > 0, label: t("Add a savings goal"), href: "/goals" },
+    { done: commitments.length > 0, label: t("Add an upcoming bill"), href: "/#commitments" },
   ];
   const completed = steps.filter((s) => s.done).length;
   if (completed === steps.length) return null;
@@ -28,8 +30,8 @@ export function GettingStarted() {
             <Rocket className="size-5" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="font-semibold">Get set up</p>
-            <p className="text-sm text-muted-foreground">{completed} of {steps.length} done</p>
+            <p className="font-semibold">{t("Get set up")}</p>
+            <p className="text-sm text-muted-foreground">{t("{done} of {total} done", { done: completed, total: steps.length })}</p>
             <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-muted">
               <div className="bg-gradient-brand h-full rounded-full transition-all duration-700" style={{ width: `${pct}%` }} />
             </div>

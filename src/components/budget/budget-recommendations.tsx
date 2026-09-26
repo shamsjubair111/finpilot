@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getBudgetStatus } from "@/lib/calculations/budget";
 import { formatCurrency } from "@/lib/currency";
 import type { BudgetCategory } from "@/types/finance";
+import { t } from "@/lib/i18n";
 
 function buildRecommendations(categories: BudgetCategory[]): string[] {
   const recs: string[] = [];
@@ -12,9 +13,9 @@ function buildRecommendations(categories: BudgetCategory[]): string[] {
     const pct = Math.round((c.spent / c.budgeted) * 100);
 
     if (status === "over_budget") {
-      recs.push(`${c.category} is ${pct}% of its monthly limit — you're ${formatCurrency(c.spent - c.budgeted)} over.`);
+      recs.push(t("{category} is {pct}% of its monthly limit — you're {amount} over.", { category: t(c.category), pct, amount: formatCurrency(c.spent - c.budgeted) }));
     } else if (status === "near_limit") {
-      recs.push(`${c.category} is at ${pct}% of its monthly limit.`);
+      recs.push(t("{category} is at {pct}% of its monthly limit.", { category: t(c.category), pct }));
     }
   }
 
@@ -24,13 +25,13 @@ function buildRecommendations(categories: BudgetCategory[]): string[] {
   const potentialSavings = discretionary.reduce((sum, c) => sum + Math.round(c.spent * 0.15), 0);
   if (potentialSavings > 0) {
     recs.push(
-      `You could save ${formatCurrency(potentialSavings)} by trimming 15% off discretionary categories like Shopping and Entertainment.`
+      t("You could save {amount} by trimming 15% off discretionary categories like Shopping and Entertainment.", { amount: formatCurrency(potentialSavings) })
     );
   }
 
   const healthy = categories.filter((c) => getBudgetStatus(c.spent, c.budgeted) === "on_track");
   if (healthy.length >= 3) {
-    recs.push(`${healthy.length} categories are comfortably on track this month — nice discipline.`);
+    recs.push(t("{count} categories are comfortably on track this month — nice discipline.", { count: healthy.length }));
   }
 
   return recs;
@@ -44,12 +45,12 @@ export function BudgetRecommendations({ categories }: { categories: BudgetCatego
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Lightbulb className="size-4 text-warning" />
-          Budget Recommendations
+          {t("Budget Recommendations")}
         </CardTitle>
       </CardHeader>
       <CardContent>
         {recommendations.length === 0 && (
-          <p className="text-sm text-muted-foreground">No recommendations yet — they&apos;ll appear as you record expenses.</p>
+          <p className="text-sm text-muted-foreground">{t("No recommendations yet — they'll appear as you record expenses.")}</p>
         )}
         <ul className="space-y-2.5">
           {recommendations.map((r, i) => (

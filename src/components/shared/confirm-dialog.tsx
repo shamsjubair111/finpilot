@@ -11,13 +11,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { t } from "@/lib/i18n";
 
 export function ConfirmDialog({
   open,
   onOpenChange,
   title,
   description,
-  confirmLabel = "Delete",
+  confirmLabel,
   onConfirm,
 }: {
   open: boolean;
@@ -48,11 +49,11 @@ export function ConfirmDialog({
         </DialogHeader>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={pending}>
-            Cancel
+            {t("Cancel")}
           </Button>
           <Button variant="destructive" onClick={handleConfirm} disabled={pending} className="gap-2">
             {pending && <Loader2 className="size-4 animate-spin" />}
-            {confirmLabel}
+            {confirmLabel ?? t("Delete")}
           </Button>
         </DialogFooter>
       </DialogContent>

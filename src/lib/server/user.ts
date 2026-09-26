@@ -7,12 +7,13 @@ export function toProfile(u: User) {
     name: u.name,
     email: u.email,
     avatarUrl: u.avatarUrl ?? undefined,
-    currency: u.currency,
+    currency: u.currency as import("@/types/finance").Currency,
     monthlySalary: u.monthlySalary,
     currentSavings: u.currentSavings,
     emergencyFundTarget: u.emergencyFundTarget,
     emergencyFundCurrent: u.emergencyFundCurrent,
     defaultSavingsTarget: u.defaultSavingsTarget,
     memberSince: u.createdAt.toISOString(),
+    language: u.language === "bn" ? ("bn" as const) : ("en" as const),
   };
 }

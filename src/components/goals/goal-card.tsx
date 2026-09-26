@@ -1,6 +1,6 @@
 "use client";
 
-import { format } from "date-fns";
+import { formatDate } from "@/lib/format-date";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ProgressBar } from "@/components/finance/progress-bar";
@@ -9,6 +9,7 @@ import { formatCurrency } from "@/lib/currency";
 import { calculateGoalProgress, calculateGoalRemaining, calculateMonthsToGoal, estimateCompletionDate } from "@/lib/calculations/goals";
 import type { FinancialGoal } from "@/types/finance";
 import { cn } from "cn";
+import { t } from "@/lib/i18n";
 
 const PRIORITY_STYLE: Record<FinancialGoal["priority"], string> = {
   high: "bg-destructive/10 text-destructive",
@@ -41,7 +42,7 @@ export function GoalCard({ goal, onClick }: { goal: FinancialGoal; onClick: () =
           <div>
             <p className="text-sm font-semibold">{goal.name}</p>
             <Badge className={cn("mt-0.5 font-normal capitalize", PRIORITY_STYLE[goal.priority])} variant="secondary">
-              {goal.priority} priority
+              {t({ high: "High priority", medium: "Medium priority", low: "Low priority" }[goal.priority])}
             </Badge>
           </div>
         </div>
@@ -52,29 +53,29 @@ export function GoalCard({ goal, onClick }: { goal: FinancialGoal; onClick: () =
 
       <div className="grid grid-cols-2 gap-x-3 gap-y-2 text-xs">
         <div>
-          <p className="text-muted-foreground">Saved</p>
+          <p className="text-muted-foreground">{t("Saved")}</p>
           <p className="font-semibold tabular-nums">{formatCurrency(goal.currentAmount)}</p>
         </div>
         <div>
-          <p className="text-muted-foreground">Target</p>
+          <p className="text-muted-foreground">{t("Target")}</p>
           <p className="font-semibold tabular-nums">{formatCurrency(goal.goalAmount)}</p>
         </div>
         <div>
-          <p className="text-muted-foreground">Remaining</p>
+          <p className="text-muted-foreground">{t("Remaining")}</p>
           <p className="font-semibold tabular-nums">{formatCurrency(remaining)}</p>
         </div>
         <div>
-          <p className="text-muted-foreground">Target Date</p>
-          <p className="font-semibold">{format(new Date(goal.targetDate), "MMM yyyy")}</p>
+          <p className="text-muted-foreground">{t("Target Date")}</p>
+          <p className="font-semibold">{formatDate(goal.targetDate, "MMM yyyy")}</p>
         </div>
       </div>
 
       <div className="flex items-center justify-between border-t border-border pt-3 text-xs">
         <span className="text-muted-foreground">
-          {formatCurrency(goal.monthlyContribution)}/mo
+          {formatCurrency(goal.monthlyContribution)}{t("/mo")}
         </span>
         <span className="font-medium">
-          {estCompletion ? `Est. ${format(estCompletion, "MMM yyyy")}` : "Set a contribution"}
+          {estCompletion ? t("Est. {date}", { date: formatDate(estCompletion, "MMM yyyy") }) : t("Set a contribution")}
         </span>
       </div>
     </Card>

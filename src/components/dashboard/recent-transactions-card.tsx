@@ -1,6 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowDownLeft, ArrowUpRight, Receipt } from "lucide-react";
-import { format } from "date-fns";
+import { formatDate } from "@/lib/format-date";
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { DynamicIcon } from "@/components/shared/dynamic-icon";
@@ -8,22 +10,23 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { formatCurrency } from "@/lib/currency";
 import { CATEGORY_ICON_MAP } from "@/lib/constants";
 import type { Transaction } from "@/types/finance";
+import { t as tr } from "@/lib/i18n";
 
 export function RecentTransactionsCard({ transactions }: { transactions: Transaction[] }) {
   return (
     <Card className="animate-in-up">
       <CardHeader>
-        <CardTitle>Recent Transactions</CardTitle>
+        <CardTitle>{tr("Recent Transactions")}</CardTitle>
         <CardAction><Button variant="ghost" size="sm" asChild>
-          <Link href="/transactions">View all</Link>
+          <Link href="/transactions">{tr("View all")}</Link>
         </Button></CardAction>
       </CardHeader>
       <CardContent>
         {transactions.length === 0 ? (
           <EmptyState
             icon={Receipt}
-            title="No transactions yet"
-            description="Transactions you add will show up here."
+            title={tr("No transactions yet")}
+            description={tr("Transactions you add will show up here.")}
           />
         ) : (
           <ul className="divide-y divide-border">
@@ -42,7 +45,7 @@ export function RecentTransactionsCard({ transactions }: { transactions: Transac
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium">{t.title}</p>
                     <p className="truncate text-xs text-muted-foreground">
-                      {t.merchant ? `${t.merchant} · ` : ""}{format(new Date(t.date), "MMM d")}
+                      {t.merchant ? `${t.merchant} · ` : ""}{formatDate(t.date, "MMM d")}
                     </p>
                   </div>
                   <div className="flex shrink-0 items-center gap-1">
@@ -56,7 +59,7 @@ export function RecentTransactionsCard({ transactions }: { transactions: Transac
                         isIncome ? "text-success" : "text-foreground"
                       }`}
                     >
-                      {isIncome ? "+" : "-"}
+                      {isIncome ? "+" : t.type === "expense" ? "-" : ""}
                       {formatCurrency(t.amount)}
                     </span>
                   </div>

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronsLeft, ChevronsRight } from "lucide-react";
 import { cn } from "cn";
+import { t } from "@/lib/i18n";
 import { Logo } from "./logo";
 import { NAV_ITEMS } from "./nav-items";
 import { SidebarUser } from "./sidebar-user";
@@ -43,7 +44,7 @@ export function Sidebar({
           <div key={section}>
             {!collapsed && (
               <p className="px-2.5 pb-1.5 text-[11px] font-medium uppercase tracking-wider text-sidebar-foreground/40">
-                {section}
+                {t(section)}
               </p>
             )}
             <ul className="space-y-0.5">
@@ -75,7 +76,7 @@ export function Sidebar({
                       )}
                       strokeWidth={2}
                     />
-                    {!collapsed && <span className="truncate">{item.label}</span>}
+                    {!collapsed && <span className="truncate">{t(item.label)}</span>}
                   </Link>
                 );
 
@@ -84,7 +85,7 @@ export function Sidebar({
                     {collapsed ? (
                       <Tooltip>
                         <TooltipTrigger asChild>{link}</TooltipTrigger>
-                        <TooltipContent side="right">{item.label}</TooltipContent>
+                        <TooltipContent side="right">{t(item.label)}</TooltipContent>
                       </Tooltip>
                     ) : (
                       link
@@ -101,14 +102,14 @@ export function Sidebar({
         <SidebarUser collapsed={collapsed} />
         <button
           onClick={onToggle}
-          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          aria-label={collapsed ? t("Expand sidebar") : t("Collapse sidebar")}
           className={cn(
             "flex w-full items-center gap-3 rounded-lg px-2.5 py-2 text-sm font-medium text-sidebar-foreground/60 transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground",
             collapsed && "justify-center px-0"
           )}
         >
           {collapsed ? <ChevronsRight className="size-[18px]" /> : <ChevronsLeft className="size-[18px]" />}
-          {!collapsed && <span>Collapse</span>}
+          {!collapsed && <span>{t("Collapse")}</span>}
         </button>
       </div>
     </aside>

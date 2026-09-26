@@ -8,17 +8,21 @@ import { MonthSelector } from "./month-selector";
 import { NotificationsMenu } from "./notifications-menu";
 import { UserMenu } from "./user-menu";
 import { QuickAdd } from "./quick-add";
+import { LanguageSwitcher } from "./language-switcher";
+import { useFinance } from "@/components/providers/finance-provider";
+import { t } from "@/lib/i18n";
 
 function useCurrentPageTitle() {
   const pathname = usePathname();
   const match = NAV_ITEMS.find((item) =>
     item.href === "/" ? pathname === "/" : pathname.startsWith(item.href)
   );
-  return match?.label ?? "FinPilot";
+  return t(match?.label ?? "Sanchay");
 }
 
 export function Header({ onMenuClick }: { onMenuClick: () => void }) {
   const title = useCurrentPageTitle();
+  const { setLanguage } = useFinance();
 
   return (
     <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-2 bg-background/70 px-3 backdrop-blur-xl [box-shadow:0_1px_0_color-mix(in_oklch,var(--foreground),transparent_93%)] supports-backdrop-filter:bg-background/55 sm:gap-3 sm:px-6">
@@ -27,7 +31,7 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
         size="icon"
         className="lg:hidden"
         onClick={onMenuClick}
-        aria-label="Open navigation"
+        aria-label={t("Open navigation")}
       >
         <Menu className="size-5" />
       </Button>
@@ -40,6 +44,7 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
         <div className="hidden sm:block">
           <MonthSelector />
         </div>
+        <LanguageSwitcher onChange={setLanguage} />
         <NotificationsMenu />
         <QuickAdd />
         <UserMenu />

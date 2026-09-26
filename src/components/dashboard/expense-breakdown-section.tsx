@@ -1,7 +1,10 @@
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ExpenseDonutChart } from "@/components/charts/expense-donut-chart";
 import { CATEGORY_COLORS } from "@/lib/chart-colors";
-import { formatCurrency } from "@/lib/currency";
+import { formatCurrency, formatNumber } from "@/lib/currency";
+import { t } from "@/lib/i18n";
 import type { BudgetCategory } from "@/types/finance";
 import { PieChart } from "lucide-react";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -13,11 +16,11 @@ export function ExpenseBreakdownSection({ categories }: { categories: BudgetCate
   return (
     <Card className="animate-in-up">
       <CardHeader>
-        <CardTitle>Expense Breakdown</CardTitle>
+        <CardTitle>{t("Expense Breakdown")}</CardTitle>
       </CardHeader>
       {total === 0 ? (
         <CardContent>
-          <EmptyState icon={PieChart} title="No spending to break down" description="Expenses in your budget categories for the selected month will appear here." />
+          <EmptyState icon={PieChart} title={t("No spending to break down")} description={t("Expenses in your budget categories for the selected month will appear here.")} />
         </CardContent>
       ) : (
       <CardContent className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:items-center">
@@ -32,11 +35,11 @@ export function ExpenseBreakdownSection({ categories }: { categories: BudgetCate
                     className="size-2.5 shrink-0 rounded-full"
                     style={{ backgroundColor: CATEGORY_COLORS[c.category] }}
                   />
-                  <span className="truncate">{c.category}</span>
+                  <span className="truncate">{t(c.category)}</span>
                 </span>
                 <span className="flex shrink-0 items-center gap-2 tabular-nums">
                   <span className="font-medium">{formatCurrency(c.spent, { compact: true })}</span>
-                  <span className="w-9 text-right text-xs text-muted-foreground">{pct}%</span>
+                  <span className="w-9 text-right text-xs text-muted-foreground">{formatNumber(pct)}%</span>
                 </span>
               </li>
             );

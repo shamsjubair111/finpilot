@@ -12,6 +12,7 @@ import { runScenarioProjection, runBaselineProjection } from "@/lib/calculations
 import { defaultScenarioInput } from "@/lib/derive";
 import { useFinance } from "@/components/providers/finance-provider";
 import type { ScenarioInput } from "@/types/finance";
+import { t } from "@/lib/i18n";
 
 export default function ScenarioLabPage() {
   const { user, budgetCategories } = useFinance();
@@ -45,11 +46,11 @@ export default function ScenarioLabPage() {
   return (
     <div>
       <PageHeader
-        title="Scenario Lab"
+        title={t("Scenario Lab")}
         subtitle={
           user.monthlySalary > 0
-            ? "Starts from your saved profile and budgets — adjust the levers to simulate your future."
-            : "Tip: set your monthly salary in Settings so scenarios start from your real numbers."
+            ? t("Starts from your saved profile and budgets — adjust the levers to simulate your future.")
+            : t("Tip: set your monthly salary in Settings so scenarios start from your real numbers.")
         }
       />
 
@@ -63,9 +64,9 @@ export default function ScenarioLabPage() {
 
           <Card className="animate-in-up">
             <CardHeader>
-              <CardTitle>Projected Balance Over Time</CardTitle>
+              <CardTitle>{t("Projected Balance Over Time")}</CardTitle>
               <CardDescription>
-                Scenario plan vs. your current plan over {input.periodMonths} months
+                {t("Scenario plan vs. your current plan over {n} months", { n: input.periodMonths })}
               </CardDescription>
             </CardHeader>
             <CardContent>

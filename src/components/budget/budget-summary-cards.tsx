@@ -1,3 +1,4 @@
+import { t } from "@/lib/i18n";
 import { Wallet, TrendingDown, PiggyBank, Gauge } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/currency";
@@ -27,7 +28,7 @@ export function BudgetSummaryCards({
           <div className={`flex size-8 items-center justify-center rounded-lg ${item.tone}`}>
             <item.icon className="size-4" />
           </div>
-          <p className="text-xs text-muted-foreground">{item.label}</p>
+          <p className="text-xs text-muted-foreground">{t(item.label)}</p>
           <p className="text-xl font-semibold tabular-nums">{item.value}</p>
         </Card>
       ))}

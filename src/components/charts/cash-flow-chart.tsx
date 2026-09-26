@@ -1,5 +1,7 @@
 "use client";
 
+import { t } from "@/lib/i18n";
+
 import {
   ResponsiveContainer,
   ComposedChart,
@@ -68,7 +70,7 @@ export function CashFlowChart({ data }: { data: MonthlyFinancials[] }) {
           type="monotone"
           animationDuration={450}
           dataKey="income"
-          name="Income"
+          name={t("Income")}
           stroke={SERIES_COLORS.income}
           strokeWidth={2}
           fill="url(#incomeFill)"
@@ -79,7 +81,7 @@ export function CashFlowChart({ data }: { data: MonthlyFinancials[] }) {
           type="monotone"
           animationDuration={450}
           dataKey="expenses"
-          name="Expenses"
+          name={t("Expenses")}
           stroke={SERIES_COLORS.expenses}
           strokeWidth={2}
           fill="url(#expensesFill)"
@@ -90,7 +92,7 @@ export function CashFlowChart({ data }: { data: MonthlyFinancials[] }) {
           type="monotone"
           animationDuration={450}
           dataKey="savings"
-          name="Savings"
+          name={t("Savings")}
           stroke={SERIES_COLORS.savings}
           strokeWidth={2.5}
           dot={false}

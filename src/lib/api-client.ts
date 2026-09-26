@@ -1,3 +1,4 @@
+import { t } from "@/lib/i18n";
 export class ApiClientError extends Error {
   constructor(public status: number, message: string) {
     super(message);
@@ -14,7 +15,7 @@ export async function api<T>(path: string, init?: { method?: string; body?: unkn
       credentials: "same-origin",
     });
   } catch {
-    throw new ApiClientError(0, "Can't reach the server. Check your connection and try again.");
+    throw new ApiClientError(0, t("Can't reach the server. Check your connection and try again."));
   }
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new ApiClientError(res.status, data.error ?? `Request failed (${res.status})`);

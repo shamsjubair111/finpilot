@@ -1,3 +1,4 @@
+import { t } from "@/lib/i18n";
 import type {
   AffordabilityResult,
   AffordabilityStatus,
@@ -96,35 +97,35 @@ function buildReasons(params: {
   const reasons: string[] = [];
 
   if (incomeScore >= 22) {
-    reasons.push("Price is a small fraction of your monthly income.");
+    reasons.push(t("Price is a small fraction of your monthly income."));
   } else if (incomeScore <= 10) {
-    reasons.push("Price is large relative to your monthly income.");
+    reasons.push(t("Price is large relative to your monthly income."));
   }
 
   if (remaining === 0) {
-    reasons.push("You've already saved the full amount.");
+    reasons.push(t("You've already saved the full amount."));
   } else if (savingsScore <= 8) {
-    reasons.push("Remaining amount is a large share of your available savings.");
+    reasons.push(t("Remaining amount is a large share of your available savings."));
   } else if (savingsScore >= 18) {
-    reasons.push("Remaining amount is easily covered by your available savings.");
+    reasons.push(t("Remaining amount is easily covered by your available savings."));
   }
 
   if (ctx.emergencyFundCoverage < 60 && remaining > 0) {
-    reasons.push("Your emergency fund isn't fully built up yet.");
+    reasons.push(t("Your emergency fund isn't fully built up yet."));
   } else if (emergencyScore >= 16) {
-    reasons.push("Your emergency fund is healthy enough to absorb this.");
+    reasons.push(t("Your emergency fund is healthy enough to absorb this."));
   }
 
   if (monthsNeeded > 6 && remaining > 0) {
-    reasons.push("Would take a while to save using free cash flow alone.");
+    reasons.push(t("Would take a while to save using free cash flow alone."));
   } else if (freeCashScore >= 12) {
-    reasons.push("Fits comfortably within your monthly free cash flow.");
+    reasons.push(t("Fits comfortably within your monthly free cash flow."));
   }
 
   if (ctx.priority === "high") {
-    reasons.push("Marked as a high priority item.");
+    reasons.push(t("Marked as a high priority item."));
   } else if (ctx.priority === "low") {
-    reasons.push("Marked as a low priority — safe to delay.");
+    reasons.push(t("Marked as a low priority — safe to delay."));
   }
 
   return reasons;
@@ -191,8 +192,8 @@ export function calculatePurchaseImpact(params: {
   const goalsDelayed = remainingFreeCash < otherGoalsMonthlyTotal;
   const emergencyFundImpact =
     remainingFreeCash < 0
-      ? "May require dipping into savings, delaying emergency fund growth."
-      : "Emergency fund contributions remain unaffected.";
+      ? t("May require dipping into savings, delaying emergency fund growth.")
+      : t("Emergency fund contributions remain unaffected.");
   const emergencyFundCoverageAfter = Math.min(
     100,
     Math.round((emergencyFundCurrent / emergencyFundTarget) * 100)

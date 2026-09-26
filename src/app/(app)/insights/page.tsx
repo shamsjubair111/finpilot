@@ -6,6 +6,7 @@ import { PageHeader } from "@/components/shared/page-header";
 import { InsightSection } from "@/components/insights/insight-section";
 import { useFinance } from "@/components/providers/finance-provider";
 import { generateInsights } from "@/lib/derive";
+import { t } from "@/lib/i18n";
 
 export default function InsightsPage() {
   const { user, transactions, budgetCategories, goals, purchases } = useFinance();
@@ -27,40 +28,40 @@ export default function InsightsPage() {
   return (
     <div>
       <PageHeader
-        title="Insights"
-        subtitle="Observations generated live from your transactions, budgets, goals and wishlist."
+        title={t("Insights")}
+        subtitle={t("Observations generated live from your transactions, budgets, goals and wishlist.")}
       />
 
       <div className="stagger grid grid-cols-1 gap-6 lg:grid-cols-2">
         <InsightSection
-          title="Spending Insights"
+          title={t("Spending Insights")}
           icon={TrendingUp}
           insights={grouped.spending}
-          emptyLabel="No notable spending changes this month."
+          emptyLabel={t("No notable spending changes this month.")}
         />
         <InsightSection
-          title="Savings Insights"
+          title={t("Savings Insights")}
           icon={PiggyBank}
           insights={grouped.savings}
-          emptyLabel="No savings insights available yet."
+          emptyLabel={t("No savings insights available yet.")}
         />
         <InsightSection
-          title="Budget Warnings"
+          title={t("Budget Warnings")}
           icon={Wallet}
           insights={grouped.budget}
-          emptyLabel="All budgets are within healthy limits."
+          emptyLabel={t("All budgets are within healthy limits.")}
         />
         <InsightSection
-          title="Goal Recommendations"
+          title={t("Goal Recommendations")}
           icon={Target}
           insights={grouped.goals}
-          emptyLabel="No goal recommendations right now."
+          emptyLabel={t("No goal recommendations right now.")}
         />
         <InsightSection
-          title="Purchase Recommendations"
+          title={t("Purchase Recommendations")}
           icon={ShoppingBag}
           insights={grouped.purchases}
-          emptyLabel="No purchase recommendations right now."
+          emptyLabel={t("No purchase recommendations right now.")}
         />
       </div>
     </div>

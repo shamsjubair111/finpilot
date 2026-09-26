@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { CURRENCY_CODES } from "@/lib/currency";
 
 const money = z.coerce.number().finite().min(0, "must be 0 or more").max(1e12, "is too large");
 const positiveMoney = z.coerce.number().finite().gt(0, "must be greater than 0").max(1e12, "is too large");
@@ -11,6 +12,8 @@ export const registerSchema = z.object({
   name: text(60),
   email: z.email("must be a valid email").trim().toLowerCase(),
   password: z.string().min(8, "must be at least 8 characters").max(128),
+  language: z.enum(["en", "bn"]).default("en"),
+  currency: z.enum(CURRENCY_CODES).default("BDT"),
 });
 
 export const loginSchema = z.object({
@@ -21,9 +24,9 @@ export const loginSchema = z.object({
 export const profileSchema = z
   .object({
     name: text(60),
-    email: z.email("must be a valid email").trim().toLowerCase(),
     avatarUrl: z.url("must be a valid URL").optional().nullable().or(z.literal("")).transform((v) => v || null),
-    currency: z.enum(["BDT", "USD", "EUR", "GBP"]),
+    currency: z.enum(CURRENCY_CODES),
+    language: z.enum(["en", "bn"]),
     monthlySalary: money,
     currentSavings: money,
     emergencyFundTarget: money,
@@ -37,13 +40,32 @@ export const passwordSchema = z.object({
   newPassword: z.string().min(8, "must be at least 8 characters").max(128),
 });
 
+export const ACCOUNT_TYPES = ["bank", "bkash", "nagad", "rocket", "upay", "e_wallet", "cash", "credit_card", "loan", "savings", "investment", "other"] as const;
+export const LIABILITY_TYPES = ["credit_card", "loan"] as const;
+
+const optionalId = z.string().trim().min(1).optional().nullable().transform((v) => v || null);
+
+export const accountSchema = z.object({
+  name: text(60),
+  type: z.enum(ACCOUNT_TYPES),
+  institution: optionalText(80),
+  accountNumber: optionalText(40),
+  openingBalance: z.coerce.number().finite().min(-1e12).max(1e12).default(0),
+  creditLimit: z.coerce.number().finite().min(0).max(1e12).optional().nullable(),
+  interestRate: z.coerce.number().finite().min(0).max(100).optional().nullable(),
+  color: z.string().max(40).optional(),
+  archived: z.boolean().optional(),
+});
+
 export const transactionSchema = z.object({
+  accountId: optionalId,
+  toAccountId: optionalId,
   title: text(),
   merchant: z.string().trim().max(120).default(""),
   category: text(40),
   date,
   amount: positiveMoney,
-  type: z.enum(["income", "expense"]),
+  type: z.enum(["income", "expense", "transfer"]),
   paymentMethod: z.enum(["cash", "card", "bank_transfer", "mobile_banking", "other"]).default("card"),
   notes: optionalText(),
 });
