@@ -254,6 +254,8 @@ function AdminDashboard() {
         </CardContent>
       </Card>
 
+      <CouponsCard />
+
       <ErrorsCard />
 
       <GrantDialog user={granting} onClose={() => setGranting(null)} onDone={loadAll} />
@@ -377,6 +379,76 @@ function ErrorsCard() {
             )}
           </div>
         ))}
+      </CardContent>
+    </Card>
+  );
+}
+
+interface CouponRow {
+  id: string;
+  code: string;
+  percentOff: number;
+  maxUses: number | null;
+  uses: number;
+  expiresAt: string | null;
+  active: boolean;
+}
+
+function CouponsCard() {
+  const [coupons, setCoupons] = useState<CouponRow[]>([]);
+  const [code, setCode] = useState("");
+  const [percent, setPercent] = useState("20");
+  const [maxUses, setMaxUses] = useState("");
+  const [expires, setExpires] = useState("");
+  const load = useCallback(() => api<CouponRow[]>("/admin/coupons").then(setCoupons).catch(() => {}), []);
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  async function create(e: React.FormEvent) {
+    e.preventDefault();
+    try {
+      await api("/admin/coupons", { method: "POST", body: { code, percentOff: Number(percent), maxUses: maxUses ? Number(maxUses) : null, expiresAt: expires || null } });
+      toast.success("Coupon created");
+      setCode("");
+      load();
+    } catch (err) {
+      toast.error("Couldn't create coupon", { description: err instanceof Error ? err.message : undefined });
+    }
+  }
+
+  async function toggle(c: CouponRow) {
+    await api(`/admin/coupons/${c.id}`, { method: "PATCH", body: { active: !c.active } }).catch(() => toast.error("Couldn't update coupon"));
+    load();
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">Promo codes</CardTitle>
+        <CardDescription>Percentage off Pro checkout. 100% codes grant Pro without payment.</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <form onSubmit={create} className="grid gap-2 sm:grid-cols-[1fr_6rem_7rem_10rem_auto]">
+          <Input value={code} onChange={(e) => setCode(e.target.value)} placeholder="CODE" className="uppercase" required aria-label="Code" />
+          <Input type="number" min={1} max={100} value={percent} onChange={(e) => setPercent(e.target.value)} aria-label="Percent off" />
+          <Input type="number" min={1} value={maxUses} onChange={(e) => setMaxUses(e.target.value)} placeholder="Max uses" aria-label="Max uses" />
+          <Input type="date" value={expires} onChange={(e) => setExpires(e.target.value)} aria-label="Expires" />
+          <Button type="submit" disabled={!code}>Create</Button>
+        </form>
+        <div className="divide-y text-sm">
+          {coupons.map((c) => (
+            <div key={c.id} className="flex flex-wrap items-center justify-between gap-2 py-2">
+              <span className={c.active ? "" : "text-muted-foreground line-through"}>
+                <span className="font-mono font-medium">{c.code}</span> · {c.percentOff}% off · used {c.uses}
+                {c.maxUses ? `/${c.maxUses}` : ""}
+                {c.expiresAt ? ` · until ${format(new Date(c.expiresAt), "d MMM yyyy")}` : ""}
+              </span>
+              <Button size="sm" variant="ghost" onClick={() => toggle(c)}>{c.active ? "Deactivate" : "Activate"}</Button>
+            </div>
+          ))}
+          {!coupons.length && <p className="py-2 text-muted-foreground">No codes yet.</p>}
+        </div>
       </CardContent>
     </Card>
   );

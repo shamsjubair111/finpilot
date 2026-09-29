@@ -265,6 +265,7 @@ model Payment {
   status    String    @default("pending")
   valId     String?
   method    String?
+  coupon    String?
   createdAt DateTime  @default(now())
   paidAt    DateTime?
 
@@ -326,4 +327,16 @@ model CustomCategory {
   createdAt DateTime @default(now())
 
   @@unique([userId, type, name])
+}
+
+// Discount codes for Pro checkout, created in /admin.
+model Coupon {
+  id         String    @id @default(cuid())
+  code       String    @unique
+  percentOff Int
+  maxUses    Int?
+  uses       Int       @default(0)
+  expiresAt  DateTime?
+  active     Boolean   @default(true)
+  createdAt  DateTime  @default(now())
 }

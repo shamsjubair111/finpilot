@@ -69,3 +69,4 @@ Status: ✅ done · 🟡 partial · ⬜ not started
 - ✅ Custom categories per household (Settings → Your categories), used in every category picker; stable colours in charts
 - ✅ Pro renewal reminder email 3 days before a trial or paid period ends (once per period)
 - ✅ Referral program: both get 30 days of Pro after the friend verifies their email (max 12 rewards a year); share card on Billing
+- ✅ Promo codes: % off Pro checkout, limits and expiry, 100% codes grant Pro directly; managed in /admin

@@ -1301,4 +1301,17 @@ export const bn: Record<string, string> = {
   "Your invite link": "আপনার আমন্ত্রণ লিংক",
   "Share": "শেয়ার",
   "{joined} joined · {rewarded} rewarded": "{joined} জন যোগ দিয়েছেন · {rewarded} জনের পুরস্কার মিলেছে",
+  // Coupons
+  "Code applied": "কোড প্রয়োগ হয়েছে",
+  "Couldn't apply code": "কোড প্রয়োগ করা যায়নি",
+  "Pro is active — enjoy!": "Pro চালু হয়েছে — উপভোগ করুন!",
+  "Get 1 month free": "১ মাস ফ্রি নিন",
+  "Get 1 year free": "১ বছর ফ্রি নিন",
+  "{code}: {n}% off": "{code}: {n}% ছাড়",
+  "Have a promo code?": "প্রোমো কোড আছে?",
+  "Promo code": "প্রোমো কোড",
+  "Apply": "প্রয়োগ",
+  "That code isn't valid.": "কোডটি সঠিক নয়।",
+  "That code has expired.": "কোডটির মেয়াদ শেষ।",
+  "That code has been fully used.": "কোডটির সব ব্যবহার শেষ।",
 };

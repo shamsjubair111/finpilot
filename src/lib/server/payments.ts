@@ -25,6 +25,7 @@ export async function confirmPayment(valId: string, tranIdHint?: string) {
       data: { status: "paid", valId, method: v.card_type?.slice(0, 60) ?? null, paidAt: new Date() },
     });
     if (count !== 1) return null;
+    if (payment.coupon) await tx.coupon.updateMany({ where: { code: payment.coupon }, data: { uses: { increment: 1 } } });
     return grantPro(
       {
         userId: payment.userId,

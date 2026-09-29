@@ -5,6 +5,7 @@ import { differenceInCalendarDays, format } from "date-fns";
 import { toast } from "sonner";
 import { Check, CreditCard, Crown, Mail } from "lucide-react";
 import { api } from "@/lib/api-client";
+import { Input } from "@/components/ui/input";
 import { ReferralCard } from "@/components/billing/referral-card";
 import { formatCurrency } from "@/lib/currency";
 import { PageHeader } from "@/components/shared/page-header";
@@ -18,6 +19,13 @@ import { PLANS, RESOURCE_LABELS, type LimitedResource } from "@/lib/plans";
 import { PLAN_FEATURES } from "@/lib/plan-features";
 
 const SUPPORT_EMAIL = process.env.NEXT_PUBLIC_SUPPORT_EMAIL;
+
+interface Coupon {
+  code: string;
+  percentOff: number;
+  month: number;
+  year: number;
+}
 
 interface PaymentRow {
   id: string;
@@ -45,6 +53,9 @@ export default function BillingPage() {
   const [online, setOnline] = useState(false);
   const [history, setHistory] = useState<PaymentRow[]>([]);
   const [paying, setPaying] = useState<string | null>(null);
+  const [codeInput, setCodeInput] = useState("");
+  const [coupon, setCoupon] = useState<Coupon | null>(null);
+  const price = (period: "month" | "year") => (coupon ? coupon[period] : period === "month" ? PLANS.pro.priceMonthly : PLANS.pro.priceYearly);
 
   useEffect(() => {
     api<{ online: boolean; payments: PaymentRow[] }>("/billing/payments")
@@ -64,11 +75,30 @@ export default function BillingPage() {
     window.history.replaceState(null, "", "/billing");
   }, [reloadUser]);
 
+  async function applyCode(e: React.FormEvent) {
+    e.preventDefault();
+    try {
+      setCoupon(await api<Coupon>("/billing/coupon", { method: "POST", body: { code: codeInput } }));
+      toast.success(t("Code applied"));
+    } catch (err) {
+      setCoupon(null);
+      toast.error(t("Couldn't apply code"), { description: err instanceof Error ? err.message : undefined });
+    }
+  }
+
   async function checkout(period: "month" | "year") {
     setPaying(period);
     try {
-      const { url } = await api<{ url: string }>("/billing/checkout", { method: "POST", body: { period } });
-      window.location.assign(url);
+      const res = await api<{ url?: string; granted?: boolean }>("/billing/checkout", { method: "POST", body: { period, coupon: coupon?.code } });
+      if (res.granted) {
+        toast.success(t("Pro is active — enjoy!"));
+        setCoupon(null);
+        setCodeInput("");
+        setPaying(null);
+        await reloadUser();
+        return;
+      }
+      window.location.assign(res.url!);
     } catch (err) {
       toast.error(t("Couldn't start payment"), { description: err instanceof Error ? err.message : undefined });
       setPaying(null);
@@ -148,15 +178,18 @@ export default function BillingPage() {
                   ))}
                 </ul>
                 {id === "pro" && (!onPro || endsAt) && (
-                  online ? (
+                  online || coupon?.month === 0 ? (
                     <div className="grid gap-2 sm:grid-cols-2">
                       {(["month", "year"] as const).map((period) => (
                         <Button key={period} className="gap-1.5" variant={period === "year" ? "default" : "outline"} disabled={!!paying} onClick={() => checkout(period)}>
                           <CreditCard className="size-4" />
-                          {period === "month" ? t("Pay ৳{n} / month", { n: PLANS.pro.priceMonthly }) : t("Pay ৳{n} / year", { n: PLANS.pro.priceYearly })}
+                          {price(period) === 0
+                            ? period === "month" ? t("Get 1 month free") : t("Get 1 year free")
+                            : period === "month" ? t("Pay ৳{n} / month", { n: price("month") }) : t("Pay ৳{n} / year", { n: price("year") })}
                         </Button>
                       ))}
                       <p className="text-center text-xs text-muted-foreground sm:col-span-2">
+                        {coupon && t("{code}: {n}% off", { code: coupon.code, n: coupon.percentOff })}{coupon && " · "}
                         {t("bKash, Nagad, Rocket, cards or internet banking via SSLCommerz. Time is added after your current Pro period.")}
                       </p>
                     </div>
@@ -178,6 +211,11 @@ export default function BillingPage() {
           );
         })}
       </div>
+
+      <form onSubmit={applyCode} className="flex max-w-sm gap-2">
+        <Input value={codeInput} onChange={(e) => setCodeInput(e.target.value)} placeholder={t("Have a promo code?")} aria-label={t("Promo code")} maxLength={40} className="uppercase" />
+        <Button type="submit" variant="outline" disabled={!codeInput.trim()}>{t("Apply")}</Button>
+      </form>
 
       <ReferralCard />
 
