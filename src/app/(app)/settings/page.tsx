@@ -5,7 +5,7 @@ import { getCurrencySymbol } from "@/lib/currency";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { formatDate } from "@/lib/format-date";
-import { AlertTriangle, Globe2, KeyRound, Laptop, Lock, LogOut, Moon, Palette, Sun, Target, User } from "lucide-react";
+import { AlertTriangle, Download, Globe2, KeyRound, Laptop, Lock, LogOut, Moon, Palette, Sun, Target, User } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -307,6 +307,24 @@ export default function SettingsPage() {
               <SubmitButton pending={pwPending} disabled={!currentPassword || newPassword.length < 8}>{t("Update password")}</SubmitButton>
             </div>
           </form>
+        </CardContent>
+      </Card>
+
+      {/* Data export */}
+      <Card className="animate-in-up">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Download className="size-4" /> {t("Your data")}
+          </CardTitle>
+          <CardDescription>{t("Download a copy of everything you've saved in Sanchay.")}</CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-wrap gap-2">
+          <Button asChild variant="outline">
+            <a href="/api/export?format=csv" download>{t("Transactions (CSV)")}</a>
+          </Button>
+          <Button asChild variant="outline">
+            <a href="/api/export" download>{t("Everything (JSON)")}</a>
+          </Button>
         </CardContent>
       </Card>
 

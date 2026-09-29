@@ -20,6 +20,8 @@ model User {
   emergencyFundTarget  Float    @default(0)
   emergencyFundCurrent Float    @default(0)
   defaultSavingsTarget Float    @default(20)
+  plan                 String   @default("free")
+  planExpiresAt        DateTime?
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
 
@@ -68,8 +70,10 @@ model Transaction {
   account       Account? @relation("TxnAccount", fields: [accountId], references: [id], onDelete: SetNull)
   toAccountId   String?
   toAccount     Account? @relation("TxnToAccount", fields: [toAccountId], references: [id], onDelete: SetNull)
+  externalId    String?
   createdAt     DateTime @default(now())
 
+  @@unique([userId, externalId])
   @@index([userId, date])
 }
 

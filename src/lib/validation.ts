@@ -1,8 +1,10 @@
 import { z } from "zod";
 import { CURRENCY_CODES } from "@/lib/currency";
 
-const money = z.coerce.number().finite().min(0, "must be 0 or more").max(1e12, "is too large");
-const positiveMoney = z.coerce.number().finite().gt(0, "must be greater than 0").max(1e12, "is too large");
+// Amounts are stored as floats, so round to cents on the way in to stop drift from accumulating.
+export const roundMoney = (v: number) => Math.round(v * 100) / 100;
+const money = z.coerce.number().finite().min(0, "must be 0 or more").max(1e12, "is too large").transform(roundMoney);
+const positiveMoney = z.coerce.number().finite().min(0.01, "must be greater than 0").max(1e12, "is too large").transform(roundMoney);
 const text = (max = 120) => z.string().trim().min(1, "is required").max(max, `must be ${max} characters or fewer`);
 const optionalText = (max = 500) => z.string().trim().max(max).optional().nullable().transform((v) => v || null);
 const date = z.coerce.date({ error: "must be a valid date" });
@@ -50,8 +52,8 @@ export const accountSchema = z.object({
   type: z.enum(ACCOUNT_TYPES),
   institution: optionalText(80),
   accountNumber: optionalText(40),
-  openingBalance: z.coerce.number().finite().min(-1e12).max(1e12).default(0),
-  creditLimit: z.coerce.number().finite().min(0).max(1e12).optional().nullable(),
+  openingBalance: z.coerce.number().finite().min(-1e12).max(1e12).transform(roundMoney).default(0),
+  creditLimit: z.coerce.number().finite().min(0).max(1e12).transform(roundMoney).optional().nullable(),
   interestRate: z.coerce.number().finite().min(0).max(100).optional().nullable(),
   color: z.string().max(40).optional(),
   archived: z.boolean().optional(),

@@ -169,6 +169,14 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
           {t(isLogin ? "Create an account" : "Sign in")}
         </Link>
       </p>
+      {!isLogin && (
+        <p className="mt-3 text-center text-xs text-muted-foreground">
+          {t("By creating an account you agree to our")}{" "}
+          <Link href="/terms" className="underline hover:text-foreground">{t("Terms")}</Link>{" "}
+          {t("and")}{" "}
+          <Link href="/privacy" className="underline hover:text-foreground">{t("Privacy Policy")}</Link>.
+        </p>
+      )}
     </div>
   );
 }

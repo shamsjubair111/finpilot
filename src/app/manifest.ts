@@ -9,6 +9,11 @@ export default function manifest(): MetadataRoute.Manifest {
     display: "standalone",
     background_color: "#0f0d1f",
     theme_color: "#6366f1",
+    share_target: {
+      action: "/import",
+      method: "GET",
+      params: { title: "title", text: "text" },
+    },
     icons: [{ src: "/icon.svg", sizes: "any", type: "image/svg+xml" }],
   };
 }

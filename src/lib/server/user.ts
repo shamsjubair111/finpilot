@@ -1,5 +1,6 @@
 import "server-only";
 import type { User } from "@/generated/prisma/client";
+import { effectivePlan } from "@/lib/plans";
 
 export function toProfile(u: User) {
   return {
@@ -15,5 +16,7 @@ export function toProfile(u: User) {
     defaultSavingsTarget: u.defaultSavingsTarget,
     memberSince: u.createdAt.toISOString(),
     language: u.language === "bn" ? ("bn" as const) : ("en" as const),
+    plan: effectivePlan(u.plan, u.planExpiresAt),
+    planExpiresAt: u.plan === "pro" && u.planExpiresAt ? u.planExpiresAt.toISOString() : undefined,
   };
 }

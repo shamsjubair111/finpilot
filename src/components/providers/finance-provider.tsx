@@ -36,6 +36,7 @@ interface FinanceContextValue {
   addTransaction: (txn: Omit<Transaction, "id">) => Promise<boolean>;
   updateTransaction: (id: string, patch: Partial<Transaction>) => Promise<boolean>;
   deleteTransaction: (id: string) => Promise<boolean>;
+  importTransactions: (items: Omit<Transaction, "id">[]) => Promise<{ created: number; skipped: number } | null>;
 
   budgetCategories: BudgetCategory[];
   addBudgetCategory: (budget: Omit<StoredBudget, "id">) => Promise<boolean>;
@@ -263,6 +264,21 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     addTransaction: txnCrud.add,
     updateTransaction: txnCrud.update,
     deleteTransaction: txnCrud.remove,
+    importTransactions: async (items) => {
+      let summary: { created: number; skipped: number } | null = null;
+      await run(
+        async () => {
+          const res = await api<{ created: Transaction[]; skipped: number }>("/transactions/import", { method: "POST", body: { items } });
+          setTransactions((prev) => [...res.created, ...prev].sort(byDateDesc));
+          summary = { created: res.created.length, skipped: res.skipped };
+          return summary;
+        },
+        (r) => t("Imported {n} transactions", { n: r.created }),
+        "Couldn't import transactions",
+        (r) => (r.skipped ? t("{n} duplicates were skipped.", { n: r.skipped }) : "")
+      );
+      return summary;
+    },
 
     budgetCategories,
     addBudgetCategory: budgetCrud.add,

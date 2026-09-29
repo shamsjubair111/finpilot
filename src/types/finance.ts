@@ -37,6 +37,8 @@ export interface Transaction {
   notes?: string;
   accountId?: string | null;
   toAccountId?: string | null;
+  /** Provider transaction ID (e.g. a bKash TrxID) for imported rows; used to skip duplicates. */
+  externalId?: string | null;
 }
 
 export type AccountType =
@@ -233,6 +235,9 @@ export interface UserProfile {
   defaultSavingsTarget: number;
   memberSince: string;
   language: "en" | "bn";
+  plan: "free" | "pro";
+  /** When the current Pro plan or trial ends; absent on Free or on Pro without an end date. */
+  planExpiresAt?: string;
 }
 
 export interface UpcomingCommitment {
