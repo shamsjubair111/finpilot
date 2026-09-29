@@ -30,6 +30,7 @@ interface FinanceContextValue {
   changePassword: (currentPassword: string, newPassword: string) => Promise<boolean>;
   deleteUserAccount: (password: string) => Promise<boolean>;
   resendVerification: () => Promise<boolean>;
+  signOutOtherDevices: () => Promise<boolean>;
   completeOnboarding: (data: {
     profile?: Partial<Pick<UserProfile, "monthlySalary" | "currentSavings" | "emergencyFundTarget">>;
     account?: Pick<Account, "name" | "type" | "openingBalance">;
@@ -277,6 +278,8 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       if (ok) router.replace("/register");
       return ok;
     },
+    signOutOtherDevices: () =>
+      run(() => api("/auth/logout-all", { method: "POST" }), "Signed out of other devices", "Couldn't sign out other devices", t("Only this device is still signed in.")),
     resendVerification: () =>
       run(() => api("/auth/verify/send", { method: "POST" }), "Confirmation email sent", "Couldn't send email", t("Check your inbox for a link from Sanchay.")),
     completeOnboarding: async (data) => {

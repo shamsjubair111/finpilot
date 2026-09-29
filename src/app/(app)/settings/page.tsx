@@ -40,7 +40,7 @@ function MoneyField({ id, label, value, onChange, hint }: { id: string; label: s
 }
 
 export default function SettingsPage() {
-  const { user, updateUser, changePassword, deleteUserAccount, signOut, setLanguage } = useFinance();
+  const { user, updateUser, changePassword, deleteUserAccount, signOut, signOutOtherDevices, setLanguage } = useFinance();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
@@ -301,9 +301,14 @@ export default function SettingsPage() {
               </div>
             </div>
             <div className="flex flex-wrap justify-between gap-2">
-              <Button type="button" variant="outline" className="gap-1.5" onClick={signOut}>
-                <LogOut className="size-3.5" /> {t("Sign out")}
-              </Button>
+              <div className="flex flex-wrap gap-2">
+                <Button type="button" variant="outline" className="gap-1.5" onClick={signOut}>
+                  <LogOut className="size-3.5" /> {t("Sign out")}
+                </Button>
+                <Button type="button" variant="ghost" onClick={signOutOtherDevices}>
+                  {t("Sign out other devices")}
+                </Button>
+              </div>
               <SubmitButton pending={pwPending} disabled={!currentPassword || newPassword.length < 8}>{t("Update password")}</SubmitButton>
             </div>
           </form>

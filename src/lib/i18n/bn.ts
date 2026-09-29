@@ -881,4 +881,9 @@ export const bn: Record<string, string> = {
   "It may have expired or already been used. Send a new one from the banner.": "লিংকটির মেয়াদ শেষ হয়েছে বা আগেই ব্যবহার হয়েছে। ব্যানার থেকে নতুন লিংক পাঠান।",
   "Your email is already confirmed.": "আপনার ইমেইল আগেই নিশ্চিত করা হয়েছে।",
   "This reset link is invalid or has expired. Please request a new one.": "এই রিসেট লিংকটি সঠিক নয় বা মেয়াদ শেষ। অনুগ্রহ করে নতুন লিংক চান।",
+  "Admin": "অ্যাডমিন",
+  "Sign out other devices": "অন্য ডিভাইস থেকে সাইন আউট",
+  "Signed out of other devices": "অন্য ডিভাইস থেকে সাইন আউট হয়েছে",
+  "Couldn't sign out other devices": "অন্য ডিভাইস থেকে সাইন আউট করা যায়নি",
+  "Only this device is still signed in.": "এখন শুধু এই ডিভাইসে সাইন ইন আছে।",
 };

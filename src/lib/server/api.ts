@@ -1,7 +1,7 @@
 import "server-only";
 import { ZodError } from "zod";
 import { db } from "./db";
-import { getSessionUserId } from "./session";
+import { destroySession, getSession } from "./session";
 import { cookies, headers } from "next/headers";
 import { isLang, LANG_COOKIE, translate, type Lang } from "@/lib/i18n";
 
@@ -53,11 +53,19 @@ export async function handleError(err: unknown) {
 }
 
 export async function requireUserId() {
-  const userId = await getSessionUserId();
-  if (!userId) throw new ApiError(401, "Your session has expired. Please sign in again.");
-  const exists = await db.user.findUnique({ where: { id: userId }, select: { id: true } });
-  if (!exists) throw new ApiError(401, "Your account no longer exists. Please sign in again.");
-  return userId;
+  const session = await getSession();
+  if (!session) throw new ApiError(401, "Your session has expired. Please sign in again.");
+  const user = await db.user.findUnique({ where: { id: session.userId }, select: { sessionVersion: true } });
+  // Clear the cookie on rejection; otherwise the proxy would still treat this browser as signed in.
+  if (!user) {
+    await destroySession();
+    throw new ApiError(401, "Your account no longer exists. Please sign in again.");
+  }
+  if (user.sessionVersion !== session.version) {
+    await destroySession();
+    throw new ApiError(401, "Your session has expired. Please sign in again.");
+  }
+  return session.userId;
 }
 
 type Ctx<P> = { params: Promise<P> };

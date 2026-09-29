@@ -8,6 +8,7 @@ import { cn } from "cn";
 import { t } from "@/lib/i18n";
 import { Logo } from "./logo";
 import { NAV_ITEMS } from "./nav-items";
+import { useFinance } from "@/components/providers/finance-provider";
 import { SidebarUser } from "./sidebar-user";
 import {
   Tooltip,
@@ -25,6 +26,7 @@ export function Sidebar({
   onToggle: () => void;
 }) {
   const pathname = usePathname();
+  const isAdmin = !!useFinance().user.isAdmin;
 
   return (
     <aside
@@ -48,7 +50,7 @@ export function Sidebar({
               </p>
             )}
             <ul className="space-y-0.5">
-              {NAV_ITEMS.filter((item) => item.section === section).map((item) => {
+              {NAV_ITEMS.filter((item) => item.section === section && (!item.adminOnly || isAdmin)).map((item) => {
                 const isActive =
                   item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
                 const Icon = item.icon;

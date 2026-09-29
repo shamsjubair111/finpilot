@@ -1,6 +1,7 @@
 import "server-only";
 import type { User } from "@/generated/prisma/client";
 import { effectivePlan } from "@/lib/plans";
+import { isAdminEmail } from "./admin";
 
 export function toProfile(u: User) {
   return {
@@ -18,6 +19,7 @@ export function toProfile(u: User) {
     language: u.language === "bn" ? ("bn" as const) : ("en" as const),
     emailVerified: !!u.emailVerifiedAt,
     onboarded: !!u.onboardedAt,
+    isAdmin: isAdminEmail(u.email),
     plan: effectivePlan(u.plan, u.planExpiresAt),
     planExpiresAt: u.plan === "pro" && u.planExpiresAt ? u.planExpiresAt.toISOString() : undefined,
   };

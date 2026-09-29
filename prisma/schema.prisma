@@ -24,6 +24,7 @@ model User {
   planExpiresAt        DateTime?
   emailVerifiedAt      DateTime?
   onboardedAt          DateTime?
+  sessionVersion       Int      @default(0)
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
 
@@ -155,4 +156,23 @@ model AuthToken {
   createdAt DateTime  @default(now())
 
   @@index([userId, type])
+}
+
+// A plan period given to a user: a manual payment recorded by an admin (bKash, bank) or, later, a gateway payment.
+// Kept without a foreign key so revenue history survives account deletion.
+model PlanGrant {
+  id        String   @id @default(cuid())
+  userId    String
+  email     String
+  plan      String
+  days      Int
+  amount    Float    @default(0)
+  currency  String   @default("BDT")
+  reference String?
+  source    String   @default("manual")
+  grantedBy String
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
 }

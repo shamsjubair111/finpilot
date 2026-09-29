@@ -17,6 +17,7 @@ Status: ✅ done · 🟡 partial · ⬜ not started
 - ✅ Account deletion (already existed)
 - ✅ Email service (Resend; prints to console when no key is set)
 - ✅ Email verification with banner and resend, password reset by email
+- ✅ Session revocation: password change/reset and "Sign out other devices" end other sessions
 - ⬜ Google sign-in, optional 2FA
 
 ## Phase 3: Launch-ready
@@ -27,7 +28,7 @@ Status: ✅ done · 🟡 partial · ⬜ not started
 - ✅ Onboarding wizard: income, first account, starter budgets from income
 - ✅ Welcome email (with verification link)
 - ⬜ Payment emails
-- ⬜ Admin dashboard
+- ✅ Admin dashboard (`/admin`, access via `ADMIN_EMAILS`): signups, activity, paying users, revenue, churn; search users; give Pro for manual bKash/bank payments, revoke
 
 ## Phase 4: Faster data entry
 - ✅ Paste-to-import for bKash, Nagad, Rocket and bank SMS (`/import`)
@@ -40,9 +41,6 @@ Status: ✅ done · 🟡 partial · ⬜ not started
 - ⬜ Reminders, PDF reports, zakat calculator, debt payoff, net worth history
 - ⬜ Household workspaces, AI categorisation and assistant
 - ⬜ Native Android app (only if demand shows)
-
-## Known gaps
-- Sessions are stateless JWTs, so a password reset doesn't sign out other devices yet.
 
 ## Before taking real payments
 - Have a lawyer review `/privacy` and `/terms`; they are a starting template.
