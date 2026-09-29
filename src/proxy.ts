@@ -1,9 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { SESSION_COOKIE, verifySession } from "@/lib/server/session-token";
 
-const AUTH_PAGES = ["/login", "/register"];
+const AUTH_PAGES = ["/login", "/register", "/forgot-password"];
 // Marketing pages anyone can open, signed in or not.
-const OPEN_PAGES = ["/pricing", "/privacy", "/terms"];
+const OPEN_PAGES = ["/pricing", "/privacy", "/terms", "/reset-password"];
 
 export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;

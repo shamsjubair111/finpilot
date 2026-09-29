@@ -5,7 +5,9 @@ import { createSession, setLangCookie } from "@/lib/server/session";
 import { toProfile } from "@/lib/server/user";
 import { rateLimit } from "@/lib/server/rate-limit";
 import { registerSchema } from "@/lib/validation";
-import { trialEndDate } from "@/lib/plans";
+import { TRIAL_DAYS, trialEndDate } from "@/lib/plans";
+import { issueToken } from "@/lib/server/auth-tokens";
+import { appUrl, sendEmailQuietly, welcomeEmail } from "@/lib/server/email";
 
 export async function POST(req: Request) {
   try {
@@ -16,6 +18,8 @@ export async function POST(req: Request) {
     const user = await db.user.create({
       data: { name, email, language, currency, plan: "pro", planExpiresAt: trialEndDate(), passwordHash: await bcrypt.hash(password, 12) },
     });
+    const token = await issueToken(user.id, "verify_email");
+    sendEmailQuietly({ to: user.email, ...welcomeEmail(language, name, `${await appUrl()}/api/auth/verify?token=${token}`, TRIAL_DAYS) });
     await createSession(user.id);
     await setLangCookie(user.language);
     return json(toProfile(user), 201);

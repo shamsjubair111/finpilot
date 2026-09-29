@@ -235,6 +235,8 @@ export interface UserProfile {
   defaultSavingsTarget: number;
   memberSince: string;
   language: "en" | "bn";
+  emailVerified: boolean;
+  onboarded: boolean;
   plan: "free" | "pro";
   /** When the current Pro plan or trial ends; absent on Free or on Pro without an end date. */
   planExpiresAt?: string;

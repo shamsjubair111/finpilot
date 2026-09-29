@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import type {
@@ -29,6 +29,12 @@ interface FinanceContextValue {
   updateUser: (patch: Partial<UserProfile>, successMessage?: string) => Promise<boolean>;
   changePassword: (currentPassword: string, newPassword: string) => Promise<boolean>;
   deleteUserAccount: (password: string) => Promise<boolean>;
+  resendVerification: () => Promise<boolean>;
+  completeOnboarding: (data: {
+    profile?: Partial<Pick<UserProfile, "monthlySalary" | "currentSavings" | "emergencyFundTarget">>;
+    account?: Pick<Account, "name" | "type" | "openingBalance">;
+    budgets?: { category: string; budgeted: number }[];
+  }) => Promise<boolean>;
   signOut: () => Promise<void>;
   setLanguage: (lang: Lang) => void;
 
@@ -77,6 +83,7 @@ const byDateDesc = (a: Transaction, b: Transaction) => new Date(b.date).getTime(
 
 export function FinanceProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const pathname = usePathname();
   const { lang, setLang } = useI18n();
   const [user, setUser] = React.useState<UserProfile | null>(null);
   const [transactions, setTransactions] = React.useState<Transaction[]>([]);
@@ -142,6 +149,22 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     load();
   }, [load]);
+
+  const needsOnboarding = !!user && !user.onboarded && pathname !== "/onboarding";
+  React.useEffect(() => {
+    if (needsOnboarding) router.replace("/onboarding");
+  }, [needsOnboarding, router]);
+
+  // The email confirmation link lands on "/?verified=1" (or 0 when the link was bad).
+  const signedIn = !!user;
+  React.useEffect(() => {
+    if (!signedIn) return;
+    const verified = new URLSearchParams(window.location.search).get("verified");
+    if (verified === null) return;
+    if (verified === "1") toast.success(t("Email confirmed"), { description: t("Thanks! Your email address is verified.") });
+    else toast.error(t("Confirmation link not valid"), { description: t("It may have expired or already been used. Send a new one from the banner.") });
+    router.replace(window.location.pathname);
+  }, [signedIn, router]);
 
   const run = React.useCallback(
     async <R,>(
@@ -232,7 +255,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     return budgets.map((b) => ({ ...b, spent: spentBy.get(b.category) ?? 0 }));
   }, [budgets, transactions, selectedMonth]);
 
-  if (!user) {
+  if (!user || needsOnboarding) {
     return <FullPageLoader error={loadError} onRetry={load} />;
   }
   setCurrencyPref(user.currency);
@@ -252,6 +275,18 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     deleteUserAccount: async (password) => {
       const ok = await run(() => api("/profile", { method: "DELETE", body: { password } }), "Account deleted", "Couldn't delete account", t("All your data has been permanently removed."));
       if (ok) router.replace("/register");
+      return ok;
+    },
+    resendVerification: () =>
+      run(() => api("/auth/verify/send", { method: "POST" }), "Confirmation email sent", "Couldn't send email", t("Check your inbox for a link from Sanchay.")),
+    completeOnboarding: async (data) => {
+      const ok = await run(
+        async () => setUser(await api<UserProfile>("/onboarding", { method: "POST", body: data })),
+        "You're all set!",
+        "Couldn't finish setup"
+      );
+      // Reload so the new account and budgets appear everywhere.
+      if (ok) await load();
       return ok;
     },
     signOut: async () => {

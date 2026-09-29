@@ -85,10 +85,10 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
         body: isLogin ? { email, password } : { name, email, password, language: lang, currency },
       });
       toast.success(t(isLogin ? "Welcome back, {name}!" : "Welcome aboard, {name}!", { name: user.name.split(" ")[0] }), {
-        description: t(isLogin ? "You're signed in." : "Your account is ready. Start by setting your monthly income in Settings."),
+        description: t(isLogin ? "You're signed in." : "Your account is ready. Let's set it up in three quick steps."),
       });
       const next = params.get("next");
-      router.replace(next && next.startsWith("/") && !next.startsWith("//") ? next : isLogin ? "/" : "/settings");
+      router.replace(next && next.startsWith("/") && !next.startsWith("//") ? next : isLogin ? "/" : "/onboarding");
       router.refresh();
     } catch (err) {
       toast.error(t(isLogin ? "Sign in failed" : "Sign up failed"), {
@@ -138,6 +138,13 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
             {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
           </button>
         </Field>
+        {isLogin && (
+          <p className="-mt-2 text-right text-sm">
+            <Link href="/forgot-password" className="text-muted-foreground hover:text-primary hover:underline">
+              {t("Forgot password?")}
+            </Link>
+          </p>
+        )}
 
         {!isLogin && (
           <div className="space-y-1.5">

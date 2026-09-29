@@ -15,7 +15,8 @@ Status: ✅ done · 🟡 partial · ⬜ not started
 ## Phase 2: Accounts and trust
 - ✅ Data export: transactions as CSV, everything as JSON (Settings → Your data)
 - ✅ Account deletion (already existed)
-- ⬜ Email service (Resend), email verification, password reset
+- ✅ Email service (Resend; prints to console when no key is set)
+- ✅ Email verification with banner and resend, password reset by email
 - ⬜ Google sign-in, optional 2FA
 
 ## Phase 3: Launch-ready
@@ -23,8 +24,9 @@ Status: ✅ done · 🟡 partial · ⬜ not started
 - ✅ Free and Pro plans with limits (`src/lib/plans.ts`), 14-day Pro trial for new and existing users
 - ✅ Plan & billing page (`/billing`) with usage meters
 - ⬜ Online payment (SSLCommerz first) with webhook; until then the upgrade button emails `NEXT_PUBLIC_SUPPORT_EMAIL`
-- ⬜ Onboarding wizard and sample data
-- ⬜ Welcome and payment emails
+- ✅ Onboarding wizard: income, first account, starter budgets from income
+- ✅ Welcome email (with verification link)
+- ⬜ Payment emails
 - ⬜ Admin dashboard
 
 ## Phase 4: Faster data entry
@@ -38,6 +40,9 @@ Status: ✅ done · 🟡 partial · ⬜ not started
 - ⬜ Reminders, PDF reports, zakat calculator, debt payoff, net worth history
 - ⬜ Household workspaces, AI categorisation and assistant
 - ⬜ Native Android app (only if demand shows)
+
+## Known gaps
+- Sessions are stateless JWTs, so a password reset doesn't sign out other devices yet.
 
 ## Before taking real payments
 - Have a lawyer review `/privacy` and `/terms`; they are a starting template.

@@ -16,6 +16,8 @@ export function toProfile(u: User) {
     defaultSavingsTarget: u.defaultSavingsTarget,
     memberSince: u.createdAt.toISOString(),
     language: u.language === "bn" ? ("bn" as const) : ("en" as const),
+    emailVerified: !!u.emailVerifiedAt,
+    onboarded: !!u.onboardedAt,
     plan: effectivePlan(u.plan, u.planExpiresAt),
     planExpiresAt: u.plan === "pro" && u.planExpiresAt ? u.planExpiresAt.toISOString() : undefined,
   };

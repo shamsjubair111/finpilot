@@ -22,6 +22,8 @@ model User {
   defaultSavingsTarget Float    @default(20)
   plan                 String   @default("free")
   planExpiresAt        DateTime?
+  emailVerifiedAt      DateTime?
+  onboardedAt          DateTime?
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
 
@@ -31,6 +33,7 @@ model User {
   purchases    Purchase[]
   commitments  Commitment[]
   accounts     Account[]
+  authTokens   AuthToken[]
 }
 
 model Account {
@@ -138,4 +141,18 @@ model Commitment {
   createdAt DateTime @default(now())
 
   @@index([userId])
+}
+
+// Single-use tokens for email verification and password reset. Only a SHA-256 hash is stored.
+model AuthToken {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId, type])
 }
