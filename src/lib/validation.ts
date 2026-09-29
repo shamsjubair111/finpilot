@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { CURRENCY_CODES } from "@/lib/currency";
 import { FREQUENCIES } from "@/lib/recurrence";
+import { INVESTMENT_KINDS, PAYOUTS } from "@/lib/calculations/investments";
 
 // Amounts are stored as floats, so round to cents on the way in to stop drift from accumulating.
 export const roundMoney = (v: number) => Math.round(v * 100) / 100;
@@ -115,4 +116,18 @@ export const commitmentSchema = z.object({
   type: z.enum(["income", "expense"]).default("expense"),
   accountId: optionalId,
   autoPost: z.boolean().default(false),
+});
+
+export const investmentSchema = z.object({
+  name: text(80),
+  kind: z.enum(INVESTMENT_KINDS),
+  institution: optionalText(80),
+  principal: z.coerce.number().finite().min(0).max(1e12).transform(roundMoney).default(0),
+  rate: z.coerce.number().finite().min(0).max(100).default(0),
+  startDate: date,
+  maturityDate: z.coerce.date().optional().nullable(),
+  payout: z.enum(PAYOUTS).default("maturity"),
+  monthlyDeposit: z.coerce.number().finite().min(0).max(1e10).transform(roundMoney).optional().nullable(),
+  currentValue: z.coerce.number().finite().min(0).max(1e12).transform(roundMoney).optional().nullable(),
+  notes: optionalText(),
 });

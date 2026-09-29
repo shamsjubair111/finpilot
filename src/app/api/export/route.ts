@@ -20,6 +20,7 @@ export const GET = authed(async ({ userId, req }) => {
     where: { id: userId },
     include: {
       accounts: { orderBy: { createdAt: "asc" } },
+      investments: { orderBy: { startDate: "asc" } },
       transactions: { orderBy: { date: "desc" } },
       budgets: { orderBy: { createdAt: "asc" } },
       goals: { orderBy: { createdAt: "asc" } },
@@ -51,6 +52,7 @@ export const GET = authed(async ({ userId, req }) => {
     exportedAt: new Date().toISOString(),
     profile: toProfile(user),
     accounts: user.accounts.map(serialize),
+    investments: user.investments.map(serialize),
     transactions: user.transactions.map(serialize),
     budgets: user.budgets.map(serialize),
     goals: user.goals.map(serialize),

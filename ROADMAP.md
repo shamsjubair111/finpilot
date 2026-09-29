@@ -46,7 +46,8 @@ Status: ✅ done · 🟡 partial · ⬜ not started
 - ✅ Printable monthly statement and year-in-review (`/reports/statement`), save as PDF via print
 - ✅ Spending alerts: unusual expenses and budgets on pace to overspend (insights + bell)
 - ✅ Weekly summary email (Mondays, opt-out in Settings) via `/api/cron/weekly-summary`
-- ⬜ Savings streaks, investment tracking
+- ✅ Investment tracking (`/investments`): Sanchayapatra, FDR, DPS, shares, funds, gold, bonds; profit to date, maturity value and dates
+- ⬜ Savings streaks
 - ⬜ Household workspaces, AI categorisation and assistant
 - ⬜ Native Android app (only if demand shows)
 

@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import type {
   Account,
   BudgetCategory,
+  Investment,
   FinancialGoal,
   PurchaseGoal,
   Transaction,
@@ -73,6 +74,11 @@ interface FinanceContextValue {
   deleteCommitment: (id: string) => Promise<boolean>;
   payCommitment: (id: string, opts?: { amount?: number; date?: string }) => Promise<boolean>;
 
+  investments: Investment[];
+  addInvestment: (i: Omit<Investment, "id" | "createdAt">) => Promise<boolean>;
+  updateInvestment: (id: string, patch: Partial<Investment>) => Promise<boolean>;
+  deleteInvestment: (id: string) => Promise<boolean>;
+
   selectedMonth: string;
   setSelectedMonth: (month: string) => void;
 }
@@ -94,6 +100,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   const [purchases, setPurchases] = React.useState<PurchaseGoal[]>([]);
   const [commitments, setCommitments] = React.useState<UpcomingCommitment[]>([]);
   const [accounts, setAccounts] = React.useState<Account[]>([]);
+  const [investments, setInvestments] = React.useState<Investment[]>([]);
   const [selectedMonth, setSelectedMonth] = React.useState(() => monthKey(new Date()));
   const [loadError, setLoadError] = React.useState<string | null>(null);
 
@@ -121,6 +128,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
           purchases: PurchaseGoal[];
           commitments: UpcomingCommitment[];
           accounts: Account[];
+          investments: Investment[];
         }>("/bootstrap");
       // One quiet retry covers a database that is still waking up.
       const data = await fetchAll().catch((err) => {
@@ -137,6 +145,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       setGoals(gls);
       setPurchases(prs);
       setCommitments(cms);
+      setInvestments(data.investments ?? []);
     } catch (err) {
       if (handleAuthFailure(err)) return;
       const message = err instanceof Error ? err.message : t("Could not load your data.");
@@ -244,6 +253,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   const purchaseCrud = crud<PurchaseGoal, NewOf<PurchaseGoal>>("/purchases", purchases, setPurchases, "Wishlist item", (p) => `${p.name} — ${fmt(p.price)}`);
   const commitCrud = crud<UpcomingCommitment, Omit<UpcomingCommitment, "id">>("/commitments", commitments, setCommitments, "Commitment", (c) => `${c.title} — ${fmt(c.amount)}`, (a, b) => +new Date(a.dueDate) - +new Date(b.dueDate));
 
+  const investmentCrud = crud<Investment, Omit<Investment, "id" | "createdAt">>("/investments", investments, setInvestments, "Investment", (i) => `${i.name} — ${fmt(i.principal)}`);
   const accountCrud = crud<Account, Omit<Account, "id" | "createdAt">>("/accounts", accounts, setAccounts, "Account", (a) => a.name);
   const accountBalances = React.useMemo(() => computeBalances(accounts, transactions), [accounts, transactions]);
   const netWorth = React.useMemo(() => netWorthOf(accounts, accountBalances), [accounts, accountBalances]);
@@ -364,6 +374,11 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
         "Couldn't record payment",
         t("Added to your transactions.")
       ),
+
+    investments,
+    addInvestment: investmentCrud.add,
+    updateInvestment: investmentCrud.update,
+    deleteInvestment: investmentCrud.remove,
 
     selectedMonth,
     setSelectedMonth,

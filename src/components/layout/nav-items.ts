@@ -17,6 +17,7 @@ import {
   CalendarClock,
   Scale,
   HandCoins,
+  LineChart,
 } from "lucide-react";
 
 export interface NavItem {
@@ -35,6 +36,7 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Import", href: "/import", icon: MessageSquareText, section: "Overview" },
   { label: "Budget", href: "/budget", icon: Wallet, section: "Overview" },
   { label: "Bills & recurring", href: "/recurring", icon: CalendarClock, section: "Overview" },
+  { label: "Investments", href: "/investments", icon: LineChart, section: "Planning" },
   { label: "Goals", href: "/goals", icon: Target, section: "Planning" },
   { label: "Wishlist", href: "/wishlist", icon: ListChecks, section: "Planning" },
   { label: "Scenario Lab", href: "/scenario-lab", icon: FlaskConical, section: "Planning" },

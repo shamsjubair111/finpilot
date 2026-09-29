@@ -36,6 +36,7 @@ model User {
   commitments  Commitment[]
   accounts     Account[]
   authTokens   AuthToken[]
+  investments  Investment[]
 }
 
 model Account {
@@ -185,4 +186,24 @@ model PlanGrant {
 
   @@index([userId])
   @@index([createdAt])
+}
+
+model Investment {
+  id             String    @id @default(cuid())
+  userId         String
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name           String
+  kind           String
+  institution    String?
+  principal      Float     @default(0)
+  rate           Float     @default(0)
+  startDate      DateTime
+  maturityDate   DateTime?
+  payout         String    @default("maturity")
+  monthlyDeposit Float?
+  currentValue   Float?
+  notes          String?
+  createdAt      DateTime  @default(now())
+
+  @@index([userId])
 }

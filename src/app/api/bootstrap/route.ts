@@ -16,6 +16,7 @@ export const GET = authed(async ({ userId }) => {
       purchases: { orderBy: { createdAt: "asc" } },
       commitments: { orderBy: { dueDate: "asc" } },
       accounts: { orderBy: { createdAt: "asc" } },
+      investments: { orderBy: { startDate: "asc" } },
     },
   });
   return json({
@@ -26,5 +27,6 @@ export const GET = authed(async ({ userId }) => {
     purchases: user.purchases.map(serialize),
     commitments: user.commitments.map(serialize),
     accounts: user.accounts.map(serialize),
+    investments: user.investments.map(serialize),
   });
 });

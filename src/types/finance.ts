@@ -257,3 +257,19 @@ export interface UpcomingCommitment {
   accountId?: string | null;
   autoPost?: boolean;
 }
+
+export interface Investment {
+  id: string;
+  name: string;
+  kind: import("@/lib/calculations/investments").InvestmentKind;
+  institution?: string | null;
+  principal: number;
+  rate: number;
+  startDate: string;
+  maturityDate?: string | null;
+  payout: import("@/lib/calculations/investments").Payout;
+  monthlyDeposit?: number | null;
+  currentValue?: number | null;
+  notes?: string | null;
+  createdAt?: string;
+}

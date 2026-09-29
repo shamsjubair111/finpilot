@@ -6,3 +6,4 @@ export * from "./health";
 export * from "./budget";
 export * from "./zakat";
 export * from "./debt";
+export * from "./investments";
