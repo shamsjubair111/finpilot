@@ -18,6 +18,7 @@ import {
   Scale,
   HandCoins,
   LineChart,
+  Sparkles,
 } from "lucide-react";
 
 export interface NavItem {
@@ -43,6 +44,7 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Timeline", href: "/timeline", icon: GanttChartSquare, section: "Planning" },
   { label: "Debt payoff", href: "/debt", icon: HandCoins, section: "Planning" },
   { label: "Zakat", href: "/zakat", icon: Scale, section: "Planning" },
+  { label: "Money assistant", href: "/assistant", icon: Sparkles, section: "Planning" },
   { label: "Insights", href: "/insights", icon: Lightbulb, section: "Planning" },
   { label: "Reports", href: "/reports", icon: FileBarChart, section: "Planning" },
   { label: "Plan & billing", href: "/billing", icon: Crown, section: "Planning" },

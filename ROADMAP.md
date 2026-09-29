@@ -53,7 +53,8 @@ Status: ✅ done · 🟡 partial · ⬜ not started
 - ✅ Streaks card on the dashboard: no-spend days, saving months, under-budget months
 - ⬜ Household workspaces (next)
 - ✅ Smart categorisation learned from the user's own history (form, SMS and CSV import)
-- ⬜ Household workspaces, AI assistant
+- ✅ AI money assistant (`/assistant`, Pro): Claude Opus 5.5, streamed answers grounded in a snapshot of the user's data, prompt caching, refusal fallbacks; needs `ANTHROPIC_API_KEY`
+- ⬜ Household workspaces
 - ⬜ Native Android app (only if demand shows)
 
 ## Before taking real payments

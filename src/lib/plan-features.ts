@@ -14,6 +14,7 @@ export const PLAN_FEATURES: Record<PlanId, string[]> = {
     "Unlimited wishlist with affordability checks",
     "Scenario Lab and timeline planning",
     "Data export at any time",
+    "AI money assistant",
     "Priority support",
   ],
 };
