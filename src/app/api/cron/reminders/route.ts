@@ -3,7 +3,8 @@ import { json } from "@/lib/server/api";
 import { cronGuard } from "@/lib/server/cron";
 import { sendPush } from "@/lib/server/push";
 import { translate } from "@/lib/i18n";
-import { appUrl, reminderEmail, sendEmail } from "@/lib/server/email";
+import { appUrl, planEndingEmail, reminderEmail, sendEmail } from "@/lib/server/email";
+import { PLANS } from "@/lib/plans";
 import { formatCurrency } from "@/lib/currency";
 import type { Currency } from "@/types/finance";
 
@@ -59,5 +60,36 @@ export async function GET(req: Request) {
       console.error("[reminders]", user.id, err);
     }
   }
-  return json({ users: byUser.size, sent });
+  // Plan renewal reminders: once per period, three days before Pro ends.
+  const planEnding = await db.user.findMany({
+    where: { plan: "pro", planExpiresAt: { gt: now, lte: new Date(now.getTime() + 3 * DAY) } },
+    select: { id: true, email: true, name: true, language: true, planExpiresAt: true, planReminderFor: true },
+  });
+  let planReminders = 0;
+  for (const u of planEnding) {
+    if (!u.planExpiresAt || u.planReminderFor?.getTime() === u.planExpiresAt.getTime()) continue;
+    const paid = await db.planGrant.count({ where: { userId: u.id, amount: { gt: 0 } } });
+    const lang = u.language === "bn" ? "bn" : "en";
+    try {
+      await sendEmail({
+        to: u.email,
+        ...planEndingEmail(
+          lang,
+          u.name,
+          {
+            trial: paid === 0,
+            date: u.planExpiresAt.toLocaleDateString(lang === "bn" ? "bn-BD" : "en-GB", { day: "numeric", month: "long", timeZone: "Asia/Dhaka" }),
+            price: `৳${PLANS.pro.priceMonthly}`,
+          },
+          `${base}/billing`
+        ),
+      });
+      await db.user.update({ where: { id: u.id }, data: { planReminderFor: u.planExpiresAt } });
+      planReminders++;
+    } catch (err) {
+      console.error("[plan reminder]", u.id, err);
+    }
+  }
+
+  return json({ users: byUser.size, sent, planReminders });
 }

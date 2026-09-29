@@ -1285,4 +1285,12 @@ export const bn: Record<string, string> = {
   "Remove {name}": "{name} সরান",
   "You can add up to 40 categories.": "সর্বোচ্চ ৪০টি ক্যাটাগরি যোগ করা যায়।",
   "already exists as a built-in category": "আগে থেকেই একটি নির্ধারিত ক্যাটাগরি আছে",
+  // Plan reminders
+  "Your Sanchay Pro trial ends soon": "আপনার সঞ্চয় Pro ট্রায়াল শীঘ্রই শেষ হচ্ছে",
+  "Your Sanchay Pro plan ends soon": "আপনার সঞ্চয় Pro প্ল্যান শীঘ্রই শেষ হচ্ছে",
+  "Your Pro trial ends on {date}": "আপনার Pro ট্রায়াল {date} তারিখে শেষ হবে",
+  "Your Pro plan ends on {date}": "আপনার Pro প্ল্যান {date} তারিখে শেষ হবে",
+  "Hi {name}, after that your account moves to the Free plan. All your data stays, but some features and limits change.": "হ্যালো {name}, এরপর আপনার অ্যাকাউন্ট ফ্রি প্ল্যানে যাবে। সব তথ্য থাকবে, তবে কিছু ফিচার ও সীমা বদলাবে।",
+  "Keep unlimited accounts, goals, budgets, the AI assistant and household sharing from {price} a month — pay with bKash, Nagad or card.": "মাসে {price} থেকে সীমাহীন অ্যাকাউন্ট, লক্ষ্য, বাজেট, AI সহকারী ও পরিবার শেয়ারিং রাখুন — বিকাশ, নগদ বা কার্ডে পরিশোধ করুন।",
+  "Keep Pro": "Pro রাখুন",
 };

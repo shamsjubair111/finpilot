@@ -25,6 +25,8 @@ model User {
   defaultSavingsTarget Float    @default(20)
   plan                 String   @default("free")
   planExpiresAt        DateTime?
+  // The planExpiresAt a renewal reminder was already sent for.
+  planReminderFor      DateTime?
   emailVerifiedAt      DateTime?
   onboardedAt          DateTime?
   sessionVersion       Int      @default(0)

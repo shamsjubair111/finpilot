@@ -142,3 +142,19 @@ export function householdInviteEmail(lang: Lang, ownerName: string, role: string
     ),
   };
 }
+
+export function planEndingEmail(lang: Lang, name: string, p: { trial: boolean; date: string; price: string }, url: string) {
+  const tr = (s: string, v?: Record<string, string | number>) => translate(lang, s, v);
+  return {
+    subject: p.trial ? tr("Your Sanchay Pro trial ends soon") : tr("Your Sanchay Pro plan ends soon"),
+    ...layout(
+      lang,
+      p.trial ? tr("Your Pro trial ends on {date}", { date: p.date }) : tr("Your Pro plan ends on {date}", { date: p.date }),
+      [
+        tr("Hi {name}, after that your account moves to the Free plan. All your data stays, but some features and limits change.", { name }),
+        tr("Keep unlimited accounts, goals, budgets, the AI assistant and household sharing from {price} a month — pay with bKash, Nagad or card.", { price: p.price }),
+      ],
+      { label: tr("Keep Pro"), url }
+    ),
+  };
+}
