@@ -5,3 +5,4 @@ export * from "./scenario";
 export * from "./health";
 export * from "./budget";
 export * from "./zakat";
+export * from "./debt";

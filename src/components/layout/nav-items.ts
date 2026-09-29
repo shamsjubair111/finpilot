@@ -16,6 +16,7 @@ import {
   ShieldCheck,
   CalendarClock,
   Scale,
+  HandCoins,
 } from "lucide-react";
 
 export interface NavItem {
@@ -38,6 +39,7 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Wishlist", href: "/wishlist", icon: ListChecks, section: "Planning" },
   { label: "Scenario Lab", href: "/scenario-lab", icon: FlaskConical, section: "Planning" },
   { label: "Timeline", href: "/timeline", icon: GanttChartSquare, section: "Planning" },
+  { label: "Debt payoff", href: "/debt", icon: HandCoins, section: "Planning" },
   { label: "Zakat", href: "/zakat", icon: Scale, section: "Planning" },
   { label: "Insights", href: "/insights", icon: Lightbulb, section: "Planning" },
   { label: "Reports", href: "/reports", icon: FileBarChart, section: "Planning" },

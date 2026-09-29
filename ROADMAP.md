@@ -41,7 +41,8 @@ Status: ✅ done · 🟡 partial · ⬜ not started
 ## Phases 5–8
 - ⬜ Full offline PWA and push notifications
 - ✅ Zakat calculator (`/zakat`): prefilled from balances, gold/silver nisab
-- ⬜ PDF reports, debt payoff, net worth history
+- ✅ Debt payoff planner (`/debt`): avalanche vs snowball, payoff dates, interest saved
+- ⬜ PDF reports, net worth history
 - ⬜ Household workspaces, AI categorisation and assistant
 - ⬜ Native Android app (only if demand shows)
 
