@@ -1262,4 +1262,6 @@ export const bn: Record<string, string> = {
   "This invitation is invalid or has expired. Ask for a new one.": "এই আমন্ত্রণটি সঠিক নয় বা মেয়াদ শেষ। নতুন একটি চেয়ে নিন।",
   "This invitation was sent to a different email address. Sign in with that address to accept.": "এই আমন্ত্রণ অন্য ইমেইলে পাঠানো হয়েছে। গ্রহণ করতে সেই ইমেইল দিয়ে সাইন ইন করুন।",
   "You don't have access to that household.": "ওই পরিবারে আপনার প্রবেশাধিকার নেই।",
+  // Viewer
+  "Couldn't add transaction": "লেনদেন যোগ করা যায়নি",
 };

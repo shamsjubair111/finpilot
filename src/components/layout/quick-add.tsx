@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useFinance } from "@/components/providers/finance-provider";
 import { Plus, ArrowDownCircle, ArrowUpCircle, Target, ListChecks, CalendarClock, Wallet, ArrowLeftRight, Landmark } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,6 +23,8 @@ type QuickAddMode = "expense" | "income" | "goal" | "purchase" | "commitment" | 
 
 export function QuickAdd() {
   const [mode, setMode] = React.useState<QuickAddMode>(null);
+  const { readOnly } = useFinance();
+  if (readOnly) return null;
 
   return (
     <>

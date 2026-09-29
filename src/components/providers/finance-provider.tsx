@@ -44,6 +44,8 @@ interface FinanceContextValue {
   ledger: Ledger;
   households: HouseholdLink[];
   switchHousehold: (ownerId: string | null) => Promise<void>;
+  /** True when viewing someone else's household with view-only access. */
+  readOnly: boolean;
   user: UserProfile;
   updateUser: (patch: Partial<UserProfile>, successMessage?: string) => Promise<boolean>;
   changePassword: (currentPassword: string, newPassword: string) => Promise<boolean>;
@@ -266,6 +268,14 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     [handleAuthFailure]
   );
 
+  /** Household data changes are refused up front for view-only members (the server enforces it too). */
+  const isViewer = ledger?.role === "viewer";
+  const viewOnly = (failure: string) => {
+    if (!isViewer) return false;
+    toast.error(t(failure), { description: t("You have view-only access to this household.") });
+    return true;
+  };
+
   function crud<T extends { id: string }, New>(
     path: string,
     list: T[],
@@ -276,7 +286,8 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   ) {
     const apply = (fn: (prev: T[]) => T[]) => setter((prev) => (sort ? fn(prev).sort(sort) : fn(prev)));
     return {
-      add: (data: New) =>
+      add: async (data: New) =>
+        !viewOnly(t("Couldn't add {item}", { item: t(label).toLowerCase() })) &&
         run(
           async () => {
             const created = await api<T>(path, { method: "POST", body: data });
@@ -287,7 +298,8 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
           t("Couldn't add {item}", { item: t(label).toLowerCase() }),
           describe
         ),
-      update: (id: string, patch: Partial<T>, message?: string) =>
+      update: async (id: string, patch: Partial<T>, message?: string) =>
+        !viewOnly(t("Couldn't update {item}", { item: t(label).toLowerCase() })) &&
         run(
           async () => {
             const updated = await api<T>(`${path}/${id}`, { method: "PATCH", body: patch });
@@ -298,7 +310,8 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
           t("Couldn't update {item}", { item: t(label).toLowerCase() }),
           describe
         ),
-      remove: (id: string) =>
+      remove: async (id: string) =>
+        !viewOnly(t("Couldn't delete {item}", { item: t(label).toLowerCase() })) &&
         run(
           async () => {
             const removed = list.find((x) => x.id === id);
@@ -364,6 +377,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       run(() => api("/auth/logout-all", { method: "POST" }), "Signed out of other devices", "Couldn't sign out other devices", t("Only this device is still signed in.")),
     ledger: ledger ?? { ownerId: user.id, ownerName: user.name, role: "owner", plan: user.plan },
     households,
+    readOnly: ledger?.role === "viewer",
     switchHousehold: async (ownerId) => {
       try {
         await api("/household/switch", { method: "POST", body: { ownerId } });
@@ -403,6 +417,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     transactions,
     pendingSync,
     addTransaction: async (data) => {
+      if (viewOnly("Couldn't add transaction")) return false;
       if (typeof navigator !== "undefined" && navigator.onLine) {
         const ok = await txnCrud.add(data);
         if (ok || navigator.onLine) return ok;
@@ -434,6 +449,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       return true;
     },
     importTransactions: async (items) => {
+      if (viewOnly("Couldn't import transactions")) return null;
       let summary: { created: number; skipped: number } | null = null;
       await run(
         async () => {
@@ -479,7 +495,8 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     addCommitment: commitCrud.add,
     updateCommitment: commitCrud.update,
     deleteCommitment: commitCrud.remove,
-    payCommitment: (id, opts = {}) =>
+    payCommitment: async (id, opts = {}) =>
+      !viewOnly("Couldn't record payment") &&
       run(
         async () => {
           const res = await api<{ transaction: Transaction; commitment: UpcomingCommitment | null }>(`/commitments/${id}/pay`, { method: "POST", body: opts });

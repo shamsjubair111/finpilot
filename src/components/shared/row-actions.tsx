@@ -10,8 +10,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { t } from "@/lib/i18n";
+import { useFinance } from "@/components/providers/finance-provider";
 
 export function RowActions({ label, onEdit, onDelete }: { label: string; onEdit: () => void; onDelete: () => void }) {
+  // View-only household members can't change anything, so there's nothing to offer.
+  if (useFinance().readOnly) return null;
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
