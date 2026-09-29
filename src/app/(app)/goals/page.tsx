@@ -35,6 +35,7 @@ export default function GoalsPage() {
   return (
     <div>
       <PageHeader
+        editOnly
         title={t("Financial Goals")}
         subtitle={
           goals.length

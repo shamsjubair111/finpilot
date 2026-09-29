@@ -39,6 +39,7 @@ export default function InvestmentsPage() {
   return (
     <div>
       <PageHeader
+        editOnly
         title={t("Investments")}
         subtitle={t("Sanchayapatra, FDR, DPS, shares and gold — with profit and maturity at a glance.")}
         actions={

@@ -38,6 +38,7 @@ export default function AccountsPage() {
   return (
     <div>
       <PageHeader
+        editOnly
         title={tr("Accounts")}
         subtitle={tr("Bank accounts, bKash, Nagad, cash, credit cards and loans in one place.")}
         actions={

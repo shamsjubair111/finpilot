@@ -33,6 +33,7 @@ export default function BudgetPage() {
   return (
     <div>
       <PageHeader
+        editOnly
         title={t("Budget")}
         subtitle={t("Plan and track your spending by category for {month}.", { month: formatDate(selectedMonth, "MMMM yyyy") })}
         actions={budgetCategories.length > 0 && addButton}

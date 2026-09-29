@@ -57,6 +57,7 @@ export default function RecurringPage() {
   return (
     <div>
       <PageHeader
+        editOnly
         title={t("Bills & recurring")}
         subtitle={t("Rent, bills, EMIs, subscriptions and regular income — marked paid in one tap.")}
         actions={

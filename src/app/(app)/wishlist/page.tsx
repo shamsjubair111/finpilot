@@ -41,6 +41,7 @@ export default function WishlistPage() {
   return (
     <div>
       <PageHeader
+        editOnly
         title={t("Wishlist")}
         subtitle={t("Plan future purchases and see how affordable they really are.")}
         actions={purchases.length > 0 && addButton}

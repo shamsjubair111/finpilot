@@ -55,6 +55,7 @@ function TransactionsView() {
   return (
     <div>
       <PageHeader
+        editOnly
         title={tr("Transactions")}
         subtitle={tr("Every income and expense, all in one place.")}
         actions={
