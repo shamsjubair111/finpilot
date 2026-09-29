@@ -18,8 +18,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { SubmitButton } from "@/components/shared/submit-button";
 import { DynamicIcon } from "@/components/shared/dynamic-icon";
 import { useFinance } from "@/components/providers/finance-provider";
-import { CATEGORY_ICON_MAP, EXPENSE_CATEGORIES } from "@/lib/constants";
-import { CATEGORY_COLORS } from "@/lib/chart-colors";
+import { CATEGORY_ICON_MAP } from "@/lib/constants";
+import { categoryColor } from "@/lib/chart-colors";
 import type { BudgetCategory, ExpenseCategory } from "@/types/finance";
 import { t } from "@/lib/i18n";
 
@@ -32,13 +32,13 @@ export function BudgetEditDialog({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
-  const { budgetCategories, addBudgetCategory, updateBudgetCategory } = useFinance();
+  const { budgetCategories, addBudgetCategory, updateBudgetCategory, categoriesFor } = useFinance();
   const isEdit = !!category;
   const [name, setName] = React.useState<ExpenseCategory | "">("");
   const [budgeted, setBudgeted] = React.useState("");
   const [pending, setPending] = React.useState(false);
 
-  const available = EXPENSE_CATEGORIES.filter((c) => c === category?.category || !budgetCategories.some((b) => b.category === c));
+  const available = categoriesFor("expense").filter((c) => c === category?.category || !budgetCategories.some((b) => b.category === c));
 
   const [wasOpen, setWasOpen] = React.useState(false);
   if (open && !wasOpen) {
@@ -61,7 +61,7 @@ export function BudgetEditDialog({
           category: name as ExpenseCategory,
           budgeted: Number(budgeted),
           icon: CATEGORY_ICON_MAP[name] ?? "Wallet",
-          color: CATEGORY_COLORS[name as ExpenseCategory],
+          color: categoryColor(name),
         });
     setPending(false);
     if (ok) onOpenChange(false);
@@ -90,7 +90,7 @@ export function BudgetEditDialog({
                   <SelectContent>
                     {available.map((c) => (
                       <SelectItem key={c} value={c}>
-                        <DynamicIcon name={CATEGORY_ICON_MAP[c]} className="size-4" style={{ color: CATEGORY_COLORS[c] }} />
+                        <DynamicIcon name={CATEGORY_ICON_MAP[c]} className="size-4" style={{ color: categoryColor(c) }} />
                         {t(c)}
                       </SelectItem>
                     ))}

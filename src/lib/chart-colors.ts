@@ -26,3 +26,12 @@ export const SERIES_COLORS = {
   current: "var(--muted-foreground)",
   scenario: "var(--cat-1)",
 };
+
+/** Colour for any category, including user-created ones (stable per name). */
+export function categoryColor(category: string): string {
+  const fixed = (CATEGORY_COLORS as Record<string, string>)[category];
+  if (fixed) return fixed;
+  let h = 0;
+  for (let i = 0; i < category.length; i++) h = (h * 31 + category.charCodeAt(i)) | 0;
+  return `var(--cat-${(Math.abs(h) % 8) + 1})`;
+}

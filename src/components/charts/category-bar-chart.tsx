@@ -6,7 +6,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import type { BudgetCategory } from "@/types/finance";
 import { ChartTooltip } from "./chart-tooltip";
 import { formatCurrency } from "@/lib/currency";
-import { CATEGORY_COLORS } from "@/lib/chart-colors";
+import { categoryColor } from "@/lib/chart-colors";
 
 export function CategoryBarChart({ categories }: { categories: BudgetCategory[] }) {
   const sorted = [...categories].sort((a, b) => b.spent - a.spent);
@@ -39,14 +39,14 @@ export function CategoryBarChart({ categories }: { categories: BudgetCategory[] 
               payload={payload?.map((p) => ({
                 name: "Spent",
                 value: p.value as number,
-                color: CATEGORY_COLORS[(p.payload as BudgetCategory).category],
+                color: categoryColor((p.payload as BudgetCategory).category),
               }))}
             />
           )}
         />
         <Bar animationDuration={450} dataKey="spent" radius={[0, 6, 6, 0]} maxBarSize={20}>
           {sorted.map((c) => (
-            <Cell key={c.id} fill={CATEGORY_COLORS[c.category]} />
+            <Cell key={c.id} fill={categoryColor(c.category)} />
           ))}
         </Bar>
       </BarChart>

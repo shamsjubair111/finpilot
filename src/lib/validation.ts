@@ -131,3 +131,10 @@ export const investmentSchema = z.object({
   currentValue: z.coerce.number().finite().min(0).max(1e12).transform(roundMoney).optional().nullable(),
   notes: optionalText(),
 });
+
+const BUILT_IN_CATEGORIES = ["Housing", "Food", "Transport", "Shopping", "Entertainment", "Bills", "Subscriptions", "Health", "Education", "Other", "Salary", "Freelance", "Bonus", "Investment", "Transfer"];
+
+export const customCategorySchema = z.object({
+  name: text(30).refine((n) => !BUILT_IN_CATEGORIES.some((b) => b.toLowerCase() === n.toLowerCase()), "already exists as a built-in category"),
+  type: z.enum(["income", "expense"]),
+});

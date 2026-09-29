@@ -11,7 +11,6 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useFinance } from "@/components/providers/finance-provider";
-import { EXPENSE_CATEGORIES, INCOME_CATEGORIES } from "@/lib/constants";
 import { formatCurrency } from "@/lib/currency";
 import { formatDate } from "@/lib/format-date";
 import { t } from "@/lib/i18n";
@@ -29,7 +28,7 @@ type Row = CsvTransaction & { key: number; include: boolean; duplicate: boolean 
 
 export function CsvImport() {
   const router = useRouter();
-  const { accounts, transactions, importTransactions } = useFinance();
+  const { accounts, transactions, importTransactions, categoriesFor } = useFinance();
   const fileRef = useRef<HTMLInputElement>(null);
   const [fileName, setFileName] = useState("");
   const [headers, setHeaders] = useState<string[]>([]);
@@ -226,7 +225,7 @@ export function CsvImport() {
               <Select value={r.category} onValueChange={(v) => update(r.key, { category: v as ExpenseCategory | IncomeCategory })}>
                 <SelectTrigger className="h-8 w-36" aria-label={t("Category")}><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {(r.type === "income" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES).map((c) => (
+                  {categoriesFor(r.type).map((c) => (
                     <SelectItem key={c} value={c}>{t(c)}</SelectItem>
                   ))}
                 </SelectContent>

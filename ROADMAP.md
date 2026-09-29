@@ -64,3 +64,6 @@ Status: ✅ done · 🟡 partial · ⬜ not started
 
 ## SEO
 - ✅ robots.txt, sitemap.xml, Open Graph/Twitter card (set `APP_URL` so links are absolute)
+
+## Extras
+- ✅ Custom categories per household (Settings → Your categories), used in every category picker; stable colours in charts

@@ -18,6 +18,7 @@ import { api, ApiClientError } from "@/lib/api-client";
 import { clearOfflineCache } from "@/components/pwa/service-worker";
 import { isOfflineId, newTempId, readOutbox, writeOutbox } from "@/lib/outbox";
 import { computeBalances, netWorthOf } from "@/lib/accounts";
+import { EXPENSE_CATEGORIES, INCOME_CATEGORIES } from "@/lib/constants";
 import { t } from "@/lib/i18n";
 import { useI18n } from "@/lib/i18n/provider";
 import { formatCurrency, setCurrencyPref } from "@/lib/currency";
@@ -33,6 +34,11 @@ export interface Ledger {
   role: "owner" | "editor" | "viewer";
   plan: "free" | "pro";
 }
+export interface CustomCategory {
+  id: string;
+  name: string;
+  type: "income" | "expense";
+}
 export interface HouseholdLink {
   ownerId: string;
   ownerName: string;
@@ -46,6 +52,11 @@ interface FinanceContextValue {
   switchHousehold: (ownerId: string | null) => Promise<void>;
   /** True when viewing someone else's household with view-only access. */
   readOnly: boolean;
+  customCategories: CustomCategory[];
+  addCustomCategory: (c: Omit<CustomCategory, "id">) => Promise<boolean>;
+  deleteCustomCategory: (id: string) => Promise<boolean>;
+  /** Built-in categories followed by the household's own, for pickers. */
+  categoriesFor: (type: "income" | "expense") => string[];
   setReceiptFlag: (transactionId: string, has: boolean) => void;
   user: UserProfile;
   updateUser: (patch: Partial<UserProfile>, successMessage?: string) => Promise<boolean>;
@@ -128,6 +139,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   const [pendingSync, setPendingSync] = React.useState(0);
   const [ledger, setLedger] = React.useState<Ledger | null>(null);
   const [households, setHouseholds] = React.useState<HouseholdLink[]>([]);
+  const [customCategories, setCustomCategories] = React.useState<CustomCategory[]>([]);
   const [selectedMonth, setSelectedMonth] = React.useState(() => monthKey(new Date()));
   const [loadError, setLoadError] = React.useState<string | null>(null);
 
@@ -158,6 +170,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
           investments: Investment[];
           ledger: Ledger;
           households: HouseholdLink[];
+          customCategories: CustomCategory[];
         }>("/bootstrap");
       // One quiet retry covers a database that is still waking up.
       const data = await fetchAll().catch((err) => {
@@ -180,6 +193,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       setInvestments(data.investments ?? []);
       setLedger(data.ledger);
       setHouseholds(data.households ?? []);
+      setCustomCategories(data.customCategories ?? []);
     } catch (err) {
       if (handleAuthFailure(err)) return;
       const message = err instanceof Error ? err.message : t("Could not load your data.");
@@ -335,6 +349,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   const commitCrud = crud<UpcomingCommitment, Omit<UpcomingCommitment, "id">>("/commitments", commitments, setCommitments, "Commitment", (c) => `${c.title} — ${fmt(c.amount)}`, (a, b) => +new Date(a.dueDate) - +new Date(b.dueDate));
 
   const investmentCrud = crud<Investment, Omit<Investment, "id" | "createdAt">>("/investments", investments, setInvestments, "Investment", (i) => `${i.name} — ${fmt(i.principal)}`);
+  const categoryCrud = crud<CustomCategory, Omit<CustomCategory, "id">>("/categories", customCategories, setCustomCategories, "Category", (c) => c.name);
   const accountCrud = crud<Account, Omit<Account, "id" | "createdAt">>("/accounts", accounts, setAccounts, "Account", (a) => a.name);
   const accountBalances = React.useMemo(() => computeBalances(accounts, transactions), [accounts, transactions]);
   const netWorth = React.useMemo(() => netWorthOf(accounts, accountBalances), [accounts, accountBalances]);
@@ -379,6 +394,13 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     ledger: ledger ?? { ownerId: user.id, ownerName: user.name, role: "owner", plan: user.plan },
     households,
     readOnly: ledger?.role === "viewer",
+    customCategories,
+    addCustomCategory: categoryCrud.add,
+    deleteCustomCategory: categoryCrud.remove,
+    categoriesFor: (type) => [
+      ...(type === "income" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES),
+      ...customCategories.filter((c) => c.type === type).map((c) => c.name),
+    ],
     setReceiptFlag: (id, has) => setTransactions((prev) => prev.map((x) => (x.id === id ? { ...x, hasReceipt: has } : x))),
     switchHousehold: async (ownerId) => {
       try {

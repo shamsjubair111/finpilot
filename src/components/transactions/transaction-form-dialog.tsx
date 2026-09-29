@@ -23,7 +23,7 @@ import { DynamicIcon } from "@/components/shared/dynamic-icon";
 import { buildCategoryModel, suggestCategory } from "@/lib/categorize";
 import { ReceiptField } from "./receipt-field";
 import { useFinance } from "@/components/providers/finance-provider";
-import { EXPENSE_CATEGORIES, INCOME_CATEGORIES, PAYMENT_METHODS } from "@/lib/constants";
+import { PAYMENT_METHODS } from "@/lib/constants";
 import { ACCOUNT_TYPE_META } from "@/lib/accounts";
 import { formatCurrency, getCurrencySymbol } from "@/lib/currency";
 import type { Account, PaymentMethod, Transaction, TransactionType } from "@/types/finance";
@@ -92,7 +92,7 @@ export function TransactionFormDialog({
   open: controlledOpen,
   onOpenChange,
 }: TransactionFormDialogProps) {
-  const { addTransaction, updateTransaction, accounts, accountBalances, transactions } = useFinance();
+  const { addTransaction, updateTransaction, accounts, accountBalances, transactions, categoriesFor } = useFinance();
   const categoryModel = React.useMemo(() => buildCategoryModel(transactions), [transactions]);
   // Suggestions only fill the category until the user picks one themselves.
   const [categoryPicked, setCategoryPicked] = React.useState(false);
@@ -148,7 +148,7 @@ export function TransactionFormDialog({
   }
 
   const isTransfer = type === "transfer";
-  const categories = type === "expense" ? EXPENSE_CATEGORIES : INCOME_CATEGORIES;
+  const categories = categoriesFor(type === "income" ? "income" : "expense");
   const fromAccount = accounts.find((a) => a.id === accountId);
   const toAccount = accounts.find((a) => a.id === toAccountId);
   const isValid =

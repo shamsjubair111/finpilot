@@ -9,7 +9,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { EXPENSE_CATEGORIES, INCOME_CATEGORIES } from "@/lib/constants";
 import { useFinance } from "@/components/providers/finance-provider";
 import { t } from "@/lib/i18n";
 
@@ -20,7 +19,6 @@ export interface TransactionFilterState {
   account: string;
 }
 
-const ALL_CATEGORIES = Array.from(new Set([...EXPENSE_CATEGORIES, ...INCOME_CATEGORIES]));
 
 export function TransactionFilters({
   filters,
@@ -29,7 +27,8 @@ export function TransactionFilters({
   filters: TransactionFilterState;
   onChange: (filters: TransactionFilterState) => void;
 }) {
-  const { accounts } = useFinance();
+  const { accounts, categoriesFor } = useFinance();
+  const ALL_CATEGORIES = Array.from(new Set([...categoriesFor("expense"), ...categoriesFor("income")]));
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
       <div className="relative flex-1">

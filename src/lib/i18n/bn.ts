@@ -1277,4 +1277,12 @@ export const bn: Record<string, string> = {
   "That photo is too large. Try a smaller one.": "ছবিটি অনেক বড়। ছোট একটি চেষ্টা করুন।",
   "Only JPEG, PNG or WebP photos are supported.": "শুধু JPEG, PNG বা WebP ছবি চলবে।",
   "Receipt storage is full. Remove some older receipts first.": "রসিদের জায়গা ভরে গেছে। আগে কিছু পুরোনো রসিদ সরান।",
+  // Custom categories
+  "Your categories": "আপনার ক্যাটাগরি",
+  "Add categories of your own, like Kids, Charity or Pets. They appear everywhere you pick a category.": "নিজের ক্যাটাগরি যোগ করুন, যেমন সন্তান, দান বা পোষা প্রাণী। ক্যাটাগরি বাছাইয়ের সব জায়গায় এগুলো দেখাবে।",
+  "Category name": "ক্যাটাগরির নাম",
+  "No custom categories yet.": "এখনো নিজের কোনো ক্যাটাগরি নেই।",
+  "Remove {name}": "{name} সরান",
+  "You can add up to 40 categories.": "সর্বোচ্চ ৪০টি ক্যাটাগরি যোগ করা যায়।",
+  "already exists as a built-in category": "আগে থেকেই একটি নির্ধারিত ক্যাটাগরি আছে",
 };

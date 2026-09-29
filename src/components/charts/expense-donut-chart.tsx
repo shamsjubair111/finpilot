@@ -3,7 +3,7 @@
 import { t } from "@/lib/i18n";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import type { BudgetCategory } from "@/types/finance";
-import { CATEGORY_COLORS } from "@/lib/chart-colors";
+import { categoryColor } from "@/lib/chart-colors";
 import { formatCurrency } from "@/lib/currency";
 import { ChartTooltip } from "./chart-tooltip";
 
@@ -32,7 +32,7 @@ export function ExpenseDonutChart({
             strokeWidth={2}
           >
             {categories.map((c) => (
-              <Cell key={c.id} fill={CATEGORY_COLORS[c.category]} />
+              <Cell key={c.id} fill={categoryColor(c.category)} />
             ))}
           </Pie>
           <Tooltip
@@ -43,7 +43,7 @@ export function ExpenseDonutChart({
                   name: p.name as string,
                   value: p.value as number,
                   color: (p.payload as BudgetCategory & { fill?: string })?.color
-                    ? CATEGORY_COLORS[(p.payload as BudgetCategory).category]
+                    ? categoryColor((p.payload as BudgetCategory).category)
                     : undefined,
                 }))}
               />

@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ExpenseDonutChart } from "@/components/charts/expense-donut-chart";
-import { CATEGORY_COLORS } from "@/lib/chart-colors";
+import { categoryColor } from "@/lib/chart-colors";
 import { formatCurrency, formatNumber } from "@/lib/currency";
 import { t } from "@/lib/i18n";
 import type { BudgetCategory } from "@/types/finance";
@@ -33,7 +33,7 @@ export function ExpenseBreakdownSection({ categories }: { categories: BudgetCate
                 <span className="flex items-center gap-2 min-w-0">
                   <span
                     className="size-2.5 shrink-0 rounded-full"
-                    style={{ backgroundColor: CATEGORY_COLORS[c.category] }}
+                    style={{ backgroundColor: categoryColor(c.category) }}
                   />
                   <span className="truncate">{t(c.category)}</span>
                 </span>

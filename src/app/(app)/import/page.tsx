@@ -15,7 +15,6 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useFinance } from "@/components/providers/finance-provider";
-import { EXPENSE_CATEGORIES, INCOME_CATEGORIES } from "@/lib/constants";
 import { formatCurrency } from "@/lib/currency";
 import { t } from "@/lib/i18n";
 import { parseSmsBatch, type ParsedSms } from "@/lib/sms-parser";
@@ -73,7 +72,7 @@ function ImportTabs() {
 function ImportView() {
   const router = useRouter();
   const params = useSearchParams();
-  const { accounts, transactions, importTransactions } = useFinance();
+  const { accounts, transactions, importTransactions, categoriesFor } = useFinance();
   // Text shared from another app (PWA share target) arrives as ?text=… or ?title=….
   const [text, setText] = useState(() => [params.get("title"), params.get("text")].filter(Boolean).join("\n\n"));
   const [rows, setRows] = useState<Row[] | null>(null);
@@ -249,7 +248,7 @@ function ImportView() {
                       <Select value={r.category} onValueChange={(v) => update(r.key, { category: v as ExpenseCategory | IncomeCategory })}>
                         <SelectTrigger className="h-8 w-40" aria-label={t("Category")}><SelectValue /></SelectTrigger>
                         <SelectContent>
-                          {(r.type === "income" ? INCOME_CATEGORIES : EXPENSE_CATEGORIES).map((c) => (
+                          {categoriesFor(r.type).map((c) => (
                             <SelectItem key={c} value={c}>{t(c)}</SelectItem>
                           ))}
                         </SelectContent>

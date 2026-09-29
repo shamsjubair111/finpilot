@@ -47,6 +47,7 @@ model User {
   investments  Investment[]
   pushSubscriptions PushSubscription[]
   ownedMemberships  Membership[] @relation("OwnedMemberships")
+  customCategories  CustomCategory[]
   joinedMemberships Membership[] @relation("JoinedMemberships")
 }
 
@@ -307,4 +308,16 @@ model Receipt {
   createdAt     DateTime    @default(now())
 
   @@index([userId])
+}
+
+// A category the household added on top of the built-in ones.
+model CustomCategory {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  type      String
+  createdAt DateTime @default(now())
+
+  @@unique([userId, type, name])
 }

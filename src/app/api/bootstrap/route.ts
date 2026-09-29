@@ -20,6 +20,7 @@ export const GET = authed(
           commitments: { orderBy: { dueDate: "asc" } },
           accounts: { orderBy: { createdAt: "asc" } },
           investments: { orderBy: { startDate: "asc" } },
+          customCategories: { orderBy: { name: "asc" } },
         },
       }),
       userId === actorId ? null : db.user.findUniqueOrThrow({ where: { id: actorId } }),
@@ -59,6 +60,7 @@ export const GET = authed(
       commitments: owner.commitments.map(serialize),
       accounts: owner.accounts.map(serialize),
       investments: owner.investments.map(serialize),
+      customCategories: owner.customCategories.map((c) => ({ id: c.id, name: c.name, type: c.type })),
     });
   },
   { scope: "ledger" }

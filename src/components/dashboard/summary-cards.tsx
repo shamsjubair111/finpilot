@@ -13,7 +13,7 @@ import { Progress } from "@/components/ui/progress";
 import { InfoTooltip } from "@/components/shared/info-tooltip";
 import { formatCurrency } from "@/lib/currency";
 import { GLOSSARY } from "@/lib/glossary";
-import { CATEGORY_COLORS } from "@/lib/chart-colors";
+import { categoryColor } from "@/lib/chart-colors";
 import type { BudgetCategory } from "@/types/finance";
 import { cn } from "cn";
 import { formatNumber } from "@/lib/currency";
@@ -79,7 +79,7 @@ export function SummaryCards({
                 key={c.id}
                 style={{
                   width: `${(c.spent / totalSpent) * 100}%`,
-                  backgroundColor: CATEGORY_COLORS[c.category],
+                  backgroundColor: categoryColor(c.category),
                 }}
                 className="h-full first:rounded-l-full last:rounded-r-full"
               />
