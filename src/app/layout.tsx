@@ -7,6 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import { I18nProvider } from "@/lib/i18n/provider";
 import { ServiceWorkerRegistration } from "@/components/pwa/service-worker";
+import { SITE_URL } from "@/lib/site";
 import { isLang, LANG_COOKIE, type Lang } from "@/lib/i18n";
 
 const geistSans = Geist({ variable: "--font-latin", subsets: ["latin"] });
@@ -18,6 +19,14 @@ export const metadata: Metadata = {
   description:
     "Sanchay (সঞ্চয়) helps you track bank accounts, bKash, cards, loans, budgets and savings goals — in English or বাংলা, in any currency.",
   applicationName: "Sanchay",
+  metadataBase: new URL(SITE_URL),
+  openGraph: {
+    type: "website",
+    siteName: "Sanchay",
+    title: "Sanchay — Smart money for everyone",
+    description: "Track bank accounts, bKash, cards, budgets, bills and savings goals — in English or বাংলা.",
+  },
+  twitter: { card: "summary_large_image" },
   appleWebApp: { title: "Sanchay" },
 };
 
