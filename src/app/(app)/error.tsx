@@ -14,6 +14,12 @@ export default function GlobalError({
 }) {
   useEffect(() => {
     console.error(error);
+    // Best-effort report so crashes show up in the admin dashboard.
+    fetch("/api/errors", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: `${error.message}${error.digest ? ` (digest ${error.digest})` : ""}`.slice(0, 500), stack: error.stack?.slice(0, 4000), path: window.location.pathname }),
+    }).catch(() => {});
   }, [error]);
 
   return (

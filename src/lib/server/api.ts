@@ -2,6 +2,7 @@ import "server-only";
 import { ZodError } from "zod";
 import { db } from "./db";
 import { destroySession, getSession } from "./session";
+import { recordError } from "./errors";
 import { cookies, headers } from "next/headers";
 import { isLang, LANG_COOKIE, translate, type Lang } from "@/lib/i18n";
 
@@ -13,6 +14,15 @@ async function requestLang(): Promise<Lang> {
     return /^bn\b|,\s*bn\b/i.test(accept) ? "bn" : "en";
   } catch {
     return "en";
+  }
+}
+
+async function requestPath() {
+  try {
+    const h = await headers();
+    return h.get("x-invoke-path") ?? h.get("referer") ?? null;
+  } catch {
+    return null;
   }
 }
 
@@ -49,6 +59,7 @@ export async function handleError(err: unknown) {
     return json({ error: tr(lang, "The database is waking up or unreachable. Please try again in a moment.") }, 503);
   if (err instanceof SyntaxError) return json({ error: tr(lang, "Malformed request body") }, 400);
   console.error(err);
+  await recordError("server", err, { path: await requestPath() });
   return json({ error: tr(lang, "Something went wrong on our side. Please try again.") }, 500);
 }
 

@@ -9,7 +9,7 @@ Status: ✅ done · 🟡 partial · ⬜ not started
 - ✅ Security headers (`next.config.ts`)
 - ✅ Rate limiting on login, register, password change, import and export (in-memory; move to Redis for multi-instance hosting)
 - ⬜ Staging environment with its own database
-- ⬜ Sentry error tracking and uptime monitoring
+- ✅ Monitoring: `/api/health` for uptime checks; server and browser errors logged to the admin dashboard (30-day retention). Sentry optional later
 - ✅ Security activity log (sign-ins, failed attempts, password/2FA changes, exports) shown in Settings; 180-day retention; removed on account deletion
 - ⬜ Field encryption for account numbers
 

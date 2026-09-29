@@ -65,5 +65,6 @@ export async function GET(req: Request) {
   }
   // Housekeeping: keep six months of security activity.
   await db.auditEvent.deleteMany({ where: { createdAt: { lt: new Date(now.getTime() - 180 * DAY) } } });
+  await db.errorEvent.deleteMany({ where: { createdAt: { lt: new Date(now.getTime() - 30 * DAY) } } });
   return json({ users: users.length, sent });
 }

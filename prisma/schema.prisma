@@ -260,3 +260,16 @@ model Payment {
 
   @@index([userId, createdAt])
 }
+
+// Unexpected errors from the server and browsers, for the admin dashboard.
+model ErrorEvent {
+  id        String   @id @default(cuid())
+  source    String
+  message   String
+  stack     String?
+  path      String?
+  userId    String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}

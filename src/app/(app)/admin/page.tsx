@@ -254,6 +254,8 @@ function AdminDashboard() {
         </CardContent>
       </Card>
 
+      <ErrorsCard />
+
       <GrantDialog user={granting} onClose={() => setGranting(null)} onDone={loadAll} />
     </div>
   );
@@ -335,5 +337,47 @@ function GrantDialog({ user, onClose, onDone }: { user: AdminUser | null; onClos
         </form>
       </DialogContent>
     </Dialog>
+  );
+}
+
+interface ErrorRow {
+  id: string;
+  source: string;
+  message: string;
+  stack: string | null;
+  path: string | null;
+  createdAt: string;
+}
+
+function ErrorsCard() {
+  const [data, setData] = useState<{ count24h: number; events: ErrorRow[] } | null>(null);
+  const [open, setOpen] = useState<string | null>(null);
+  useEffect(() => {
+    api<{ count24h: number; events: ErrorRow[] }>("/admin/errors").then(setData).catch(() => setData({ count24h: 0, events: [] }));
+  }, []);
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">Errors (last 7 days)</CardTitle>
+        <CardDescription>{data ? `${data.count24h} in the last 24 hours. Uptime check: /api/health` : "Loading…"}</CardDescription>
+      </CardHeader>
+      <CardContent className="divide-y text-sm">
+        {data?.events.length === 0 && <p className="py-4 text-muted-foreground">No errors recorded. 🎉</p>}
+        {data?.events.map((e) => (
+          <div key={e.id} className="py-2">
+            <button type="button" className="flex w-full items-start justify-between gap-3 text-left" onClick={() => setOpen(open === e.id ? null : e.id)}>
+              <span className="min-w-0">
+                <Badge variant={e.source === "server" ? "destructive" : "secondary"} className="mr-2">{e.source}</Badge>
+                <span className="break-words">{e.message}</span>
+              </span>
+              <span className="shrink-0 text-xs text-muted-foreground">{format(new Date(e.createdAt), "d MMM, HH:mm")}</span>
+            </button>
+            {open === e.id && (
+              <pre className="mt-2 max-h-64 overflow-auto rounded-md bg-muted p-2 text-[11px]">{[e.path, e.stack].filter(Boolean).join("\n\n")}</pre>
+            )}
+          </div>
+        ))}
+      </CardContent>
+    </Card>
   );
 }
