@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Offline · Sanchay</title>
+<style>
+  :root { color-scheme: light dark; --bg: #f7f7fb; --fg: #111827; --muted: #6b7280; --accent: #6366f1; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #0f0d1f; --fg: #f3f4f6; --muted: #9ca3af; } }
+  body { margin: 0; min-height: 100dvh; display: grid; place-items: center; background: var(--bg); color: var(--fg); font: 16px/1.5 system-ui, "Hind Siliguri", sans-serif; }
+  main { max-width: 22rem; padding: 1.5rem; text-align: center; }
+  img { width: 56px; height: 56px; }
+  h1 { font-size: 1.25rem; margin: 1rem 0 .25rem; }
+  p { color: var(--muted); margin: 0 0 1.25rem; }
+  button { background: var(--accent); color: #fff; border: 0; border-radius: .6rem; padding: .6rem 1.2rem; font: inherit; font-weight: 600; cursor: pointer; }
+</style>
+</head>
+<body>
+<main>
+  <img src="/icon.svg" alt="">
+  <h1>You're offline · আপনি অফলাইনে</h1>
+  <p>Sanchay will load again as soon as you're connected.<br>সংযোগ ফিরলেই সঞ্চয় আবার খুলবে।</p>
+  <button onclick="location.reload()">Try again · আবার চেষ্টা করুন</button>
+</main>
+</body>
+</html>

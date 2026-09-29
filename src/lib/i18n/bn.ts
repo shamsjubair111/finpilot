@@ -1153,4 +1153,15 @@ export const bn: Record<string, string> = {
   "If something here wasn't you, change your password and sign out other devices.": "এখানে কোনো কাজ আপনার না হলে পাসওয়ার্ড বদলান এবং অন্য ডিভাইস থেকে সাইন আউট করুন।",
   "Loading…": "লোড হচ্ছে…",
   "No activity recorded yet.": "এখনো কোনো কার্যকলাপ নেই।",
+  // Offline
+  "Couldn't sync \"{title}\"": "\"{title}\" সিঙ্ক করা যায়নি",
+  "Synced {n} offline transactions": "অফলাইনের {n}টি লেনদেন সিঙ্ক হয়েছে",
+  "Couldn't save offline": "অফলাইনে সেভ করা যায়নি",
+  "Your browser's storage is unavailable.": "আপনার ব্রাউজারের স্টোরেজ ব্যবহার করা যাচ্ছে না।",
+  "Saved offline": "অফলাইনে সেভ হয়েছে",
+  "It will sync when you're back online.": "অনলাইনে ফিরলে সিঙ্ক হবে।",
+  "Transaction updated": "লেনদেন আপডেট হয়েছে",
+  "Transaction deleted": "লেনদেন মুছে ফেলা হয়েছে",
+  "You're offline. New transactions are saved on this device.": "আপনি অফলাইনে আছেন। নতুন লেনদেন এই ডিভাইসে সেভ হচ্ছে।",
+  "{n} waiting to sync.": "{n}টি সিঙ্কের অপেক্ষায়।",
 };

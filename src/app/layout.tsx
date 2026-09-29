@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/providers/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import { I18nProvider } from "@/lib/i18n/provider";
+import { ServiceWorkerRegistration } from "@/components/pwa/service-worker";
 import { isLang, LANG_COOKIE, type Lang } from "@/lib/i18n";
 
 const geistSans = Geist({ variable: "--font-latin", subsets: ["latin"] });
@@ -47,6 +48,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           <I18nProvider initialLang={lang}>
             <TooltipProvider delayDuration={200}>
               {children}
+              <ServiceWorkerRegistration />
               <Toaster position="top-right" richColors closeButton />
             </TooltipProvider>
           </I18nProvider>

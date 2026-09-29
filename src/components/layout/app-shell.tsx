@@ -6,6 +6,7 @@ import { Sidebar } from "./sidebar";
 import { MobileNav } from "./mobile-nav";
 import { Header } from "./header";
 import { VerifyEmailBanner } from "./verify-email-banner";
+import { SyncBanner } from "./sync-banner";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = React.useState(false);
@@ -30,6 +31,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <div className="mx-auto w-full min-w-0 max-w-[1400px]">
             <div className="print:hidden">
               <VerifyEmailBanner />
+              <SyncBanner />
             </div>
             {children}
           </div>

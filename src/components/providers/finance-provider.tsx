@@ -15,6 +15,8 @@ import type {
   UserProfile,
 } from "@/types/finance";
 import { api, ApiClientError } from "@/lib/api-client";
+import { clearOfflineCache } from "@/components/pwa/service-worker";
+import { isOfflineId, newTempId, readOutbox, writeOutbox } from "@/lib/outbox";
 import { computeBalances, netWorthOf } from "@/lib/accounts";
 import { t } from "@/lib/i18n";
 import { useI18n } from "@/lib/i18n/provider";
@@ -45,6 +47,8 @@ interface FinanceContextValue {
   addTransaction: (txn: Omit<Transaction, "id">) => Promise<boolean>;
   updateTransaction: (id: string, patch: Partial<Transaction>) => Promise<boolean>;
   deleteTransaction: (id: string) => Promise<boolean>;
+  /** Transactions saved on this device while offline, waiting to sync. */
+  pendingSync: number;
   importTransactions: (items: Omit<Transaction, "id">[]) => Promise<{ created: number; skipped: number } | null>;
 
   budgetCategories: BudgetCategory[];
@@ -102,6 +106,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   const [commitments, setCommitments] = React.useState<UpcomingCommitment[]>([]);
   const [accounts, setAccounts] = React.useState<Account[]>([]);
   const [investments, setInvestments] = React.useState<Investment[]>([]);
+  const [pendingSync, setPendingSync] = React.useState(0);
   const [selectedMonth, setSelectedMonth] = React.useState(() => monthKey(new Date()));
   const [loadError, setLoadError] = React.useState<string | null>(null);
 
@@ -141,7 +146,10 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       setCurrencyPref(me.currency);
       if (me.language !== lang) setLang(me.language);
       setUser(me);
-      setTransactions(txns);
+      // Keep showing anything still queued from an offline session on this device.
+      const queued = readOutbox(me.id).map((e) => ({ ...e.payload, id: e.tempId }) as Transaction);
+      setTransactions([...txns, ...queued].sort(byDateDesc));
+      setPendingSync(queued.length);
       setBudgets(bgs);
       setGoals(gls);
       setPurchases(prs);
@@ -161,6 +169,40 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     load();
   }, [load]);
+
+  const userId = user?.id;
+  const flushing = React.useRef(false);
+  const flushOutbox = React.useCallback(async () => {
+    if (!userId || flushing.current) return;
+    flushing.current = true;
+    let synced = 0;
+    try {
+      for (const entry of readOutbox(userId)) {
+        try {
+          const created = await api<Transaction>("/transactions", { method: "POST", body: entry.payload });
+          setTransactions((prev) => prev.map((x) => (x.id === entry.tempId ? created : x)).sort(byDateDesc));
+          synced++;
+        } catch (err) {
+          if (err instanceof ApiClientError && err.status === 0) break; // still offline: try again later
+          setTransactions((prev) => prev.filter((x) => x.id !== entry.tempId));
+          toast.error(t("Couldn't sync \"{title}\"", { title: entry.payload.title }), { description: err instanceof Error ? err.message : undefined });
+        }
+        writeOutbox(userId, readOutbox(userId).filter((e) => e.tempId !== entry.tempId));
+      }
+    } finally {
+      flushing.current = false;
+      setPendingSync(readOutbox(userId).length);
+    }
+    if (synced) toast.success(t("Synced {n} offline transactions", { n: synced }));
+  }, [userId]);
+
+  React.useEffect(() => {
+    if (!userId) return;
+    // Sync once on load, then whenever the connection comes back.
+    flushOutbox();
+    window.addEventListener("online", flushOutbox);
+    return () => window.removeEventListener("online", flushOutbox);
+  }, [userId, flushOutbox]);
 
   const needsOnboarding = !!user && !user.onboarded && pathname !== "/onboarding";
   React.useEffect(() => {
@@ -287,7 +329,10 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     },
     deleteUserAccount: async (password) => {
       const ok = await run(() => api("/profile", { method: "DELETE", body: { password } }), "Account deleted", "Couldn't delete account", t("All your data has been permanently removed."));
-      if (ok) router.replace("/register");
+      if (ok) {
+        clearOfflineCache();
+        router.replace("/register");
+      }
       return ok;
     },
     signOutOtherDevices: () =>
@@ -312,15 +357,45 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       return ok;
     },
     signOut: async () => {
+      clearOfflineCache();
       await run(() => api("/auth/logout", { method: "POST" }), "Signed out", "Couldn't sign out", t("See you next time!"));
       router.replace("/login");
       router.refresh();
     },
 
     transactions,
-    addTransaction: txnCrud.add,
-    updateTransaction: txnCrud.update,
-    deleteTransaction: txnCrud.remove,
+    pendingSync,
+    addTransaction: async (data) => {
+      if (typeof navigator !== "undefined" && navigator.onLine) {
+        const ok = await txnCrud.add(data);
+        if (ok || navigator.onLine) return ok;
+      }
+      // Offline: keep it on this device and sync later.
+      const tempId = newTempId();
+      if (!writeOutbox(user.id, [...readOutbox(user.id), { tempId, payload: data }])) {
+        toast.error(t("Couldn't save offline"), { description: t("Your browser's storage is unavailable.") });
+        return false;
+      }
+      setTransactions((prev) => [{ ...data, id: tempId } as Transaction, ...prev].sort(byDateDesc));
+      setPendingSync((n) => n + 1);
+      toast.success(t("Saved offline"), { description: t("It will sync when you're back online.") });
+      return true;
+    },
+    updateTransaction: async (id, patch) => {
+      if (!isOfflineId(id)) return txnCrud.update(id, patch);
+      writeOutbox(user.id, readOutbox(user.id).map((e) => (e.tempId === id ? { ...e, payload: { ...e.payload, ...patch } } : e)));
+      setTransactions((prev) => prev.map((x) => (x.id === id ? { ...x, ...patch } : x)).sort(byDateDesc));
+      toast.success(t("Transaction updated"));
+      return true;
+    },
+    deleteTransaction: async (id) => {
+      if (!isOfflineId(id)) return txnCrud.remove(id);
+      writeOutbox(user.id, readOutbox(user.id).filter((e) => e.tempId !== id));
+      setTransactions((prev) => prev.filter((x) => x.id !== id));
+      setPendingSync((n) => Math.max(0, n - 1));
+      toast.success(t("Transaction deleted"));
+      return true;
+    },
     importTransactions: async (items) => {
       let summary: { created: number; skipped: number } | null = null;
       await run(
