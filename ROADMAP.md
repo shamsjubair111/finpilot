@@ -61,3 +61,6 @@ Status: ✅ done · 🟡 partial · ⬜ not started
 - Have a lawyer review `/privacy` and `/terms`; they are a starting template.
 - Set `NEXT_PUBLIC_SUPPORT_EMAIL` in production.
 - Pro prices (৳199/month, ৳1,990/year) are placeholders in `src/lib/plans.ts`.
+
+## SEO
+- ✅ robots.txt, sitemap.xml, Open Graph/Twitter card (set `APP_URL` so links are absolute)
