@@ -47,10 +47,11 @@ export function CsvImport() {
     () =>
       (result?.parsed ?? []).map((p, key) => {
         const duplicate = knownIds.has(p.externalId);
-        const learned = suggestCategory(categoryModel, p.title, "", p.type) as Row["category"] | null;
+        // A category column in the file wins; otherwise use what the user usually picks.
+        const learned = map && map.category < 0 ? (suggestCategory(categoryModel, p.title, "", p.type) as Row["category"] | null) : null;
         return { ...p, category: learned ?? p.category, key, duplicate, include: !duplicate, ...overrides[key] };
       }),
-    [result, knownIds, overrides, categoryModel]
+    [result, knownIds, overrides, categoryModel, map]
   );
   const selected = rows.filter((r) => r.include);
 
