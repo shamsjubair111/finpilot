@@ -21,6 +21,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SubmitButton } from "@/components/shared/submit-button";
 import { DynamicIcon } from "@/components/shared/dynamic-icon";
 import { buildCategoryModel, suggestCategory } from "@/lib/categorize";
+import { ReceiptField } from "./receipt-field";
 import { useFinance } from "@/components/providers/finance-provider";
 import { EXPENSE_CATEGORIES, INCOME_CATEGORIES, PAYMENT_METHODS } from "@/lib/constants";
 import { ACCOUNT_TYPE_META } from "@/lib/accounts";
@@ -325,6 +326,12 @@ export function TransactionFormDialog({
               <Label htmlFor="txn-notes">{tr("Notes (optional)")}</Label>
               <Textarea id="txn-notes" placeholder={tr("Add any extra detail...")} value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} />
             </div>
+
+            {isEdit && transaction && (
+              <div className="sm:col-span-2">
+                <ReceiptField transactionId={transaction.id} />
+              </div>
+            )}
           </div>
 
           <DialogFooter>

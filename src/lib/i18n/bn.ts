@@ -1264,4 +1264,17 @@ export const bn: Record<string, string> = {
   "You don't have access to that household.": "ওই পরিবারে আপনার প্রবেশাধিকার নেই।",
   // Viewer
   "Couldn't add transaction": "লেনদেন যোগ করা যায়নি",
+  // Receipts
+  "Receipt attached": "রসিদ যুক্ত হয়েছে",
+  "Couldn't attach receipt": "রসিদ যুক্ত করা যায়নি",
+  "Couldn't remove receipt": "রসিদ সরানো যায়নি",
+  "Receipt removed": "রসিদ সরানো হয়েছে",
+  "Receipt": "রসিদ",
+  "Replace": "বদলান",
+  "No receipt": "রসিদ নেই",
+  "Add receipt photo": "রসিদের ছবি যোগ করুন",
+  "Choose a photo to upload.": "আপলোডের জন্য একটি ছবি বেছে নিন।",
+  "That photo is too large. Try a smaller one.": "ছবিটি অনেক বড়। ছোট একটি চেষ্টা করুন।",
+  "Only JPEG, PNG or WebP photos are supported.": "শুধু JPEG, PNG বা WebP ছবি চলবে।",
+  "Receipt storage is full. Remove some older receipts first.": "রসিদের জায়গা ভরে গেছে। আগে কিছু পুরোনো রসিদ সরান।",
 };

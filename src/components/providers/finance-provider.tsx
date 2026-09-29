@@ -46,6 +46,7 @@ interface FinanceContextValue {
   switchHousehold: (ownerId: string | null) => Promise<void>;
   /** True when viewing someone else's household with view-only access. */
   readOnly: boolean;
+  setReceiptFlag: (transactionId: string, has: boolean) => void;
   user: UserProfile;
   updateUser: (patch: Partial<UserProfile>, successMessage?: string) => Promise<boolean>;
   changePassword: (currentPassword: string, newPassword: string) => Promise<boolean>;
@@ -378,6 +379,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     ledger: ledger ?? { ownerId: user.id, ownerName: user.name, role: "owner", plan: user.plan },
     households,
     readOnly: ledger?.role === "viewer",
+    setReceiptFlag: (id, has) => setTransactions((prev) => prev.map((x) => (x.id === id ? { ...x, hasReceipt: has } : x))),
     switchHousehold: async (ownerId) => {
       try {
         await api("/household/switch", { method: "POST", body: { ownerId } });
@@ -434,7 +436,13 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       return true;
     },
     updateTransaction: async (id, patch) => {
-      if (!isOfflineId(id)) return txnCrud.update(id, patch);
+      if (!isOfflineId(id)) {
+        // The update response doesn't carry the receipt flag, so keep what we knew.
+        const hadReceipt = transactions.find((x) => x.id === id)?.hasReceipt;
+        const ok = await txnCrud.update(id, patch);
+        if (ok && hadReceipt) setTransactions((prev) => prev.map((x) => (x.id === id ? { ...x, hasReceipt: true } : x)));
+        return ok;
+      }
       writeOutbox(outboxKey, readOutbox(outboxKey).map((e) => (e.tempId === id ? { ...e, payload: { ...e.payload, ...patch } } : e)));
       setTransactions((prev) => prev.map((x) => (x.id === id ? { ...x, ...patch } : x)).sort(byDateDesc));
       toast.success(t("Transaction updated"));

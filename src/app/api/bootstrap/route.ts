@@ -13,7 +13,7 @@ export const GET = authed(
       db.user.findUniqueOrThrow({
         where: { id: userId },
         include: {
-          transactions: { orderBy: { date: "desc" } },
+          transactions: { orderBy: { date: "desc" }, include: { receipt: { select: { id: true } } } },
           budgets: { orderBy: { createdAt: "asc" } },
           goals: { orderBy: { createdAt: "asc" } },
           purchases: { orderBy: { createdAt: "asc" } },
@@ -52,7 +52,7 @@ export const GET = authed(
         plan: effectivePlan(owner.plan, owner.planExpiresAt),
       },
       households: households.map((h) => ({ ownerId: h.owner.id, ownerName: h.owner.name, role: h.role })),
-      transactions: owner.transactions.map(serialize),
+      transactions: owner.transactions.map(({ receipt, ...t }) => ({ ...serialize(t), hasReceipt: !!receipt })),
       budgets: owner.budgets.map(serialize),
       goals: owner.goals.map(serialize),
       purchases: owner.purchases.map(serialize),

@@ -88,6 +88,7 @@ model Transaction {
   toAccountId   String?
   toAccount     Account? @relation("TxnToAccount", fields: [toAccountId], references: [id], onDelete: SetNull)
   externalId    String?
+  receipt       Receipt?
   createdAt     DateTime @default(now())
 
   @@unique([userId, externalId])
@@ -292,4 +293,18 @@ model Membership {
 
   @@unique([ownerId, email])
   @@index([memberId])
+}
+
+// A photo of a receipt attached to a transaction (compressed in the browser before upload).
+model Receipt {
+  id            String      @id @default(cuid())
+  userId        String
+  transactionId String      @unique
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  mime          String
+  size          Int
+  data          Bytes
+  createdAt     DateTime    @default(now())
+
+  @@index([userId])
 }

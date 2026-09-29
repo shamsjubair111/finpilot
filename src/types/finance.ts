@@ -39,6 +39,8 @@ export interface Transaction {
   toAccountId?: string | null;
   /** Provider transaction ID (e.g. a bKash TrxID) for imported rows; used to skip duplicates. */
   externalId?: string | null;
+  /** A receipt photo is attached (fetched separately). */
+  hasReceipt?: boolean;
 }
 
 export type AccountType =

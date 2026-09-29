@@ -38,7 +38,7 @@ Status: ✅ done · 🟡 partial · ⬜ not started
 - ✅ PWA share target: share an SMS to Sanchay on Android to open it in Import
 - ✅ Recurring bills and income (`/recurring`): weekly/monthly/quarterly/yearly, mark paid, optional auto-post, due-bill notifications, daily email reminders via `/api/cron/reminders` (`CRON_SECRET`, `vercel.json`)
 - ✅ Bank statement CSV import (Import → Bank statement): auto-detects columns, debit/credit or signed amounts, keyword categories, re-upload safe
-- ⬜ Receipt photos
+- ✅ Receipt photos on transactions (compressed in the browser, stored in Postgres, 50 MB per household, image type verified)
 
 ## Phases 5–8
 - ✅ Offline PWA: service worker (static cache-first, pages + bootstrap network-first), offline page, offline transaction outbox that syncs on reconnect, sync banner

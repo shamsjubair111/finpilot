@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { formatDate } from "@/lib/format-date";
-import { ArrowDownLeft, ArrowLeftRight, ArrowUpRight, Receipt } from "lucide-react";
+import { ArrowDownLeft, ArrowLeftRight, ArrowUpRight, Paperclip, Receipt } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -80,7 +80,10 @@ export function TransactionList({ transactions, emptyAction }: { transactions: T
                         <DynamicIcon name={iconName} className="size-4" />
                       </div>
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-medium">{t.title}</p>
+                        <p className="flex items-center gap-1 truncate text-sm font-medium">
+                          {t.title}
+                          {t.hasReceipt && <Paperclip className="size-3 shrink-0 text-muted-foreground" aria-label={tr("Receipt")} />}
+                        </p>
                         <p className="truncate text-xs text-muted-foreground">{t.merchant || paymentLabel(t.paymentMethod)}</p>
                       </div>
                     </div>
@@ -127,7 +130,10 @@ export function TransactionList({ transactions, emptyAction }: { transactions: T
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-start justify-between gap-2">
-                    <p className="truncate text-sm font-medium">{t.title}</p>
+                    <p className="flex items-center gap-1 truncate text-sm font-medium">
+                          {t.title}
+                          {t.hasReceipt && <Paperclip className="size-3 shrink-0 text-muted-foreground" aria-label={tr("Receipt")} />}
+                        </p>
                     <span className={`shrink-0 text-sm font-semibold tabular-nums ${amountTone(t)}`}>
                       {sign(t)}
                       {formatCurrency(t.amount)}
