@@ -19,7 +19,8 @@ npx prisma migrate deploy
 npm run dev
 ```
 
-`.env` needs:
+See [DEPLOY.md](DEPLOY.md) for going live and the full list of optional environment variables
+(email, payments, Google sign-in, push notifications, AI assistant). The minimum `.env` needs:
 
 | Variable       | Purpose                                                     |
 | -------------- | ----------------------------------------------------------- |
