@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { CURRENCY_CODES } from "@/lib/currency";
+import { FREQUENCIES } from "@/lib/recurrence";
 
 // Amounts are stored as floats, so round to cents on the way in to stop drift from accumulating.
 export const roundMoney = (v: number) => Math.round(v * 100) / 100;
@@ -109,4 +110,8 @@ export const commitmentSchema = z.object({
   amount: positiveMoney,
   icon: z.string().max(40).optional(),
   recurring: z.boolean().default(false),
+  frequency: z.enum(FREQUENCIES).default("monthly"),
+  type: z.enum(["income", "expense"]).default("expense"),
+  accountId: optionalId,
+  autoPost: z.boolean().default(false),
 });

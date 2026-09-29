@@ -34,11 +34,12 @@ Status: ✅ done · 🟡 partial · ⬜ not started
 - ✅ Paste-to-import for bKash, Nagad, Rocket and bank SMS (`/import`)
 - ✅ Duplicate protection by transaction ID
 - ✅ PWA share target: share an SMS to Sanchay on Android to open it in Import
-- ⬜ CSV / statement upload, recurring transactions, receipt photos
+- ✅ Recurring bills and income (`/recurring`): weekly/monthly/quarterly/yearly, mark paid, optional auto-post, due-bill notifications, daily email reminders via `/api/cron/reminders` (`CRON_SECRET`, `vercel.json`)
+- ⬜ CSV / statement upload, receipt photos
 
 ## Phases 5–8
 - ⬜ Full offline PWA and push notifications
-- ⬜ Reminders, PDF reports, zakat calculator, debt payoff, net worth history
+- ⬜ PDF reports, zakat calculator, debt payoff, net worth history
 - ⬜ Household workspaces, AI categorisation and assistant
 - ⬜ Native Android app (only if demand shows)
 

@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { differenceInCalendarDays } from "date-fns";
 import { formatDate } from "@/lib/format-date";
 import { CalendarClock, Plus, Repeat } from "lucide-react";
@@ -27,9 +28,14 @@ export function UpcomingCommitmentsCard() {
     <Card className="animate-in-up">
       <CardHeader>
         <CardTitle>{t("Upcoming Commitments")}</CardTitle>
-        <CardAction><Button variant="ghost" size="sm" className="gap-1" onClick={() => setAdding(true)}>
-          <Plus className="size-3.5" /> {t("Add")}
-        </Button></CardAction>
+        <CardAction className="flex gap-1">
+          <Button asChild variant="ghost" size="sm">
+            <Link href="/recurring">{t("View all")}</Link>
+          </Button>
+          <Button variant="ghost" size="sm" className="gap-1" onClick={() => setAdding(true)}>
+            <Plus className="size-3.5" /> {t("Add")}
+          </Button>
+        </CardAction>
       </CardHeader>
       <CardContent>
         {commitments.length === 0 ? (

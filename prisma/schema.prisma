@@ -139,6 +139,15 @@ model Commitment {
   amount    Float
   icon      String   @default("CalendarClock")
   recurring Boolean  @default(false)
+  // weekly | monthly | quarterly | yearly (used when recurring)
+  frequency       String    @default("monthly")
+  // Day of month the schedule is anchored to, so a 31st bill returns to the 31st after short months.
+  anchorDay       Int?
+  type            String    @default("expense")
+  accountId       String?
+  // Post the transaction automatically when it falls due.
+  autoPost        Boolean   @default(false)
+  lastRemindedFor DateTime?
   createdAt DateTime @default(now())
 
   @@index([userId])

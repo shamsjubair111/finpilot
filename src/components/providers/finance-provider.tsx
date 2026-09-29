@@ -71,6 +71,7 @@ interface FinanceContextValue {
   addCommitment: (c: Omit<UpcomingCommitment, "id">) => Promise<boolean>;
   updateCommitment: (id: string, patch: Partial<UpcomingCommitment>) => Promise<boolean>;
   deleteCommitment: (id: string) => Promise<boolean>;
+  payCommitment: (id: string, opts?: { amount?: number; date?: string }) => Promise<boolean>;
 
   selectedMonth: string;
   setSelectedMonth: (month: string) => void;
@@ -348,6 +349,21 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     addCommitment: commitCrud.add,
     updateCommitment: commitCrud.update,
     deleteCommitment: commitCrud.remove,
+    payCommitment: (id, opts = {}) =>
+      run(
+        async () => {
+          const res = await api<{ transaction: Transaction; commitment: UpcomingCommitment | null }>(`/commitments/${id}/pay`, { method: "POST", body: opts });
+          setTransactions((prev) => [res.transaction, ...prev].sort(byDateDesc));
+          setCommitments((prev) =>
+            (res.commitment ? prev.map((c) => (c.id === id ? res.commitment! : c)) : prev.filter((c) => c.id !== id)).sort(
+              (a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
+            )
+          );
+        },
+        "Marked as paid",
+        "Couldn't record payment",
+        t("Added to your transactions.")
+      ),
 
     selectedMonth,
     setSelectedMonth,

@@ -20,6 +20,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { SubmitButton } from "@/components/shared/submit-button";
 import { useFinance } from "@/components/providers/finance-provider";
 import type { UpcomingCommitment } from "@/types/finance";
+import { FREQUENCIES, type Frequency } from "@/lib/recurrence";
+
+const NO_ACCOUNT = "__none__";
+const FREQUENCY_LABELS: Record<Frequency, string> = { weekly: "Weekly", monthly: "Monthly", quarterly: "Every 3 months", yearly: "Yearly" };
 import { t } from "@/lib/i18n";
 
 const KINDS = [
@@ -29,6 +33,7 @@ const KINDS = [
   { value: "Loan", icon: "Landmark" },
   { value: "Insurance", icon: "ShieldCheck" },
   { value: "Savings", icon: "PiggyBank" },
+  { value: "Salary", icon: "Banknote" },
   { value: "Other", icon: "CalendarClock" },
 ];
 
@@ -43,7 +48,7 @@ export function CommitmentFormDialog({
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }) {
-  const { addCommitment, updateCommitment } = useFinance();
+  const { addCommitment, updateCommitment, accounts } = useFinance();
   const [internalOpen, setInternalOpen] = React.useState(false);
   const open = controlledOpen ?? internalOpen;
   const setOpen = onOpenChange ?? setInternalOpen;
@@ -54,6 +59,10 @@ export function CommitmentFormDialog({
   const [amount, setAmount] = React.useState("");
   const [dueDate, setDueDate] = React.useState("");
   const [recurring, setRecurring] = React.useState(true);
+  const [frequency, setFrequency] = React.useState<Frequency>("monthly");
+  const [type, setType] = React.useState<"income" | "expense">("expense");
+  const [accountId, setAccountId] = React.useState(NO_ACCOUNT);
+  const [autoPost, setAutoPost] = React.useState(false);
   const [pending, setPending] = React.useState(false);
 
   const [wasOpen, setWasOpen] = React.useState(false);
@@ -64,6 +73,10 @@ export function CommitmentFormDialog({
     setAmount(commitment ? String(commitment.amount) : "");
     setDueDate(commitment ? commitment.dueDate.slice(0, 10) : "");
     setRecurring(commitment?.recurring ?? true);
+    setFrequency(commitment?.frequency ?? "monthly");
+    setType(commitment?.type ?? "expense");
+    setAccountId(commitment?.accountId ?? NO_ACCOUNT);
+    setAutoPost(commitment?.autoPost ?? false);
   } else if (!open && wasOpen) {
     setWasOpen(false);
   }
@@ -80,6 +93,10 @@ export function CommitmentFormDialog({
       amount: Number(amount),
       dueDate,
       recurring,
+      frequency,
+      type,
+      accountId: accountId === NO_ACCOUNT ? null : accountId,
+      autoPost: recurring && autoPost,
       icon: KINDS.find((k) => k.value === category)?.icon ?? "CalendarClock",
     };
     const ok = isEdit ? await updateCommitment(commitment!.id, data) : await addCommitment(data);
@@ -122,13 +139,56 @@ export function CommitmentFormDialog({
                 </SelectContent>
               </Select>
             </div>
-            <label className="col-span-2 flex items-center justify-between rounded-xl border border-border p-3">
-              <div>
-                <p className="text-sm font-medium">{t("Recurring monthly")}</p>
-                <p className="text-xs text-muted-foreground">{t("Repeats every month on the same day.")}</p>
-              </div>
-              <Switch checked={recurring} onCheckedChange={setRecurring} />
-            </label>
+            <div className="space-y-1.5">
+              <Label htmlFor="cm-direction">{t("Money")}</Label>
+              <Select value={type} onValueChange={(v) => setType(v as "income" | "expense")}>
+                <SelectTrigger id="cm-direction" className="w-full"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="expense">{t("Going out")}</SelectItem>
+                  <SelectItem value="income">{t("Coming in")}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="cm-account">{t("Account")}</Label>
+              <Select value={accountId} onValueChange={setAccountId}>
+                <SelectTrigger id="cm-account" className="w-full"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={NO_ACCOUNT}>{t("No account")}</SelectItem>
+                  {accounts.filter((a) => !a.archived).map((a) => (
+                    <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="col-span-2 space-y-3 rounded-xl border border-border p-3">
+              <label className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-sm font-medium">{t("Repeats")}</p>
+                  <p className="text-xs text-muted-foreground">{t("After you mark it paid, the next due date is set automatically.")}</p>
+                </div>
+                <Switch checked={recurring} onCheckedChange={setRecurring} />
+              </label>
+              {recurring && (
+                <>
+                  <Select value={frequency} onValueChange={(v) => setFrequency(v as Frequency)}>
+                    <SelectTrigger aria-label={t("How often")} className="w-full"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {FREQUENCIES.map((f) => (
+                        <SelectItem key={f} value={f}>{t(FREQUENCY_LABELS[f])}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <label className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-medium">{t("Record automatically")}</p>
+                      <p className="text-xs text-muted-foreground">{t("Adds the transaction on the due date without asking. Best for fixed amounts like rent or salary.")}</p>
+                    </div>
+                    <Switch checked={autoPost} onCheckedChange={setAutoPost} />
+                  </label>
+                </>
+              )}
+            </div>
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>{t("Cancel")}</Button>

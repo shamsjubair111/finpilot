@@ -72,3 +72,16 @@ export function welcomeEmail(lang: Lang, name: string, verifyUrl: string, trialD
     ...layout(lang, tr("Welcome, {name}!", { name }), [tr("Your account is ready, and you have {n} days of Pro free.", { n: trialDays }), tr("Add your accounts, paste a few bKash or bank SMS to import transactions, and set a budget — it takes about two minutes."), tr("Please confirm your email address so you can recover your account if you ever forget your password.")], { label: tr("Confirm email"), url: verifyUrl }),
   };
 }
+
+export function reminderEmail(lang: Lang, name: string, items: { title: string; amount: string; due: string }[], url: string) {
+  const tr = (s: string, v?: Record<string, string | number>) => translate(lang, s, v);
+  return {
+    subject: tr("Upcoming payments on Sanchay"),
+    ...layout(
+      lang,
+      tr("Hi {name}, you have payments coming up", { name }),
+      items.map((i) => tr("{title}: {amount}, due {date}", { title: i.title, amount: i.amount, date: i.due })),
+      { label: tr("View bills"), url }
+    ),
+  };
+}

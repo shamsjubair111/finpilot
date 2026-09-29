@@ -2,8 +2,11 @@ import { db } from "@/lib/server/db";
 import { authed, json } from "@/lib/server/api";
 import { serialize } from "@/lib/server/crud";
 import { toProfile } from "@/lib/server/user";
+import { processAutoPost } from "@/lib/server/recurring";
 
 export const GET = authed(async ({ userId }) => {
+  // Catch up on bills and income set to post automatically; never block loading the app on it.
+  await processAutoPost(userId).catch((err) => console.error("[auto-post]", err));
   const user = await db.user.findUniqueOrThrow({
     where: { id: userId },
     include: {

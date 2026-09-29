@@ -251,4 +251,8 @@ export interface UpcomingCommitment {
   amount: number;
   icon: string;
   recurring: boolean;
+  frequency?: "weekly" | "monthly" | "quarterly" | "yearly";
+  type?: "income" | "expense";
+  accountId?: string | null;
+  autoPost?: boolean;
 }
