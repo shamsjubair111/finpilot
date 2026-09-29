@@ -30,7 +30,7 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Dashboard", href: "/", icon: LayoutDashboard, section: "Overview" },
   { label: "Accounts", href: "/accounts", icon: Landmark, section: "Overview" },
   { label: "Transactions", href: "/transactions", icon: ArrowLeftRight, section: "Overview" },
-  { label: "Import SMS", href: "/import", icon: MessageSquareText, section: "Overview" },
+  { label: "Import", href: "/import", icon: MessageSquareText, section: "Overview" },
   { label: "Budget", href: "/budget", icon: Wallet, section: "Overview" },
   { label: "Bills & recurring", href: "/recurring", icon: CalendarClock, section: "Overview" },
   { label: "Goals", href: "/goals", icon: Target, section: "Planning" },

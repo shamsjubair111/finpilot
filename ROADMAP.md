@@ -35,7 +35,8 @@ Status: ✅ done · 🟡 partial · ⬜ not started
 - ✅ Duplicate protection by transaction ID
 - ✅ PWA share target: share an SMS to Sanchay on Android to open it in Import
 - ✅ Recurring bills and income (`/recurring`): weekly/monthly/quarterly/yearly, mark paid, optional auto-post, due-bill notifications, daily email reminders via `/api/cron/reminders` (`CRON_SECRET`, `vercel.json`)
-- ⬜ CSV / statement upload, receipt photos
+- ✅ Bank statement CSV import (Import → Bank statement): auto-detects columns, debit/credit or signed amounts, keyword categories, re-upload safe
+- ⬜ Receipt photos
 
 ## Phases 5–8
 - ⬜ Full offline PWA and push notifications

@@ -3,7 +3,9 @@
 import { Suspense, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { format } from "date-fns";
-import { ClipboardPaste, FileCheck2, MessageSquareText, RotateCcw } from "lucide-react";
+import { ClipboardPaste, FileCheck2, FileSpreadsheet, MessageSquareText, RotateCcw } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CsvImport } from "@/components/import/csv-import";
 import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -30,8 +32,40 @@ Send Money Tk 500.00 to 01898765432 successful. Ref gift. Fee Tk 5.00. Balance T
 export default function ImportPage() {
   return (
     <Suspense>
-      <ImportView />
+      <ImportTabs />
     </Suspense>
+  );
+}
+
+function ImportTabs() {
+  const params = useSearchParams();
+  // Shared SMS text always opens the SMS tab; ?tab=csv deep-links to statements.
+  const initial = params.get("text") || params.get("title") ? "sms" : params.get("tab") === "csv" ? "csv" : "sms";
+  return (
+    <div>
+      <PageHeader
+        title={t("Import transactions")}
+        subtitle={t("Bring in transactions from SMS alerts or a bank statement. You review everything before it's saved.")}
+      />
+      <Tabs defaultValue={initial}>
+        <TabsList className="mb-4">
+          <TabsTrigger value="sms" className="gap-1.5">
+            <MessageSquareText className="size-4" />
+            {t("SMS messages")}
+          </TabsTrigger>
+          <TabsTrigger value="csv" className="gap-1.5">
+            <FileSpreadsheet className="size-4" />
+            {t("Bank statement (CSV)")}
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="sms">
+          <ImportView />
+        </TabsContent>
+        <TabsContent value="csv">
+          <CsvImport />
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 }
 
@@ -97,11 +131,6 @@ function ImportView() {
 
   return (
     <div>
-      <PageHeader
-        title={t("Import from SMS")}
-        subtitle={t("Paste bKash, Nagad, Rocket or bank SMS messages and turn them into transactions.")}
-      />
-
       {!rows ? (
         <Card className="animate-in-up">
           <CardHeader>
