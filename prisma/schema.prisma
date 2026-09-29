@@ -45,6 +45,7 @@ model User {
   accounts     Account[]
   authTokens   AuthToken[]
   investments  Investment[]
+  pushSubscriptions PushSubscription[]
 }
 
 model Account {
@@ -226,4 +227,17 @@ model AuditEvent {
   createdAt DateTime @default(now())
 
   @@index([userId, createdAt])
+}
+
+// A browser/device that agreed to receive push notifications.
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 }

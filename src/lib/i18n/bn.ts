@@ -1164,4 +1164,17 @@ export const bn: Record<string, string> = {
   "Transaction deleted": "লেনদেন মুছে ফেলা হয়েছে",
   "You're offline. New transactions are saved on this device.": "আপনি অফলাইনে আছেন। নতুন লেনদেন এই ডিভাইসে সেভ হচ্ছে।",
   "{n} waiting to sync.": "{n}টি সিঙ্কের অপেক্ষায়।",
+  // Push
+  "Notifications are on for this device.": "এই ডিভাইসে নোটিফিকেশন চালু হয়েছে।",
+  "Install or reload the app first, then try again.": "আগে অ্যাপটি ইনস্টল বা রিলোড করুন, তারপর আবার চেষ্টা করুন।",
+  "Notifications on": "নোটিফিকেশন চালু",
+  "Notifications off": "নোটিফিকেশন বন্ধ",
+  "Couldn't change notifications": "নোটিফিকেশন পরিবর্তন করা যায়নি",
+  "Notifications on this device": "এই ডিভাইসে নোটিফিকেশন",
+  "Get a reminder on this phone or computer when bills are due.": "বিল দেওয়ার সময় হলে এই ফোন বা কম্পিউটারে রিমাইন্ডার পান।",
+  "Notifications are blocked for Sanchay in your browser settings. Allow them there, then come back.": "ব্রাউজার সেটিংসে সঞ্চয়-এর নোটিফিকেশন বন্ধ আছে। সেখানে চালু করে আবার আসুন।",
+  "Bill reminders": "বিলের রিমাইন্ডার",
+  "Push notifications aren't set up on this server.": "এই সার্ভারে পুশ নোটিফিকেশন চালু করা নেই।",
+  // Push
+  "must be a browser push service": "ব্রাউজারের পুশ সার্ভিস হতে হবে",
 };

@@ -1,6 +1,8 @@
 import { db } from "@/lib/server/db";
 import { json } from "@/lib/server/api";
 import { cronGuard } from "@/lib/server/cron";
+import { sendPush } from "@/lib/server/push";
+import { translate } from "@/lib/i18n";
 import { appUrl, reminderEmail, sendEmail } from "@/lib/server/email";
 import { formatCurrency } from "@/lib/currency";
 import type { Currency } from "@/types/finance";
@@ -46,6 +48,11 @@ export async function GET(req: Request) {
           `${base}/recurring`
         ),
       });
+      await sendPush(user.id, {
+        title: translate(lang, "Upcoming payments on Sanchay"),
+        body: items.map((c) => `${c.title}: ${formatCurrency(c.amount, { currency: user.currency as Currency })}`).join(" · "),
+        url: "/recurring",
+      }).catch((err) => console.error("[reminders push]", err));
       await db.$transaction(items.map((c) => db.commitment.update({ where: { id: c.id }, data: { lastRemindedFor: c.dueDate } })));
       sent += 1;
     } catch (err) {

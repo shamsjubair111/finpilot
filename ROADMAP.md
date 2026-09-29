@@ -42,7 +42,7 @@ Status: ✅ done · 🟡 partial · ⬜ not started
 
 ## Phases 5–8
 - ✅ Offline PWA: service worker (static cache-first, pages + bootstrap network-first), offline page, offline transaction outbox that syncs on reconnect, sync banner
-- ⬜ Push notifications
+- ✅ Push notifications for bill reminders (VAPID; per-device toggle in Settings; push-service allowlist)
 - ✅ Zakat calculator (`/zakat`): prefilled from balances, gold/silver nisab
 - ✅ Debt payoff planner (`/debt`): avalanche vs snowball, payoff dates, interest saved
 - ✅ Net worth history chart on Accounts (12 months, replayed from transactions)

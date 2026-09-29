@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { SubmitButton } from "@/components/shared/submit-button";
 import { TwoFactorCard } from "@/components/settings/two-factor-card";
+import { PushCard } from "@/components/settings/push-card";
 import { SecurityActivity } from "@/components/settings/security-activity";
 import { useFinance } from "@/components/providers/finance-provider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -303,6 +304,8 @@ export default function SettingsPage() {
           </label>
         </CardContent>
       </Card>
+
+      <PushCard />
 
       {/* Security */}
       <Card className="animate-in-up">
