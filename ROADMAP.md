@@ -43,7 +43,8 @@ Status: ✅ done · 🟡 partial · ⬜ not started
 - ✅ Zakat calculator (`/zakat`): prefilled from balances, gold/silver nisab
 - ✅ Debt payoff planner (`/debt`): avalanche vs snowball, payoff dates, interest saved
 - ✅ Net worth history chart on Accounts (12 months, replayed from transactions)
-- ⬜ PDF reports
+- ✅ Printable monthly statement and year-in-review (`/reports/statement`), save as PDF via print
+- ⬜ Spending alerts, savings streaks, investment tracking
 - ⬜ Household workspaces, AI categorisation and assistant
 - ⬜ Native Android app (only if demand shows)
 

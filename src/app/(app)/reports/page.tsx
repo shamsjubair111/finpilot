@@ -1,6 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
+import { FileText } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/shared/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import {
@@ -69,6 +72,10 @@ export default function ReportsPage() {
         title={t("Reports")}
         subtitle={t("Deeper visual breakdowns of your financial trends.")}
         actions={
+          <>
+          <Button asChild variant="outline" size="sm" className="gap-1.5">
+            <Link href="/reports/statement"><FileText className="size-4" />{t("Monthly statement")}</Link>
+          </Button>
           <Select value={range} onValueChange={setRange}>
             <SelectTrigger className="w-40">
               <SelectValue />
@@ -81,6 +88,7 @@ export default function ReportsPage() {
               ))}
             </SelectContent>
           </Select>
+          </>
         }
       />
 

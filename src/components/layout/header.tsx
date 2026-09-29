@@ -25,7 +25,7 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
   const { setLanguage } = useFinance();
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-2 bg-background/70 px-3 backdrop-blur-xl [box-shadow:0_1px_0_color-mix(in_oklch,var(--foreground),transparent_93%)] supports-backdrop-filter:bg-background/55 sm:gap-3 sm:px-6">
+    <header className="sticky top-0 z-30 flex print:hidden h-16 shrink-0 items-center gap-2 bg-background/70 px-3 backdrop-blur-xl [box-shadow:0_1px_0_color-mix(in_oklch,var(--foreground),transparent_93%)] supports-backdrop-filter:bg-background/55 sm:gap-3 sm:px-6">
       <Button
         variant="ghost"
         size="icon"
