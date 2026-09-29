@@ -16,6 +16,7 @@ export const PATCH = authed(async ({ userId, req }) => {
 export const DELETE = authed(async ({ userId, req }) => {
   const { password } = z.object({ password: z.string().min(1, "is required") }).parse(await req.json());
   const user = await db.user.findUniqueOrThrow({ where: { id: userId } });
+  if (!user.passwordSet) throw new ApiError(400, "You signed up with Google. Use \"Forgot password\" to set a password first.");
   if (!(await bcrypt.compare(password, user.passwordHash)))
     throw new ApiError(403, "Password is incorrect. Your account was not deleted.");
   await db.user.delete({ where: { id: userId } });

@@ -12,6 +12,9 @@ model User {
   name                 String
   email                String   @unique
   passwordHash         String
+  // False for accounts created with Google until the user sets a password via reset.
+  passwordSet          Boolean  @default(true)
+  googleId             String?  @unique
   avatarUrl            String?
   currency             String   @default("BDT")
   language             String   @default("en")

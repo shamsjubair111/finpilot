@@ -65,11 +65,16 @@ export function resetEmail(lang: Lang, name: string, url: string) {
   };
 }
 
-export function welcomeEmail(lang: Lang, name: string, verifyUrl: string, trialDays: number) {
+export function welcomeEmail(lang: Lang, name: string, verifyUrl: string | null, trialDays: number, openUrl?: string) {
   const tr = (s: string, v?: Record<string, string | number>) => translate(lang, s, v);
+  const lines = [
+    tr("Your account is ready, and you have {n} days of Pro free.", { n: trialDays }),
+    tr("Add your accounts, paste a few bKash or bank SMS to import transactions, and set a budget — it takes about two minutes."),
+    ...(verifyUrl ? [tr("Please confirm your email address so you can recover your account if you ever forget your password.")] : []),
+  ];
   return {
     subject: tr("Welcome to Sanchay"),
-    ...layout(lang, tr("Welcome, {name}!", { name }), [tr("Your account is ready, and you have {n} days of Pro free.", { n: trialDays }), tr("Add your accounts, paste a few bKash or bank SMS to import transactions, and set a budget — it takes about two minutes."), tr("Please confirm your email address so you can recover your account if you ever forget your password.")], { label: tr("Confirm email"), url: verifyUrl }),
+    ...layout(lang, tr("Welcome, {name}!", { name }), lines, verifyUrl ? { label: tr("Confirm email"), url: verifyUrl } : { label: tr("Open Sanchay"), url: openUrl ?? "" }),
   };
 }
 

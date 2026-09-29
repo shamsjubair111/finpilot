@@ -1130,4 +1130,12 @@ export const bn: Record<string, string> = {
   "Couldn't start setup": "সেটআপ শুরু করা যায়নি",
   "Couldn't turn on two-step verification": "দুই-ধাপের যাচাই চালু করা যায়নি",
   "Couldn't turn off two-step verification": "দুই-ধাপের যাচাই বন্ধ করা যায়নি",
+  // Google sign-in
+  "Google sign-in didn't work": "গুগল দিয়ে সাইন ইন হয়নি",
+  "Please try again, or use your email and password.": "আবার চেষ্টা করুন, অথবা ইমেইল ও পাসওয়ার্ড ব্যবহার করুন।",
+  "Your Google account's email isn't verified.": "আপনার গুগল অ্যাকাউন্টের ইমেইল যাচাই করা নেই।",
+  "Continue with Google": "গুগল দিয়ে চালিয়ে যান",
+  "or": "অথবা",
+  "This account uses Google sign-in. Continue with Google, or use \"Forgot password\" to set a password.": "এই অ্যাকাউন্টে গুগল দিয়ে সাইন ইন করা হয়। গুগল দিয়ে চালিয়ে যান, অথবা পাসওয়ার্ড ঠিক করতে \"পাসওয়ার্ড ভুলে গেছেন\" ব্যবহার করুন।",
+  "You signed up with Google. Use \"Forgot password\" to set a password first.": "আপনি গুগল দিয়ে সাইন আপ করেছেন। আগে \"পাসওয়ার্ড ভুলে গেছেন\" দিয়ে একটি পাসওয়ার্ড ঠিক করুন।",
 };

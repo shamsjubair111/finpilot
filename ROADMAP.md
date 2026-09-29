@@ -19,7 +19,7 @@ Status: ✅ done · 🟡 partial · ⬜ not started
 - ✅ Email verification with banner and resend, password reset by email
 - ✅ Session revocation: password change/reset and "Sign out other devices" end other sessions
 - ✅ Two-step verification (TOTP apps + 10 recovery codes, encrypted secret, replay-safe)
-- ⬜ Google sign-in
+- ✅ Google sign-in (OAuth + PKCE; shown when NEXT_PUBLIC_GOOGLE_CLIENT_ID + GOOGLE_CLIENT_SECRET are set; links accounts by verified email; works with 2FA)
 
 ## Phase 3: Launch-ready
 - ✅ Public landing page at `/` for signed-out visitors, `/pricing`, `/privacy`, `/terms`

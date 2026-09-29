@@ -20,7 +20,7 @@ export async function POST(req: Request) {
     // Following the emailed link proves ownership of the address, so confirm it too.
     await db.user.update({
       where: { id: userId },
-      data: { passwordHash: await bcrypt.hash(password, 12), emailVerifiedAt: new Date() },
+      data: { passwordHash: await bcrypt.hash(password, 12), passwordSet: true, emailVerifiedAt: new Date() },
     });
     await db.authToken.deleteMany({ where: { userId, type: "reset_password", usedAt: null } });
     // Sign out every device, in case someone else had access to the old password.

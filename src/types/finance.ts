@@ -240,6 +240,8 @@ export interface UserProfile {
   isAdmin?: boolean;
   weeklySummary?: boolean;
   twoFactorEnabled?: boolean;
+  passwordSet?: boolean;
+  googleLinked?: boolean;
   recoveryCodesLeft?: number;
   plan: "free" | "pro";
   /** When the current Pro plan or trial ends; absent on Free or on Pro without an end date. */
