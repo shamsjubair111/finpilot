@@ -1014,4 +1014,9 @@ export const bn: Record<string, string> = {
   "With your plan": "আপনার পরিকল্পনায়",
   "Minimums only": "শুধু ন্যূনতম",
   "Debt payoff": "ঋণ পরিশোধ",
+  // Net worth history
+  "Net worth over time": "সময়ের সাথে নিট সম্পদ",
+  "No change over the last 12 months.": "গত ১২ মাসে কোনো পরিবর্তন নেই।",
+  "Up {amount} over the last 12 months.": "গত ১২ মাসে {amount} বেড়েছে।",
+  "Down {amount} over the last 12 months.": "গত ১২ মাসে {amount} কমেছে।",
 };

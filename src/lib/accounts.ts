@@ -61,3 +61,18 @@ export function maskNumber(n?: string | null) {
   if (!n) return "";
   return n.length > 4 ? `•••• ${n.slice(-4)}` : n;
 }
+
+/**
+ * Net worth at the end of each of the last `months` months (oldest first), found by replaying
+ * each account's opening balance plus every transaction dated up to that month's end.
+ */
+export function netWorthHistory(accounts: Account[], transactions: Transaction[], months = 12, now = new Date()) {
+  const sorted = [...transactions].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  const points: { monthEnd: Date; assets: number; liabilities: number; netWorth: number }[] = [];
+  for (let i = months - 1; i >= 0; i--) {
+    const monthEnd = i === 0 ? now : new Date(now.getFullYear(), now.getMonth() - i + 1, 0, 23, 59, 59, 999);
+    const upTo = sorted.filter((t) => new Date(t.date) <= monthEnd);
+    points.push({ monthEnd, ...netWorthOf(accounts, computeBalances(accounts, upTo)) });
+  }
+  return points;
+}

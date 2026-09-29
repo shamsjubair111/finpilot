@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { ArrowLeftRight, Landmark, Plus, Scale, TrendingDown, TrendingUp } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
@@ -10,13 +10,18 @@ import { AccountCard } from "@/components/accounts/account-card";
 import { AccountFormDialog } from "@/components/accounts/account-form-dialog";
 import { TransactionFormDialog } from "@/components/transactions/transaction-form-dialog";
 import { useFinance } from "@/components/providers/finance-provider";
-import { ACCOUNT_GROUPS, ACCOUNT_TYPE_META } from "@/lib/accounts";
+import { ACCOUNT_GROUPS, ACCOUNT_TYPE_META, netWorthHistory } from "@/lib/accounts";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { MetricLineChart } from "@/components/charts/metric-line-chart";
+import { formatDate } from "@/lib/format-date";
 import { formatCurrency } from "@/lib/currency";
 import type { Account } from "@/types/finance";
 import { t as tr } from "@/lib/i18n";
 
 export default function AccountsPage() {
   const { accounts, accountBalances, netWorth, deleteAccount, transactions } = useFinance();
+  const history = useMemo(() => netWorthHistory(accounts, transactions, 12), [accounts, transactions]);
+  const change = history.length ? history[history.length - 1].netWorth - history[0].netWorth : 0;
   const [creating, setCreating] = useState(false);
   const [editing, setEditing] = useState<Account | null>(null);
   const [deleting, setDeleting] = useState<Account | null>(null);
@@ -71,6 +76,28 @@ export default function AccountsPage() {
               </div>
             ))}
           </div>
+
+          {history.some((p) => p.netWorth !== 0) && (
+            <Card className="animate-in-up">
+              <CardHeader>
+                <CardTitle className="text-base">{tr("Net worth over time")}</CardTitle>
+                <CardDescription>
+                  {change === 0
+                    ? tr("No change over the last 12 months.")
+                    : tr(change > 0 ? "Up {amount} over the last 12 months." : "Down {amount} over the last 12 months.", { amount: formatCurrency(Math.abs(change)) })}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <MetricLineChart
+                  data={history.map((p) => ({ month: formatDate(p.monthEnd.toISOString(), "MMM"), netWorth: Math.round(p.netWorth) }))}
+                  dataKey="netWorth"
+                  name={tr("Net worth")}
+                  color="var(--primary)"
+                  valueFormatter={(v) => formatCurrency(v, { compact: true })}
+                />
+              </CardContent>
+            </Card>
+          )}
 
           {ACCOUNT_GROUPS.map((group) => {
             const list = accounts.filter((a) => ACCOUNT_TYPE_META[a.type].group === group);
