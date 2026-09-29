@@ -1,4 +1,5 @@
 import bcrypt from "bcryptjs";
+import { audit } from "@/lib/server/audit";
 import { db } from "@/lib/server/db";
 import { ApiError, authed, json } from "@/lib/server/api";
 import { passwordSchema } from "@/lib/validation";
@@ -14,5 +15,6 @@ export const PATCH = authed(async ({ userId, req }) => {
     throw new ApiError(403, "Current password is incorrect.");
   await db.user.update({ where: { id: userId }, data: { passwordHash: await bcrypt.hash(newPassword, 12) } });
   await revokeSessions(userId, true);
+  await audit(userId, "password_changed");
   return json({ ok: true });
 });

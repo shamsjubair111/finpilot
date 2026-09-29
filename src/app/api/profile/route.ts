@@ -19,7 +19,7 @@ export const DELETE = authed(async ({ userId, req }) => {
   if (!user.passwordSet) throw new ApiError(400, "You signed up with Google. Use \"Forgot password\" to set a password first.");
   if (!(await bcrypt.compare(password, user.passwordHash)))
     throw new ApiError(403, "Password is incorrect. Your account was not deleted.");
-  await db.user.delete({ where: { id: userId } });
+  await db.$transaction([db.user.delete({ where: { id: userId } }), db.auditEvent.deleteMany({ where: { userId } })]);
   await destroySession();
   return json({ ok: true });
 });

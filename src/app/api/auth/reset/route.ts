@@ -1,4 +1,5 @@
 import bcrypt from "bcryptjs";
+import { audit } from "@/lib/server/audit";
 import { z } from "zod";
 import { db } from "@/lib/server/db";
 import { ApiError, handleError, json } from "@/lib/server/api";
@@ -25,6 +26,7 @@ export async function POST(req: Request) {
     await db.authToken.deleteMany({ where: { userId, type: "reset_password", usedAt: null } });
     // Sign out every device, in case someone else had access to the old password.
     await revokeSessions(userId);
+    await audit(userId, "password_reset");
     return json({ ok: true });
   } catch (err) {
     return handleError(err);

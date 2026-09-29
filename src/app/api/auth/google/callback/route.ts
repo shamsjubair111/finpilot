@@ -1,4 +1,5 @@
 import { randomBytes } from "node:crypto";
+import { audit } from "@/lib/server/audit";
 import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
@@ -67,6 +68,7 @@ export async function GET(req: Request) {
           where: { id: existing.id },
           data: { googleId: profile.sub, emailVerifiedAt: existing.emailVerifiedAt ?? new Date() },
         });
+        await audit(user.id, "google_linked");
       } else {
         const lang = jar.get(LANG_COOKIE)?.value;
         user = await db.user.create({
@@ -93,6 +95,7 @@ export async function GET(req: Request) {
       return NextResponse.redirect(new URL(`/login?ticket=${encodeURIComponent(ticket)}&next=${encodeURIComponent(saved.next)}`, base));
     }
     await createSession(user.id);
+    await audit(user.id, "login_google");
     await setLangCookie(user.language);
     return NextResponse.redirect(new URL(safeNext(saved.next), base));
   } catch (err) {

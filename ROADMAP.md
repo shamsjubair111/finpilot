@@ -10,7 +10,8 @@ Status: ✅ done · 🟡 partial · ⬜ not started
 - ✅ Rate limiting on login, register, password change, import and export (in-memory; move to Redis for multi-instance hosting)
 - ⬜ Staging environment with its own database
 - ⬜ Sentry error tracking and uptime monitoring
-- ⬜ Audit log, field encryption for account numbers
+- ✅ Security activity log (sign-ins, failed attempts, password/2FA changes, exports) shown in Settings; 180-day retention; removed on account deletion
+- ⬜ Field encryption for account numbers
 
 ## Phase 2: Accounts and trust
 - ✅ Data export: transactions as CSV, everything as JSON (Settings → Your data)

@@ -1,4 +1,5 @@
 import bcrypt from "bcryptjs";
+import { audit } from "@/lib/server/audit";
 import { db } from "@/lib/server/db";
 import { ApiError, handleError, json } from "@/lib/server/api";
 import { createSession, setLangCookie } from "@/lib/server/session";
@@ -15,10 +16,13 @@ export async function POST(req: Request) {
     const user = await db.user.findUnique({ where: { email } });
     if (user && !user.passwordSet)
       throw new ApiError(400, "This account uses Google sign-in. Continue with Google, or use \"Forgot password\" to set a password.");
-    if (!user || !(await bcrypt.compare(password, user.passwordHash)))
+    if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
+      if (user) await audit(user.id, "login_failed");
       throw new ApiError(401, "Incorrect email or password.");
+    }
     if (user.totpEnabledAt) return json({ twoFactorRequired: true, ticket: await signTwoFactorTicket(user.id) });
     await createSession(user.id);
+    await audit(user.id, "login");
     await setLangCookie(user.language);
     return json(toProfile(user));
   } catch (err) {

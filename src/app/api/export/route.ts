@@ -1,4 +1,5 @@
 import { db } from "@/lib/server/db";
+import { audit } from "@/lib/server/audit";
 import { authed } from "@/lib/server/api";
 import { serialize } from "@/lib/server/crud";
 import { rateLimit } from "@/lib/server/rate-limit";
@@ -15,6 +16,7 @@ function csvCell(v: unknown) {
 
 export const GET = authed(async ({ userId, req }) => {
   await rateLimit("export", 10, 60 * 60 * 1000, userId);
+  await audit(userId, "data_exported");
   const format = new URL(req.url).searchParams.get("format") === "csv" ? "csv" : "json";
   const user = await db.user.findUniqueOrThrow({
     where: { id: userId },

@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { SubmitButton } from "@/components/shared/submit-button";
 import { TwoFactorCard } from "@/components/settings/two-factor-card";
+import { SecurityActivity } from "@/components/settings/security-activity";
 import { useFinance } from "@/components/providers/finance-provider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CURRENCIES } from "@/lib/currency";
@@ -340,6 +341,7 @@ export default function SettingsPage() {
       </Card>
 
       <TwoFactorCard />
+      <SecurityActivity />
 
       {/* Data export */}
       <Card className="animate-in-up">

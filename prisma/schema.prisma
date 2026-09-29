@@ -215,3 +215,15 @@ model Investment {
 
   @@index([userId])
 }
+
+// Security-relevant events shown to the user in Settings. No foreign key so the trail outlives deletions.
+model AuditEvent {
+  id        String   @id @default(cuid())
+  userId    String
+  action    String
+  ip        String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+}

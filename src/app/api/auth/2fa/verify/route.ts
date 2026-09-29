@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { audit } from "@/lib/server/audit";
 import { db } from "@/lib/server/db";
 import { ApiError, handleError, json } from "@/lib/server/api";
 import { rateLimit } from "@/lib/server/rate-limit";
@@ -41,6 +42,7 @@ export async function POST(req: Request) {
     if (!ok) throw new ApiError(400, "That code didn't match. Try the newest code from your app, or a recovery code.");
 
     await createSession(user.id);
+    await audit(user.id, "login_2fa");
     await setLangCookie(user.language);
     return json(toProfile(await db.user.findUniqueOrThrow({ where: { id: user.id } })));
   } catch (err) {

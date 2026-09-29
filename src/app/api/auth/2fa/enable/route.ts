@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { audit } from "@/lib/server/audit";
 import { db } from "@/lib/server/db";
 import { ApiError, authed, json } from "@/lib/server/api";
 import { rateLimit } from "@/lib/server/rate-limit";
@@ -20,5 +21,6 @@ export const POST = authed(async ({ userId, req }) => {
     where: { id: userId },
     data: { totpEnabledAt: new Date(), totpLastStep: step, recoveryCodes: recoveryCodes.map(hashRecoveryCode) },
   });
+  await audit(userId, "2fa_enabled");
   return json({ recoveryCodes });
 });
