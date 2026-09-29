@@ -13,6 +13,7 @@ import { RecentTransactionsCard } from "@/components/dashboard/recent-transactio
 import { UpcomingCommitmentsCard } from "@/components/dashboard/upcoming-commitments-card";
 import { GettingStarted } from "@/components/dashboard/getting-started";
 import { AccountsStrip } from "@/components/dashboard/accounts-strip";
+import { StreaksCard } from "@/components/dashboard/streaks-card";
 import {
   calculateSavingsRate,
   calculateAvailableToSpend,
@@ -91,6 +92,8 @@ export default function DashboardPage() {
           </div>
           <FinancialHealthCard health={health} />
         </div>
+
+        <StreaksCard />
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <ExpenseBreakdownSection categories={budgetCategories} />

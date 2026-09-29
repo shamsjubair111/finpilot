@@ -47,7 +47,8 @@ Status: ✅ done · 🟡 partial · ⬜ not started
 - ✅ Spending alerts: unusual expenses and budgets on pace to overspend (insights + bell)
 - ✅ Weekly summary email (Mondays, opt-out in Settings) via `/api/cron/weekly-summary`
 - ✅ Investment tracking (`/investments`): Sanchayapatra, FDR, DPS, shares, funds, gold, bonds; profit to date, maturity value and dates
-- ⬜ Savings streaks
+- ✅ Streaks card on the dashboard: no-spend days, saving months, under-budget months
+- ⬜ Household workspaces (next)
 - ⬜ Household workspaces, AI categorisation and assistant
 - ⬜ Native Android app (only if demand shows)
 

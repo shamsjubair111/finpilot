@@ -1089,4 +1089,10 @@ export const bn: Record<string, string> = {
   "Gold": "সোনা",
   "Bond": "বন্ড",
   "At maturity": "মেয়াদশেষে",
+  // Streaks
+  "No-spend days in a row": "টানা খরচহীন দিন",
+  "No-spend days this month": "এই মাসে খরচহীন দিন",
+  "Months in a row saving money": "টানা সঞ্চয়ের মাস",
+  "Months in a row under budget": "টানা বাজেটের মধ্যে থাকা মাস",
+  "Your streaks": "আপনার ধারাবাহিকতা",
 };
