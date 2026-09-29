@@ -7,6 +7,7 @@ import { db } from "@/lib/server/db";
 import { appUrl, sendEmailQuietly, welcomeEmail } from "@/lib/server/email";
 import { GOOGLE_STATE_COOKIE, googleConfig, safeNext } from "@/lib/server/google";
 import { rateLimit } from "@/lib/server/rate-limit";
+import { referrerIdFor, rewardReferral } from "@/lib/server/referrals";
 import { createSession, setLangCookie } from "@/lib/server/session";
 import { signTwoFactorTicket } from "@/lib/server/session-token";
 import { isLang, LANG_COOKIE } from "@/lib/i18n";
@@ -28,7 +29,7 @@ export async function GET(req: Request) {
 
   const url = new URL(req.url);
   const jar = await cookies();
-  let saved: { state: string; verifier: string; next: string } | null = null;
+  let saved: { state: string; verifier: string; next: string; ref?: string | null } | null = null;
   try {
     saved = JSON.parse(jar.get(GOOGLE_STATE_COOKIE)?.value ?? "null");
   } catch {
@@ -80,12 +81,14 @@ export async function GET(req: Request) {
             language: isLang(lang) ? lang : "en",
             emailVerifiedAt: new Date(),
             passwordSet: false,
+            referredById: await referrerIdFor(saved.ref),
             // Unusable random password: the user can set a real one later through "Forgot password".
             passwordHash: await bcrypt.hash(randomBytes(32).toString("hex"), 12),
             plan: "pro",
             planExpiresAt: trialEndDate(),
           },
         });
+        await rewardReferral(user.id).catch((err) => console.error("[referral]", err));
         sendEmailQuietly({ to: user.email, ...welcomeEmail(user.language === "bn" ? "bn" : "en", user.name, null, TRIAL_DAYS, base) });
       }
     }

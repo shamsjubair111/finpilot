@@ -18,6 +18,7 @@ export const registerSchema = z.object({
   password: z.string().min(8, "must be at least 8 characters").max(128),
   language: z.enum(["en", "bn"]).default("en"),
   currency: z.enum(CURRENCY_CODES).default("BDT"),
+  ref: z.string().trim().max(20).optional(),
 });
 
 export const loginSchema = z.object({

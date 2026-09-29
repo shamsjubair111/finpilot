@@ -15,6 +15,10 @@ model User {
   // False for accounts created with Google until the user sets a password via reset.
   passwordSet          Boolean  @default(true)
   googleId             String?  @unique
+  // Referral program: my shareable code, who referred me, and when the reward was paid out.
+  referralCode         String?  @unique
+  referredById         String?
+  referralRewardedAt   DateTime?
   avatarUrl            String?
   currency             String   @default("BDT")
   language             String   @default("en")

@@ -1293,4 +1293,12 @@ export const bn: Record<string, string> = {
   "Hi {name}, after that your account moves to the Free plan. All your data stays, but some features and limits change.": "হ্যালো {name}, এরপর আপনার অ্যাকাউন্ট ফ্রি প্ল্যানে যাবে। সব তথ্য থাকবে, তবে কিছু ফিচার ও সীমা বদলাবে।",
   "Keep unlimited accounts, goals, budgets, the AI assistant and household sharing from {price} a month — pay with bKash, Nagad or card.": "মাসে {price} থেকে সীমাহীন অ্যাকাউন্ট, লক্ষ্য, বাজেট, AI সহকারী ও পরিবার শেয়ারিং রাখুন — বিকাশ, নগদ বা কার্ডে পরিশোধ করুন।",
   "Keep Pro": "Pro রাখুন",
+  // Referrals
+  "I use Sanchay to track my money. Join with my link and we both get a free month of Pro:": "আমি টাকার হিসাব রাখতে সঞ্চয় ব্যবহার করি। আমার লিংক দিয়ে যোগ দিন, আমরা দুজনেই এক মাস Pro ফ্রি পাব:",
+  "Link copied": "লিংক কপি হয়েছে",
+  "Invite friends, get Pro free": "বন্ধুদের আমন্ত্রণ জানান, Pro ফ্রি পান",
+  "When a friend signs up with your link and confirms their email, you both get {n} days of Pro.": "আপনার লিংক দিয়ে কোনো বন্ধু সাইন আপ করে ইমেইল নিশ্চিত করলে, আপনারা দুজনেই {n} দিন Pro পাবেন।",
+  "Your invite link": "আপনার আমন্ত্রণ লিংক",
+  "Share": "শেয়ার",
+  "{joined} joined · {rewarded} rewarded": "{joined} জন যোগ দিয়েছেন · {rewarded} জনের পুরস্কার মিলেছে",
 };

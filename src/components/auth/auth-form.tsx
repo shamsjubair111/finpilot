@@ -104,7 +104,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
     try {
       const res = await api<UserProfile | { twoFactorRequired: true; ticket: string }>(isLogin ? "/auth/login" : "/auth/register", {
         method: "POST",
-        body: isLogin ? { email, password } : { name, email, password, language: lang, currency },
+        body: isLogin ? { email, password } : { name, email, password, language: lang, currency, ref: params.get("ref") ?? undefined },
       });
       if ("twoFactorRequired" in res) {
         setTicket(res.ticket);
@@ -193,7 +193,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
       {GOOGLE_ENABLED && (
         <>
           <Button asChild variant="outline" className="h-11 w-full gap-2">
-            <a href={`/api/auth/google${params.get("next") ? `?next=${encodeURIComponent(params.get("next")!)}` : ""}`}>
+            <a href={`/api/auth/google?${new URLSearchParams(Object.fromEntries([["next", params.get("next")], ["ref", params.get("ref")]].filter((e): e is [string, string] => !!e[1])))}`}>
               <GoogleIcon />
               {t("Continue with Google")}
             </a>

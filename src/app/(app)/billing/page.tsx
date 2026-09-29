@@ -5,6 +5,7 @@ import { differenceInCalendarDays, format } from "date-fns";
 import { toast } from "sonner";
 import { Check, CreditCard, Crown, Mail } from "lucide-react";
 import { api } from "@/lib/api-client";
+import { ReferralCard } from "@/components/billing/referral-card";
 import { formatCurrency } from "@/lib/currency";
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
@@ -177,6 +178,8 @@ export default function BillingPage() {
           );
         })}
       </div>
+
+      <ReferralCard />
 
       {history.length > 0 && (
         <Card>

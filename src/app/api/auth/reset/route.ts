@@ -6,6 +6,7 @@ import { ApiError, handleError, json } from "@/lib/server/api";
 import { consumeToken } from "@/lib/server/auth-tokens";
 import { rateLimit } from "@/lib/server/rate-limit";
 import { revokeSessions } from "@/lib/server/session";
+import { rewardReferral } from "@/lib/server/referrals";
 
 const schema = z.object({
   token: z.string().min(1, "is required").max(200),
@@ -27,6 +28,7 @@ export async function POST(req: Request) {
     // Sign out every device, in case someone else had access to the old password.
     await revokeSessions(userId);
     await audit(userId, "password_reset");
+    await rewardReferral(userId).catch((err) => console.error("[referral]", err));
     return json({ ok: true });
   } catch (err) {
     return handleError(err);

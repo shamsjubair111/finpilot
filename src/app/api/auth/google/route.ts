@@ -11,7 +11,9 @@ export async function GET(req: Request) {
 
   const state = randomBytes(16).toString("base64url");
   const { verifier, challenge } = pkcePair();
-  const next = safeNext(new URL(req.url).searchParams.get("next"));
+  const params = new URL(req.url).searchParams;
+  const next = safeNext(params.get("next"));
+  const ref = params.get("ref")?.slice(0, 20) ?? null;
   const auth = new URL("https://accounts.google.com/o/oauth2/v2/auth");
   auth.search = new URLSearchParams({
     client_id: config.clientId,
@@ -25,7 +27,7 @@ export async function GET(req: Request) {
   }).toString();
 
   const res = NextResponse.redirect(auth);
-  res.cookies.set(GOOGLE_STATE_COOKIE, JSON.stringify({ state, verifier, next }), {
+  res.cookies.set(GOOGLE_STATE_COOKIE, JSON.stringify({ state, verifier, next, ref }), {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
