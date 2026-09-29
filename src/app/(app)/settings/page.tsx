@@ -5,12 +5,13 @@ import { getCurrencySymbol } from "@/lib/currency";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { formatDate } from "@/lib/format-date";
-import { AlertTriangle, Download, Globe2, KeyRound, Laptop, Lock, LogOut, Moon, Palette, Sun, Target, User } from "lucide-react";
+import { AlertTriangle, Download, Globe2, Mail, KeyRound, Laptop, Lock, LogOut, Moon, Palette, Sun, Target, User } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Dialog,
@@ -276,6 +277,28 @@ export default function SettingsPage() {
               </button>
             ))}
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Email */}
+      <Card className="animate-in-up">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Mail className="size-4 text-muted-foreground" /> {t("Emails")}
+          </CardTitle>
+          <CardDescription>{t("Account and security emails are always sent.")}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <label className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-sm font-medium">{t("Weekly summary")}</p>
+              <p className="text-xs text-muted-foreground">{t("A short Monday email with last week's spending, budgets and upcoming bills.")}</p>
+            </div>
+            <Switch
+              checked={user.weeklySummary ?? true}
+              onCheckedChange={(v) => updateUser({ weeklySummary: v }, v ? "Weekly summary on" : "Weekly summary off")}
+            />
+          </label>
         </CardContent>
       </Card>
 

@@ -35,6 +35,7 @@ export const profileSchema = z
     emergencyFundTarget: money,
     emergencyFundCurrent: money,
     defaultSavingsTarget: z.coerce.number().min(0).max(100),
+    weeklySummary: z.boolean(),
   })
   .partial();
 

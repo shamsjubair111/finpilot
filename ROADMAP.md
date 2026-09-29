@@ -44,7 +44,9 @@ Status: ✅ done · 🟡 partial · ⬜ not started
 - ✅ Debt payoff planner (`/debt`): avalanche vs snowball, payoff dates, interest saved
 - ✅ Net worth history chart on Accounts (12 months, replayed from transactions)
 - ✅ Printable monthly statement and year-in-review (`/reports/statement`), save as PDF via print
-- ⬜ Spending alerts, savings streaks, investment tracking
+- ✅ Spending alerts: unusual expenses and budgets on pace to overspend (insights + bell)
+- ✅ Weekly summary email (Mondays, opt-out in Settings) via `/api/cron/weekly-summary`
+- ⬜ Savings streaks, investment tracking
 - ⬜ Household workspaces, AI categorisation and assistant
 - ⬜ Native Android app (only if demand shows)
 

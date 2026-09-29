@@ -85,3 +85,20 @@ export function reminderEmail(lang: Lang, name: string, items: { title: string; 
     ),
   };
 }
+
+export function weeklySummaryEmail(
+  lang: Lang,
+  name: string,
+  s: { income: string; expenses: string; top: string[]; overBudget: string[]; billsDue: string | null },
+  url: string
+) {
+  const tr = (x: string, v?: Record<string, string | number>) => translate(lang, x, v);
+  const lines = [
+    tr("Last 7 days: {income} in, {expenses} out.", { income: s.income, expenses: s.expenses }),
+    ...(s.top.length ? [tr("Most spent on: {list}.", { list: s.top.join(", ") })] : []),
+    ...(s.overBudget.length ? [tr("Over budget this month: {list}.", { list: s.overBudget.join(", ") })] : []),
+    ...(s.billsDue ? [tr("Bills due in the next 7 days: {amount}.", { amount: s.billsDue })] : []),
+    tr("You can turn off these emails in Settings."),
+  ];
+  return { subject: tr("Your week with Sanchay"), ...layout(lang, tr("Hi {name}, here's your week", { name }), lines, { label: tr("Open Sanchay"), url }) };
+}

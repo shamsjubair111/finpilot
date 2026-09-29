@@ -20,6 +20,7 @@ export function toProfile(u: User) {
     emailVerified: !!u.emailVerifiedAt,
     onboarded: !!u.onboardedAt,
     isAdmin: isAdminEmail(u.email),
+    weeklySummary: u.weeklySummary,
     plan: effectivePlan(u.plan, u.planExpiresAt),
     planExpiresAt: u.plan === "pro" && u.planExpiresAt ? u.planExpiresAt.toISOString() : undefined,
   };

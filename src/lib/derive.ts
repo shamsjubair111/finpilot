@@ -1,3 +1,4 @@
+import { findUnusualExpenses, projectMonthEnd } from "@/lib/alerts";
 import { addMonths, differenceInCalendarDays, format, startOfMonth, subMonths } from "date-fns";
 import type {
   BudgetCategory,
@@ -181,6 +182,19 @@ export function generateInsights(args: {
       });
   }
 
+  for (const { transaction: tx, typical } of findUnusualExpenses(transactions, now).slice(0, 2))
+    push({
+      category: "spending",
+      severity: "warning",
+      title: t("Unusual expense: {title}", { title: tx.title }),
+      description: t("{amount} on {date} — about {times}× your usual {category} spend.", {
+        amount: formatCurrency(tx.amount),
+        date: formatDate(tx.date, "MMM d"),
+        times: Math.round(tx.amount / typical),
+        category: t(tx.category),
+      }),
+    });
+
   // Savings
   const income = curr.income || user.monthlySalary;
   if (income > 0) {
@@ -208,6 +222,16 @@ export function generateInsights(args: {
   // Budget
   for (const b of budgets) {
     const status = getBudgetStatus(b.spent, b.budgeted);
+    const projected = projectMonthEnd(b.spent, now);
+    if (status === "on_track" && projected !== null && projected > b.budgeted * 1.1) {
+      push({
+        category: "budget",
+        severity: "warning",
+        title: t("{category} is on pace to go over budget", { category: t(b.category) }),
+        description: t("At this rate you'll spend about {projected} against a {budget} budget.", { projected: formatCurrency(projected), budget: formatCurrency(b.budgeted) }),
+      });
+      continue;
+    }
     if (status === "on_track") continue;
     push({
       category: "budget",

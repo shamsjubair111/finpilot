@@ -1,6 +1,6 @@
-import { timingSafeEqual } from "node:crypto";
 import { db } from "@/lib/server/db";
 import { json } from "@/lib/server/api";
+import { cronGuard } from "@/lib/server/cron";
 import { appUrl, reminderEmail, sendEmail } from "@/lib/server/email";
 import { formatCurrency } from "@/lib/currency";
 import type { Currency } from "@/types/finance";
@@ -8,18 +8,11 @@ import type { Currency } from "@/types/finance";
 const DAY = 24 * 60 * 60 * 1000;
 const REMIND_DAYS_AHEAD = 3;
 
-function authorized(req: Request) {
-  const secret = process.env.CRON_SECRET;
-  const header = req.headers.get("authorization") ?? "";
-  const expected = `Bearer ${secret}`;
-  return !!secret && header.length === expected.length && timingSafeEqual(Buffer.from(header), Buffer.from(expected));
-}
-
 // Called once a day by a scheduler (vercel.json, or any cron hitting this URL with the secret).
 // Emails each user one digest of bills due in the next few days, once per due date.
 export async function GET(req: Request) {
-  if (!process.env.CRON_SECRET) return json({ error: "CRON_SECRET is not configured." }, 503);
-  if (!authorized(req)) return json({ error: "Unauthorized" }, 401);
+  const denied = cronGuard(req);
+  if (denied) return denied;
 
   const now = new Date();
   const until = new Date(now.getTime() + REMIND_DAYS_AHEAD * DAY);

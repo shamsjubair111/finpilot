@@ -238,6 +238,7 @@ export interface UserProfile {
   emailVerified: boolean;
   onboarded: boolean;
   isAdmin?: boolean;
+  weeklySummary?: boolean;
   plan: "free" | "pro";
   /** When the current Pro plan or trial ends; absent on Free or on Pro without an end date. */
   planExpiresAt?: string;
