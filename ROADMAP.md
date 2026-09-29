@@ -67,3 +67,4 @@ Status: ✅ done · 🟡 partial · ⬜ not started
 
 ## Extras
 - ✅ Custom categories per household (Settings → Your categories), used in every category picker; stable colours in charts
+- ✅ Pro renewal reminder email 3 days before a trial or paid period ends (once per period)
