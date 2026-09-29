@@ -3,8 +3,7 @@ import { db } from "@/lib/server/db";
 import { ApiError, json } from "@/lib/server/api";
 import { adminOnly } from "@/lib/server/admin";
 import { roundMoney } from "@/lib/validation";
-
-const DAY = 24 * 60 * 60 * 1000;
+import { grantPro } from "@/lib/server/plan-grants";
 
 const schema = z.discriminatedUnion("action", [
   z.object({
@@ -27,24 +26,11 @@ export const PATCH = adminOnly<{ id: string }>(async ({ req, params, adminEmail 
     return json({ ok: true });
   }
 
-  // Extend from the current end date if Pro is still running, so paying early never loses days.
-  const now = Date.now();
-  const current = user.plan === "pro" && user.planExpiresAt && user.planExpiresAt.getTime() > now ? user.planExpiresAt.getTime() : now;
-  const planExpiresAt = new Date(current + body.days * DAY);
-  await db.$transaction([
-    db.user.update({ where: { id: user.id }, data: { plan: "pro", planExpiresAt } }),
-    db.planGrant.create({
-      data: {
-        userId: user.id,
-        email: user.email,
-        plan: "pro",
-        days: body.days,
-        amount: body.amount,
-        currency: body.currency.toUpperCase(),
-        reference: body.reference,
-        grantedBy: adminEmail,
-      },
-    }),
-  ]);
+  const planExpiresAt = await db.$transaction((tx) =>
+    grantPro(
+      { userId: user.id, days: body.days, amount: body.amount, currency: body.currency.toUpperCase(), reference: body.reference, grantedBy: adminEmail, source: "manual" },
+      tx
+    )
+  );
   return json({ ok: true, planExpiresAt: planExpiresAt.toISOString() });
 });

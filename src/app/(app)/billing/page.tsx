@@ -1,7 +1,11 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { differenceInCalendarDays, format } from "date-fns";
-import { Check, Crown, Mail } from "lucide-react";
+import { toast } from "sonner";
+import { Check, CreditCard, Crown, Mail } from "lucide-react";
+import { api } from "@/lib/api-client";
+import { formatCurrency } from "@/lib/currency";
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,8 +18,18 @@ import { PLAN_FEATURES } from "@/lib/plan-features";
 
 const SUPPORT_EMAIL = process.env.NEXT_PUBLIC_SUPPORT_EMAIL;
 
+interface PaymentRow {
+  id: string;
+  tranId: string;
+  period: string;
+  amount: number;
+  currency: string;
+  method: string | null;
+  paidAt: string | null;
+}
+
 export default function BillingPage() {
-  const { user, accounts, goals, budgetCategories, purchases } = useFinance();
+  const { user, accounts, goals, budgetCategories, purchases, reloadUser } = useFinance();
   const onPro = user.plan === "pro";
   const endsAt = user.planExpiresAt ? new Date(user.planExpiresAt) : null;
   const daysLeft = endsAt ? Math.max(0, differenceInCalendarDays(endsAt, new Date())) : null;
@@ -26,6 +40,39 @@ export default function BillingPage() {
     budgets: budgetCategories.length,
     purchases: purchases.length,
   };
+
+  const [online, setOnline] = useState(false);
+  const [history, setHistory] = useState<PaymentRow[]>([]);
+  const [paying, setPaying] = useState<string | null>(null);
+
+  useEffect(() => {
+    api<{ online: boolean; payments: PaymentRow[] }>("/billing/payments")
+      .then((r) => {
+        setOnline(r.online);
+        setHistory(r.payments);
+      })
+      .catch(() => {});
+    // Returning from the payment page.
+    const result = new URLSearchParams(window.location.search).get("payment");
+    if (!result) return;
+    if (result === "success") {
+      toast.success(t("Payment received — thank you!"), { description: t("Pro is active. A receipt is on its way to your email.") });
+      reloadUser();
+    } else if (result === "cancelled") toast.info(t("Payment cancelled"));
+    else toast.error(t("Payment didn't go through"), { description: t("You weren't charged. If money left your account, it will be credited or refunded automatically.") });
+    window.history.replaceState(null, "", "/billing");
+  }, [reloadUser]);
+
+  async function checkout(period: "month" | "year") {
+    setPaying(period);
+    try {
+      const { url } = await api<{ url: string }>("/billing/checkout", { method: "POST", body: { period } });
+      window.location.assign(url);
+    } catch (err) {
+      toast.error(t("Couldn't start payment"), { description: err instanceof Error ? err.message : undefined });
+      setPaying(null);
+    }
+  }
 
   const upgradeHref = SUPPORT_EMAIL
     ? `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent("Sanchay Pro upgrade")}&body=${encodeURIComponent(`Account: ${user.email}`)}`
@@ -100,7 +147,19 @@ export default function BillingPage() {
                   ))}
                 </ul>
                 {id === "pro" && (!onPro || endsAt) && (
-                  upgradeHref ? (
+                  online ? (
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      {(["month", "year"] as const).map((period) => (
+                        <Button key={period} className="gap-1.5" variant={period === "year" ? "default" : "outline"} disabled={!!paying} onClick={() => checkout(period)}>
+                          <CreditCard className="size-4" />
+                          {period === "month" ? t("Pay ৳{n} / month", { n: PLANS.pro.priceMonthly }) : t("Pay ৳{n} / year", { n: PLANS.pro.priceYearly })}
+                        </Button>
+                      ))}
+                      <p className="text-center text-xs text-muted-foreground sm:col-span-2">
+                        {t("bKash, Nagad, Rocket, cards or internet banking via SSLCommerz. Time is added after your current Pro period.")}
+                      </p>
+                    </div>
+                  ) : upgradeHref ? (
                     <Button asChild className="w-full gap-1.5">
                       <a href={upgradeHref}>
                         <Mail className="size-4" />
@@ -118,6 +177,28 @@ export default function BillingPage() {
           );
         })}
       </div>
+
+      {history.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">{t("Payment history")}</CardTitle>
+          </CardHeader>
+          <CardContent className="divide-y text-sm">
+            {history.map((p) => (
+              <div key={p.id} className="flex flex-wrap items-center justify-between gap-2 py-2">
+                <span>
+                  {p.period === "year" ? t("Pro · 1 year") : t("Pro · 1 month")}
+                  <span className="ml-2 text-xs text-muted-foreground">{p.tranId}{p.method ? ` · ${p.method}` : ""}</span>
+                </span>
+                <span className="tabular-nums">
+                  {formatCurrency(p.amount, { currency: "BDT", showDecimals: true })}
+                  <span className="ml-2 text-xs text-muted-foreground">{p.paidAt ? format(new Date(p.paidAt), "d MMM yyyy") : ""}</span>
+                </span>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

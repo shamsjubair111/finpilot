@@ -26,10 +26,10 @@ Status: ✅ done · 🟡 partial · ⬜ not started
 - ✅ Public landing page at `/` for signed-out visitors, `/pricing`, `/privacy`, `/terms`
 - ✅ Free and Pro plans with limits (`src/lib/plans.ts`), 14-day Pro trial for new and existing users
 - ✅ Plan & billing page (`/billing`) with usage meters
-- ⬜ Online payment (SSLCommerz first) with webhook; until then the upgrade button emails `NEXT_PUBLIC_SUPPORT_EMAIL`
+- ✅ Online payment via SSLCommerz (bKash, Nagad, cards): checkout, server-side validation, IPN, idempotent crediting, receipt email, payment history. Needs `SSLCOMMERZ_STORE_ID`/`SSLCOMMERZ_STORE_PASSWORD`; falls back to email upgrade
 - ✅ Onboarding wizard: income, first account, starter budgets from income
 - ✅ Welcome email (with verification link)
-- ⬜ Payment emails
+- ✅ Payment receipt email
 - ✅ Admin dashboard (`/admin`, access via `ADMIN_EMAILS`): signups, activity, paying users, revenue, churn; search users; give Pro for manual bKash/bank payments, revoke
 
 ## Phase 4: Faster data entry

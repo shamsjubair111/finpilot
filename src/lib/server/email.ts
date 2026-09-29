@@ -107,3 +107,20 @@ export function weeklySummaryEmail(
   ];
   return { subject: tr("Your week with Sanchay"), ...layout(lang, tr("Hi {name}, here's your week", { name }), lines, { label: tr("Open Sanchay"), url }) };
 }
+
+export function paymentReceiptEmail(lang: Lang, name: string, p: { amount: string; reference: string; until: string; method: string }, url: string) {
+  const tr = (s: string, v?: Record<string, string | number>) => translate(lang, s, v);
+  return {
+    subject: tr("Your Sanchay Pro receipt"),
+    ...layout(
+      lang,
+      tr("Thank you, {name}!", { name }),
+      [
+        tr("We received your payment of {amount}.", { amount: p.amount }),
+        tr("Sanchay Pro is active until {date}.", { date: p.until }),
+        tr("Reference: {ref}", { ref: p.reference }) + (p.method ? ` · ${p.method}` : ""),
+      ],
+      { label: tr("View billing"), url }
+    ),
+  };
+}

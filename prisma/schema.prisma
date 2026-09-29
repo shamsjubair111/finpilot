@@ -241,3 +241,22 @@ model PushSubscription {
 
   @@index([userId])
 }
+
+// An online checkout. Credited exactly once (status pending → paid) after server-side validation.
+model Payment {
+  id        String    @id @default(cuid())
+  userId    String
+  tranId    String    @unique
+  provider  String    @default("sslcommerz")
+  plan      String
+  period    String
+  amount    Float
+  currency  String    @default("BDT")
+  status    String    @default("pending")
+  valId     String?
+  method    String?
+  createdAt DateTime  @default(now())
+  paidAt    DateTime?
+
+  @@index([userId, createdAt])
+}
