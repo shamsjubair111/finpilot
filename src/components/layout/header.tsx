@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { NAV_ITEMS } from "./nav-items";
 import { MonthSelector } from "./month-selector";
 import { NotificationsMenu } from "./notifications-menu";
+import { HouseholdSwitcher } from "./household-switcher";
 import { UserMenu } from "./user-menu";
 import { QuickAdd } from "./quick-add";
 import { LanguageSwitcher } from "./language-switcher";
@@ -44,6 +45,7 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
         <div className="hidden sm:block">
           <MonthSelector />
         </div>
+        <HouseholdSwitcher />
         <LanguageSwitcher onChange={setLanguage} />
         <NotificationsMenu />
         <QuickAdd />

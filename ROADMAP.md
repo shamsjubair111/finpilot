@@ -51,10 +51,10 @@ Status: ✅ done · 🟡 partial · ⬜ not started
 - ✅ Weekly summary email (Mondays, opt-out in Settings) via `/api/cron/weekly-summary`
 - ✅ Investment tracking (`/investments`): Sanchayapatra, FDR, DPS, shares, funds, gold, bonds; profit to date, maturity value and dates
 - ✅ Streaks card on the dashboard: no-spend days, saving months, under-budget months
-- ⬜ Household workspaces (next)
+- ✅ Shared households (Pro): invite up to 4 people as editor or viewer, switch between households, owner-only money settings, per-household offline outbox (next)
 - ✅ Smart categorisation learned from the user's own history (form, SMS and CSV import)
 - ✅ AI money assistant (`/assistant`, Pro): Claude Opus 5.5, streamed answers grounded in a snapshot of the user's data, prompt caching, refusal fallbacks; needs `ANTHROPIC_API_KEY`
-- ⬜ Household workspaces
+- ✅ Shared households (Pro): invite up to 4 people as editor or viewer, switch between households, owner-only money settings, per-household offline outbox
 - ⬜ Native Android app (only if demand shows)
 
 ## Before taking real payments

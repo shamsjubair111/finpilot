@@ -8,6 +8,9 @@ type Delegate = Record<"findMany" | "findFirst" | "create" | "update" | "delete"
 
 type Row = Record<string, unknown>;
 
+// Resource routes act on the active household's data.
+const LEDGER = { scope: "ledger" as const };
+
 export function serialize(row: Row) {
   const out: Row = {};
   for (const [k, v] of Object.entries(row)) {
@@ -29,13 +32,13 @@ export function collectionRoutes<S extends ZodRawShape>(
     GET: authed(async ({ userId }) => {
       const rows = await model.findMany({ where: { userId }, orderBy });
       return json(rows.map(serialize));
-    }),
+    }, LEDGER),
     POST: authed(async ({ userId, req }) => {
       const data = schema.parse(await req.json()) as Row;
       await check?.(data, userId);
       const row = await model.create({ data: { ...data, userId } });
       return json(serialize(row), 201);
-    }),
+    }, LEDGER),
   };
 }
 
@@ -46,7 +49,7 @@ export function itemRoutes<S extends ZodRawShape>(model: Delegate, schema: ZodOb
     return row;
   };
   return {
-    GET: authed<{ id: string }>(async ({ userId, params }) => json(serialize(await owned(params.id, userId)))),
+    GET: authed<{ id: string }>(async ({ userId, params }) => json(serialize(await owned(params.id, userId))), LEDGER),
     PATCH: authed<{ id: string }>(async ({ userId, req, params }) => {
       const existing = await owned(params.id, userId);
       const body = await req.json();
@@ -55,11 +58,11 @@ export function itemRoutes<S extends ZodRawShape>(model: Delegate, schema: ZodOb
       await check?.(data, userId, existing);
       const row = await model.update({ where: { id: params.id }, data });
       return json(serialize(row));
-    }),
+    }, LEDGER),
     DELETE: authed<{ id: string }>(async ({ userId, params }) => {
       await owned(params.id, userId);
       await model.delete({ where: { id: params.id } });
       return json({ ok: true });
-    }),
+    }, LEDGER),
   };
 }

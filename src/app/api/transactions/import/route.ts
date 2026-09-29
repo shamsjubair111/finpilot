@@ -43,4 +43,4 @@ export const POST = authed(async ({ userId, req }) => {
     ? await db.transaction.createManyAndReturn({ data: fresh.map((i) => ({ ...i, userId })), skipDuplicates: true })
     : [];
   return json({ created: created.map(serialize), skipped: items.length - created.length }, 201);
-});
+}, { scope: "ledger" });

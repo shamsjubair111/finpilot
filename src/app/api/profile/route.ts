@@ -1,13 +1,18 @@
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { db } from "@/lib/server/db";
-import { ApiError, authed, json } from "@/lib/server/api";
+import { ApiError, authed, json, resolveLedger } from "@/lib/server/api";
 import { destroySession, setLangCookie } from "@/lib/server/session";
 import { toProfile } from "@/lib/server/user";
 import { profileSchema } from "@/lib/validation";
 
+const HOUSEHOLD_FIELDS = ["currency", "monthlySalary", "currentSavings", "emergencyFundTarget", "emergencyFundCurrent", "defaultSavingsTarget"] as const;
+
 export const PATCH = authed(async ({ userId, req }) => {
   const data = profileSchema.parse(await req.json());
+  // In someone else's household these settings belong to the owner.
+  if (HOUSEHOLD_FIELDS.some((k) => k in data) && (await resolveLedger(userId)).ownerId !== userId)
+    throw new ApiError(403, "Only the household owner can change these settings.");
   const user = await db.user.update({ where: { id: userId }, data });
   if (data.language) await setLangCookie(data.language);
   return json(toProfile(user));

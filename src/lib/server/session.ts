@@ -19,8 +19,13 @@ export async function createSession(userId: string, version?: number) {
   });
 }
 
+// Which household's finances are shown; see resolveLedger in api.ts.
+export const LEDGER_COOKIE = "sanchay_ledger";
+
 export async function destroySession() {
-  (await cookies()).delete(SESSION_COOKIE);
+  const jar = await cookies();
+  jar.delete(SESSION_COOKIE);
+  jar.delete(LEDGER_COOKIE);
 }
 
 export async function getSession() {

@@ -1,7 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
 import { db } from "@/lib/server/db";
-import { ApiError, handleError, requireUserId } from "@/lib/server/api";
+import { ApiError, handleError, requireUserId, resolveLedger } from "@/lib/server/api";
 import { serialize } from "@/lib/server/crud";
 import { rateLimit } from "@/lib/server/rate-limit";
 import { buildFinancialSummary, type AssistantData } from "@/lib/assistant-context";
@@ -31,14 +31,15 @@ const anthropic = () => (client ??= new Anthropic());
 
 export async function POST(req: Request) {
   try {
-    const userId = await requireUserId();
+    const actorId = await requireUserId();
+    const { ownerId: userId } = await resolveLedger(actorId);
     if (!process.env.ANTHROPIC_API_KEY) throw new ApiError(503, "The AI assistant isn't set up on this server yet.");
     const user = await db.user.findUniqueOrThrow({
       where: { id: userId },
       include: { accounts: true, transactions: { orderBy: { date: "desc" }, take: 2000 }, budgets: true, goals: true, purchases: true, commitments: true, investments: true },
     });
     if (effectivePlan(user.plan, user.planExpiresAt) !== "pro") throw new ApiError(402, "The AI assistant is part of Sanchay Pro.");
-    await rateLimit("assistant", 40, 60 * 60 * 1000, userId);
+    await rateLimit("assistant", 40, 60 * 60 * 1000, actorId);
     const { messages } = bodySchema.parse(await req.json());
 
     const summary = buildFinancialSummary({

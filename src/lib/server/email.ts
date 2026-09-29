@@ -124,3 +124,21 @@ export function paymentReceiptEmail(lang: Lang, name: string, p: { amount: strin
     ),
   };
 }
+
+export function householdInviteEmail(lang: Lang, ownerName: string, role: string, url: string) {
+  const tr = (s: string, v?: Record<string, string | number>) => translate(lang, s, v);
+  return {
+    subject: tr("{name} invited you to their Sanchay household", { name: ownerName }),
+    ...layout(
+      lang,
+      tr("{name} invited you to their Sanchay household", { name: ownerName }),
+      [
+        role === "viewer"
+          ? tr("You'll be able to see their accounts, budgets and goals.")
+          : tr("You'll be able to see and update their accounts, transactions, budgets and goals."),
+        tr("Sign in or create a free account with this email address to accept. The link expires in 7 days."),
+      ],
+      { label: tr("Accept invitation"), url }
+    ),
+  };
+}

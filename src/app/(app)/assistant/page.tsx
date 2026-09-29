@@ -24,7 +24,7 @@ const SUGGESTIONS = [
 ];
 
 export default function AssistantPage() {
-  const { user } = useFinance();
+  const { ledger } = useFinance();
   const [messages, setMessages] = React.useState<Msg[]>([]);
   const [input, setInput] = React.useState("");
   const [busy, setBusy] = React.useState(false);
@@ -78,7 +78,8 @@ export default function AssistantPage() {
     }
   }
 
-  if (user.plan !== "pro")
+  // In a shared household, Pro features follow the owner's plan.
+  if (ledger.plan !== "pro")
     return (
       <div>
         <PageHeader title={t("Money assistant")} subtitle={t("Ask questions about your own money and get answers based on your data.")} />

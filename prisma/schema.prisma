@@ -46,6 +46,8 @@ model User {
   authTokens   AuthToken[]
   investments  Investment[]
   pushSubscriptions PushSubscription[]
+  ownedMemberships  Membership[] @relation("OwnedMemberships")
+  joinedMemberships Membership[] @relation("JoinedMemberships")
 }
 
 model Account {
@@ -272,4 +274,22 @@ model ErrorEvent {
   createdAt DateTime @default(now())
 
   @@index([createdAt])
+}
+
+// Shared household access: `member` can see (viewer) or also change (editor) `owner`'s finances.
+model Membership {
+  id         String    @id @default(cuid())
+  ownerId    String
+  owner      User      @relation("OwnedMemberships", fields: [ownerId], references: [id], onDelete: Cascade)
+  memberId   String?
+  member     User?     @relation("JoinedMemberships", fields: [memberId], references: [id], onDelete: Cascade)
+  email      String
+  role       String    @default("editor")
+  // Hash of the invite link token; cleared once accepted.
+  inviteHash String?   @unique
+  acceptedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@unique([ownerId, email])
+  @@index([memberId])
 }

@@ -27,7 +27,23 @@ import { FullPageLoader } from "@/components/shared/full-page-loader";
 type StoredBudget = Omit<BudgetCategory, "spent">;
 type NewOf<T> = Omit<T, "id" | "createdAt">;
 
+export interface Ledger {
+  ownerId: string;
+  ownerName: string;
+  role: "owner" | "editor" | "viewer";
+  plan: "free" | "pro";
+}
+export interface HouseholdLink {
+  ownerId: string;
+  ownerName: string;
+  role: string;
+}
+
 interface FinanceContextValue {
+  /** Whose finances are shown (the user's own, or a household they joined). */
+  ledger: Ledger;
+  households: HouseholdLink[];
+  switchHousehold: (ownerId: string | null) => Promise<void>;
   user: UserProfile;
   updateUser: (patch: Partial<UserProfile>, successMessage?: string) => Promise<boolean>;
   changePassword: (currentPassword: string, newPassword: string) => Promise<boolean>;
@@ -107,6 +123,8 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   const [accounts, setAccounts] = React.useState<Account[]>([]);
   const [investments, setInvestments] = React.useState<Investment[]>([]);
   const [pendingSync, setPendingSync] = React.useState(0);
+  const [ledger, setLedger] = React.useState<Ledger | null>(null);
+  const [households, setHouseholds] = React.useState<HouseholdLink[]>([]);
   const [selectedMonth, setSelectedMonth] = React.useState(() => monthKey(new Date()));
   const [loadError, setLoadError] = React.useState<string | null>(null);
 
@@ -135,6 +153,8 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
           commitments: UpcomingCommitment[];
           accounts: Account[];
           investments: Investment[];
+          ledger: Ledger;
+          households: HouseholdLink[];
         }>("/bootstrap");
       // One quiet retry covers a database that is still waking up.
       const data = await fetchAll().catch((err) => {
@@ -147,7 +167,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       if (me.language !== lang) setLang(me.language);
       setUser(me);
       // Keep showing anything still queued from an offline session on this device.
-      const queued = readOutbox(me.id).map((e) => ({ ...e.payload, id: e.tempId }) as Transaction);
+      const queued = readOutbox(`${me.id}:${data.ledger?.ownerId ?? me.id}`).map((e) => ({ ...e.payload, id: e.tempId }) as Transaction);
       setTransactions([...txns, ...queued].sort(byDateDesc));
       setPendingSync(queued.length);
       setBudgets(bgs);
@@ -155,6 +175,8 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       setPurchases(prs);
       setCommitments(cms);
       setInvestments(data.investments ?? []);
+      setLedger(data.ledger);
+      setHouseholds(data.households ?? []);
     } catch (err) {
       if (handleAuthFailure(err)) return;
       const message = err instanceof Error ? err.message : t("Could not load your data.");
@@ -170,7 +192,8 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     load();
   }, [load]);
 
-  const userId = user?.id;
+  // The outbox is per person *and* household, so queued items can only sync into the household they were made in.
+  const userId = user ? `${user.id}:${ledger?.ownerId ?? user.id}` : undefined;
   const flushing = React.useRef(false);
   const flushOutbox = React.useCallback(async () => {
     if (!userId || flushing.current) return;
@@ -204,7 +227,8 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener("online", flushOutbox);
   }, [userId, flushOutbox]);
 
-  const needsOnboarding = !!user && !user.onboarded && pathname !== "/onboarding";
+  // Invite links skip onboarding so a new user can join the household they were invited to.
+  const needsOnboarding = !!user && !user.onboarded && pathname !== "/onboarding" && pathname !== "/invite";
   React.useEffect(() => {
     if (needsOnboarding) router.replace("/onboarding");
   }, [needsOnboarding, router]);
@@ -315,6 +339,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   }
   setCurrencyPref(user.currency);
 
+  const outboxKey = `${user.id}:${ledger?.ownerId ?? user.id}`;
   const value: FinanceContextValue = {
     user,
     updateUser: (patch, message = "Profile updated") =>
@@ -337,6 +362,18 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     },
     signOutOtherDevices: () =>
       run(() => api("/auth/logout-all", { method: "POST" }), "Signed out of other devices", "Couldn't sign out other devices", t("Only this device is still signed in.")),
+    ledger: ledger ?? { ownerId: user.id, ownerName: user.name, role: "owner", plan: user.plan },
+    households,
+    switchHousehold: async (ownerId) => {
+      try {
+        await api("/household/switch", { method: "POST", body: { ownerId } });
+        clearOfflineCache();
+        await load();
+        router.push("/");
+      } catch (err) {
+        if (!handleAuthFailure(err)) toast.error(t("Couldn't switch household"), { description: err instanceof Error ? err.message : undefined });
+      }
+    },
     reloadUser: async () => {
       try {
         setUser(await api<UserProfile>("/auth/me"));
@@ -372,7 +409,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       }
       // Offline: keep it on this device and sync later.
       const tempId = newTempId();
-      if (!writeOutbox(user.id, [...readOutbox(user.id), { tempId, payload: data }])) {
+      if (!writeOutbox(outboxKey, [...readOutbox(outboxKey), { tempId, payload: data }])) {
         toast.error(t("Couldn't save offline"), { description: t("Your browser's storage is unavailable.") });
         return false;
       }
@@ -383,14 +420,14 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     },
     updateTransaction: async (id, patch) => {
       if (!isOfflineId(id)) return txnCrud.update(id, patch);
-      writeOutbox(user.id, readOutbox(user.id).map((e) => (e.tempId === id ? { ...e, payload: { ...e.payload, ...patch } } : e)));
+      writeOutbox(outboxKey, readOutbox(outboxKey).map((e) => (e.tempId === id ? { ...e, payload: { ...e.payload, ...patch } } : e)));
       setTransactions((prev) => prev.map((x) => (x.id === id ? { ...x, ...patch } : x)).sort(byDateDesc));
       toast.success(t("Transaction updated"));
       return true;
     },
     deleteTransaction: async (id) => {
       if (!isOfflineId(id)) return txnCrud.remove(id);
-      writeOutbox(user.id, readOutbox(user.id).filter((e) => e.tempId !== id));
+      writeOutbox(outboxKey, readOutbox(outboxKey).filter((e) => e.tempId !== id));
       setTransactions((prev) => prev.filter((x) => x.id !== id));
       setPendingSync((n) => Math.max(0, n - 1));
       toast.success(t("Transaction deleted"));

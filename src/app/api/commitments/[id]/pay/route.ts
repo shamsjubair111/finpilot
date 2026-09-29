@@ -13,4 +13,4 @@ export const POST = authed<{ id: string }>(async ({ userId, req, params }) => {
   const opts = schema.parse(await req.json().catch(() => ({})));
   const { transaction, commitment } = await payCommitment(userId, params.id, opts);
   return json({ transaction: serialize(transaction), commitment: commitment ? serialize(commitment) : null }, 201);
-});
+}, { scope: "ledger" });

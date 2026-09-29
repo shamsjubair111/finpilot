@@ -1,7 +1,7 @@
 import "server-only";
 import { ZodError } from "zod";
 import { db } from "./db";
-import { destroySession, getSession } from "./session";
+import { destroySession, getSession, LEDGER_COOKIE } from "./session";
 import { recordError } from "./errors";
 import { cookies, headers } from "next/headers";
 import { isLang, LANG_COOKIE, translate, type Lang } from "@/lib/i18n";
@@ -81,13 +81,45 @@ export async function requireUserId() {
 
 type Ctx<P> = { params: Promise<P> };
 
-export function authed<P = Record<string, never>>(
-  fn: (args: { userId: string; req: Request; params: P }) => Promise<Response>
-) {
+export { LEDGER_COOKIE };
+export type LedgerRole = "owner" | "editor" | "viewer";
+
+/**
+ * Whose finances this request acts on. Defaults to the signed-in user; a "sanchay_ledger" cookie can
+ * switch to a household the user was invited into. Invalid or revoked choices silently fall back.
+ */
+export async function resolveLedger(actorId: string): Promise<{ ownerId: string; role: LedgerRole }> {
+  const chosen = (await cookies()).get(LEDGER_COOKIE)?.value;
+  if (!chosen || chosen === actorId) return { ownerId: actorId, role: "owner" };
+  const membership = await db.membership.findFirst({
+    where: { ownerId: chosen, memberId: actorId, acceptedAt: { not: null } },
+    select: { role: true },
+  });
+  return membership ? { ownerId: chosen, role: membership.role === "viewer" ? "viewer" : "editor" } : { ownerId: actorId, role: "owner" };
+}
+
+export interface AuthedArgs<P> {
+  /** Owner of the data: the active household for "ledger" routes, otherwise the signed-in user. */
+  userId: string;
+  /** The signed-in person, always. */
+  actorId: string;
+  role: LedgerRole;
+  req: Request;
+  params: P;
+}
+
+/**
+ * Wraps a route handler with authentication. Scope "actor" (default) acts on the signed-in user's own
+ * account; scope "ledger" acts on the active household's data, and viewers may only read.
+ */
+export function authed<P = Record<string, never>>(fn: (args: AuthedArgs<P>) => Promise<Response>, opts: { scope?: "actor" | "ledger" } = {}) {
   return async (req: Request, ctx: Ctx<P>) => {
     try {
-      const userId = await requireUserId();
-      return await fn({ userId, req, params: await ctx.params });
+      const actorId = await requireUserId();
+      const ledger = opts.scope === "ledger" ? await resolveLedger(actorId) : { ownerId: actorId, role: "owner" as const };
+      if (ledger.role === "viewer" && req.method !== "GET")
+        throw new ApiError(403, "You have view-only access to this household.");
+      return await fn({ userId: ledger.ownerId, actorId, role: ledger.role, req, params: await ctx.params });
     } catch (err) {
       return handleError(err);
     }
