@@ -21,6 +21,8 @@ export function toProfile(u: User) {
     onboarded: !!u.onboardedAt,
     isAdmin: isAdminEmail(u.email),
     weeklySummary: u.weeklySummary,
+    twoFactorEnabled: !!u.totpEnabledAt,
+    recoveryCodesLeft: u.totpEnabledAt ? u.recoveryCodes.length : 0,
     plan: effectivePlan(u.plan, u.planExpiresAt),
     planExpiresAt: u.plan === "pro" && u.planExpiresAt ? u.planExpiresAt.toISOString() : undefined,
   };

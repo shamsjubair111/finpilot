@@ -4,11 +4,11 @@ import * as React from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { ArrowRight, Eye, EyeOff, Lock, Mail, User } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, Lock, Mail, ShieldCheck, User } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SubmitButton } from "@/components/shared/submit-button";
-import { api } from "@/lib/api-client";
+import { api, ApiClientError } from "@/lib/api-client";
 import type { Currency, UserProfile } from "@/types/finance";
 import { useI18n } from "@/lib/i18n/provider";
 import { CURRENCIES } from "@/lib/currency";
@@ -70,6 +70,8 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
   const [password, setPassword] = React.useState("");
   const [showPassword, setShowPassword] = React.useState(false);
   const [pending, setPending] = React.useState(false);
+  const [ticket, setTicket] = React.useState<string | null>(null);
+  const [code, setCode] = React.useState("");
   const isLogin = mode === "login";
 
   async function handleSubmit(e: React.FormEvent) {
@@ -80,16 +82,16 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
     }
     setPending(true);
     try {
-      const user = await api<UserProfile>(isLogin ? "/auth/login" : "/auth/register", {
+      const res = await api<UserProfile | { twoFactorRequired: true; ticket: string }>(isLogin ? "/auth/login" : "/auth/register", {
         method: "POST",
         body: isLogin ? { email, password } : { name, email, password, language: lang, currency },
       });
-      toast.success(t(isLogin ? "Welcome back, {name}!" : "Welcome aboard, {name}!", { name: user.name.split(" ")[0] }), {
-        description: t(isLogin ? "You're signed in." : "Your account is ready. Let's set it up in three quick steps."),
-      });
-      const next = params.get("next");
-      router.replace(next && next.startsWith("/") && !next.startsWith("//") ? next : isLogin ? "/" : "/onboarding");
-      router.refresh();
+      if ("twoFactorRequired" in res) {
+        setTicket(res.ticket);
+        setPending(false);
+        return;
+      }
+      finish(res);
     } catch (err) {
       toast.error(t(isLogin ? "Sign in failed" : "Sign up failed"), {
         description: err instanceof Error ? err.message : undefined,
@@ -97,6 +99,65 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
       setPending(false);
     }
   }
+
+  async function submitCode(e: React.FormEvent) {
+    e.preventDefault();
+    setPending(true);
+    try {
+      finish(await api<UserProfile>("/auth/2fa/verify", { method: "POST", body: { ticket, code } }));
+    } catch (err) {
+      toast.error(t("Sign in failed"), { description: err instanceof Error ? err.message : undefined });
+      // An expired ticket means starting over from the password step.
+      if (err instanceof ApiClientError && err.status === 401) {
+        setTicket(null);
+        setCode("");
+      }
+      setPending(false);
+    }
+  }
+
+  function finish(user: UserProfile) {
+    toast.success(t(isLogin ? "Welcome back, {name}!" : "Welcome aboard, {name}!", { name: user.name.split(" ")[0] }), {
+      description: t(isLogin ? "You're signed in." : "Your account is ready. Let's set it up in three quick steps."),
+    });
+    const next = params.get("next");
+    router.replace(next && next.startsWith("/") && !next.startsWith("//") ? next : isLogin ? "/" : "/onboarding");
+    router.refresh();
+  }
+
+  if (ticket)
+    return (
+      <div className="glass animate-in-up rounded-3xl p-6 shadow-pop sm:p-8">
+        <div className="mb-7 space-y-1.5">
+          <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{t("Two-step verification")}</h1>
+          <p className="text-sm text-muted-foreground">{t("Enter the 6-digit code from your authenticator app, or one of your recovery codes.")}</p>
+        </div>
+        <form onSubmit={submitCode} className="space-y-4">
+          <Field id="code" label={t("Code")} icon={ShieldCheck}>
+            <Input
+              id="code"
+              inputMode="text"
+              autoComplete="one-time-code"
+              required
+              autoFocus
+              className="h-11 pl-9 font-mono tracking-widest"
+              placeholder="123456"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              maxLength={20}
+            />
+          </Field>
+          <SubmitButton pending={pending} disabled={code.trim().length < 6} className="bg-gradient-brand glow-primary h-11 w-full text-sm font-semibold text-white hover:brightness-110">
+            {t("Verify and sign in")}
+          </SubmitButton>
+        </form>
+        <p className="mt-6 text-center text-sm">
+          <button type="button" className="text-muted-foreground hover:text-primary hover:underline" onClick={() => { setTicket(null); setCode(""); }}>
+            {t("Back to sign in")}
+          </button>
+        </p>
+      </div>
+    );
 
   return (
     <div className="glass animate-in-up rounded-3xl p-6 shadow-pop sm:p-8">

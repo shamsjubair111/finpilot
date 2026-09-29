@@ -4,6 +4,7 @@ import { ApiError, handleError, json } from "@/lib/server/api";
 import { createSession, setLangCookie } from "@/lib/server/session";
 import { toProfile } from "@/lib/server/user";
 import { rateLimit } from "@/lib/server/rate-limit";
+import { signTwoFactorTicket } from "@/lib/server/session-token";
 import { loginSchema } from "@/lib/validation";
 
 export async function POST(req: Request) {
@@ -14,6 +15,7 @@ export async function POST(req: Request) {
     const user = await db.user.findUnique({ where: { email } });
     if (!user || !(await bcrypt.compare(password, user.passwordHash)))
       throw new ApiError(401, "Incorrect email or password.");
+    if (user.totpEnabledAt) return json({ twoFactorRequired: true, ticket: await signTwoFactorTicket(user.id) });
     await createSession(user.id);
     await setLangCookie(user.language);
     return json(toProfile(user));

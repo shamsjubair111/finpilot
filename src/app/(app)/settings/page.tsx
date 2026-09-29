@@ -22,6 +22,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { SubmitButton } from "@/components/shared/submit-button";
+import { TwoFactorCard } from "@/components/settings/two-factor-card";
 import { useFinance } from "@/components/providers/finance-provider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CURRENCIES } from "@/lib/currency";
@@ -337,6 +338,8 @@ export default function SettingsPage() {
           </form>
         </CardContent>
       </Card>
+
+      <TwoFactorCard />
 
       {/* Data export */}
       <Card className="animate-in-up">
