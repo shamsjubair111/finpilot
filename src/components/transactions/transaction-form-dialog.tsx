@@ -20,6 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SubmitButton } from "@/components/shared/submit-button";
 import { DynamicIcon } from "@/components/shared/dynamic-icon";
+import { buildCategoryModel, suggestCategory } from "@/lib/categorize";
 import { useFinance } from "@/components/providers/finance-provider";
 import { EXPENSE_CATEGORIES, INCOME_CATEGORIES, PAYMENT_METHODS } from "@/lib/constants";
 import { ACCOUNT_TYPE_META } from "@/lib/accounts";
@@ -90,7 +91,11 @@ export function TransactionFormDialog({
   open: controlledOpen,
   onOpenChange,
 }: TransactionFormDialogProps) {
-  const { addTransaction, updateTransaction, accounts, accountBalances } = useFinance();
+  const { addTransaction, updateTransaction, accounts, accountBalances, transactions } = useFinance();
+  const categoryModel = React.useMemo(() => buildCategoryModel(transactions), [transactions]);
+  // Suggestions only fill the category until the user picks one themselves.
+  const [categoryPicked, setCategoryPicked] = React.useState(false);
+  const [suggested, setSuggested] = React.useState(false);
   const isEdit = !!transaction;
   const [pending, setPending] = React.useState(false);
   const [internalOpen, setInternalOpen] = React.useState(false);
@@ -119,6 +124,8 @@ export function TransactionFormDialog({
     setTitle(t?.title ?? "");
     setMerchant(t?.merchant ?? "");
     setCategory(t?.category ?? "");
+    setCategoryPicked(!!t);
+    setSuggested(false);
     setAmount(t ? String(t.amount) : "");
     setDate((t?.date ?? new Date().toISOString()).slice(0, 10));
     const firstId = activeAccounts[0]?.id;
@@ -128,6 +135,15 @@ export function TransactionFormDialog({
     setNotes(t?.notes ?? "");
   } else if (!open && wasOpen) {
     setWasOpen(false);
+  }
+
+  function changeText(nextTitle: string, nextMerchant: string) {
+    setTitle(nextTitle);
+    setMerchant(nextMerchant);
+    if (categoryPicked || type === "transfer") return;
+    const hit = suggestCategory(categoryModel, nextTitle, nextMerchant, type);
+    setCategory(hit ?? "");
+    setSuggested(!!hit);
   }
 
   const isTransfer = type === "transfer";
@@ -186,6 +202,8 @@ export function TransactionFormDialog({
             onValueChange={(v) => {
               setType(v as TransactionType);
               setCategory("");
+              setCategoryPicked(false);
+              setSuggested(false);
             }}
           >
             <TabsList className="w-full">
@@ -229,7 +247,7 @@ export function TransactionFormDialog({
                   id="txn-title"
                   placeholder={type === "income" ? tr("e.g. Salary") : tr("e.g. Groceries")}
                   value={title}
-                  onChange={(e) => setTitle(e.target.value)}
+                  onChange={(e) => changeText(e.target.value, merchant)}
                   required
                 />
               </div>
@@ -248,8 +266,17 @@ export function TransactionFormDialog({
             {!isTransfer && (
               <>
                 <div className="space-y-1.5">
-                  <Label htmlFor="txn-category">{tr("Category")}</Label>
-                  <Select value={category} onValueChange={setCategory}>
+                  <Label htmlFor="txn-category" className="flex items-center gap-1.5">
+                    {tr("Category")}
+                    {suggested && !categoryPicked && <span className="text-[10px] font-normal text-primary">{tr("Suggested")}</span>}
+                  </Label>
+                  <Select
+                    value={category}
+                    onValueChange={(v) => {
+                      setCategory(v);
+                      setCategoryPicked(true);
+                    }}
+                  >
                     <SelectTrigger id="txn-category" className="w-full">
                       <SelectValue placeholder={tr("Select category")} />
                     </SelectTrigger>
@@ -268,7 +295,7 @@ export function TransactionFormDialog({
 
                 <div className="space-y-1.5">
                   <Label htmlFor="txn-merchant">{type === "income" ? tr("From (optional)") : tr("Merchant (optional)")}</Label>
-                  <Input id="txn-merchant" placeholder={type === "income" ? tr("e.g. Employer") : tr("e.g. Shwapno")} value={merchant} onChange={(e) => setMerchant(e.target.value)} />
+                  <Input id="txn-merchant" placeholder={type === "income" ? tr("e.g. Employer") : tr("e.g. Shwapno")} value={merchant} onChange={(e) => changeText(title, e.target.value)} />
                 </div>
 
                 <div className="space-y-1.5">
@@ -290,7 +317,7 @@ export function TransactionFormDialog({
             {isTransfer && (
               <div className="space-y-1.5 sm:col-span-2">
                 <Label htmlFor="txn-title">{tr("Description (optional)")}</Label>
-                <Input id="txn-title" placeholder={tr("e.g. Credit card bill payment")} value={title} onChange={(e) => setTitle(e.target.value)} />
+                <Input id="txn-title" placeholder={tr("e.g. Credit card bill payment")} value={title} onChange={(e) => changeText(e.target.value, merchant)} />
               </div>
             )}
 

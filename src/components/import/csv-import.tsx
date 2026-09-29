@@ -17,6 +17,7 @@ import { formatDate } from "@/lib/format-date";
 import { t } from "@/lib/i18n";
 import { detectColumns, parseCsv, rowsToTransactions, type ColumnMapping, type CsvTransaction } from "@/lib/csv-import";
 import type { ExpenseCategory, IncomeCategory } from "@/types/finance";
+import { buildCategoryModel, suggestCategory } from "@/lib/categorize";
 
 const NONE = "-1";
 const NO_ACCOUNT = "__none__";
@@ -39,15 +40,17 @@ export function CsvImport() {
   const [pending, setPending] = useState(false);
 
   const knownIds = useMemo(() => new Set(transactions.map((x) => x.externalId).filter(Boolean)), [transactions]);
+  const categoryModel = useMemo(() => buildCategoryModel(transactions), [transactions]);
 
   const result = useMemo(() => (map ? rowsToTransactions(body, map) : null), [body, map]);
   const rows: Row[] = useMemo(
     () =>
       (result?.parsed ?? []).map((p, key) => {
         const duplicate = knownIds.has(p.externalId);
-        return { ...p, key, duplicate, include: !duplicate, ...overrides[key] };
+        const learned = suggestCategory(categoryModel, p.title, "", p.type) as Row["category"] | null;
+        return { ...p, category: learned ?? p.category, key, duplicate, include: !duplicate, ...overrides[key] };
       }),
-    [result, knownIds, overrides]
+    [result, knownIds, overrides, categoryModel]
   );
   const selected = rows.filter((r) => r.include);
 

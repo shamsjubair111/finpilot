@@ -1095,4 +1095,6 @@ export const bn: Record<string, string> = {
   "Months in a row saving money": "টানা সঞ্চয়ের মাস",
   "Months in a row under budget": "টানা বাজেটের মধ্যে থাকা মাস",
   "Your streaks": "আপনার ধারাবাহিকতা",
+  // Categorize
+  "Suggested": "প্রস্তাবিত",
 };

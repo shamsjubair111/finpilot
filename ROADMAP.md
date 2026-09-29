@@ -49,7 +49,8 @@ Status: ✅ done · 🟡 partial · ⬜ not started
 - ✅ Investment tracking (`/investments`): Sanchayapatra, FDR, DPS, shares, funds, gold, bonds; profit to date, maturity value and dates
 - ✅ Streaks card on the dashboard: no-spend days, saving months, under-budget months
 - ⬜ Household workspaces (next)
-- ⬜ Household workspaces, AI categorisation and assistant
+- ✅ Smart categorisation learned from the user's own history (form, SMS and CSV import)
+- ⬜ Household workspaces, AI assistant
 - ⬜ Native Android app (only if demand shows)
 
 ## Before taking real payments

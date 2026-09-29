@@ -19,6 +19,7 @@ import { EXPENSE_CATEGORIES, INCOME_CATEGORIES } from "@/lib/constants";
 import { formatCurrency } from "@/lib/currency";
 import { t } from "@/lib/i18n";
 import { parseSmsBatch, type ParsedSms } from "@/lib/sms-parser";
+import { buildCategoryModel, suggestCategory } from "@/lib/categorize";
 import type { ExpenseCategory, IncomeCategory } from "@/types/finance";
 
 const NO_ACCOUNT = "__none__";
@@ -83,12 +84,14 @@ function ImportView() {
 
   const activeAccounts = accounts.filter((a) => !a.archived);
   const knownIds = useMemo(() => new Set(transactions.map((x) => x.externalId).filter(Boolean)), [transactions]);
+  const categoryModel = useMemo(() => buildCategoryModel(transactions), [transactions]);
 
   function parse() {
     const { parsed, skipped } = parseSmsBatch(text);
     setRows(parsed.map((p, i) => {
       const duplicate = !!p.txnId && knownIds.has(p.txnId);
-      return { ...p, key: i, include: !duplicate, duplicate };
+      const learned = suggestCategory(categoryModel, p.title, p.counterparty, p.type) as Row["category"] | null;
+      return { ...p, category: learned ?? p.category, key: i, include: !duplicate, duplicate };
     }));
     setSkipped(skipped);
     // Pre-select a matching wallet when every message comes from one provider.
