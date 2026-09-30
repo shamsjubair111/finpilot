@@ -1340,4 +1340,8 @@ export const bn: Record<string, string> = {
   "Roll over unspent money": "বাকি টাকা পরের মাসে নিন",
   "Whatever you don't spend this month is added to next month's budget.": "এই মাসে যা খরচ হবে না, তা পরের মাসের বাজেটে যোগ হবে।",
   "includes {amount} rolled over": "আগের মাসের {amount} সহ",
+  // Recurring detection
+  "Looks like these repeat every month": "মনে হচ্ছে এগুলো প্রতি মাসে হয়",
+  "Add them as bills to get reminders and see your fixed costs.": "রিমাইন্ডার পেতে ও নির্দিষ্ট খরচ দেখতে এগুলো বিল হিসেবে যোগ করুন।",
+  "Around day {day} · seen {n} months in a row": "প্রায় {day} তারিখে · টানা {n} মাস দেখা গেছে",
 };

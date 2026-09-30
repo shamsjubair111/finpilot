@@ -17,6 +17,7 @@ import { RowActions } from "@/components/shared/row-actions";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { SubmitButton } from "@/components/shared/submit-button";
 import { CommitmentFormDialog } from "@/components/commitments/commitment-form-dialog";
+import { RecurringSuggestions } from "@/components/commitments/recurring-suggestions";
 import { useFinance } from "@/components/providers/finance-provider";
 import { formatCurrency, getCurrencySymbol } from "@/lib/currency";
 import { formatDate } from "@/lib/format-date";
@@ -67,6 +68,8 @@ export default function RecurringPage() {
           </Button>
         }
       />
+
+      <RecurringSuggestions />
 
       <div className="stagger mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
         {[
