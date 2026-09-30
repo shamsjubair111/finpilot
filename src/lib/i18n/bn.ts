@@ -1314,4 +1314,17 @@ export const bn: Record<string, string> = {
   "That code isn't valid.": "কোডটি সঠিক নয়।",
   "That code has expired.": "কোডটির মেয়াদ শেষ।",
   "That code has been fully used.": "কোডটির সব ব্যবহার শেষ।",
+  // Bulk actions
+  "Couldn't delete transactions": "লেনদেনগুলো মুছে ফেলা যায়নি",
+  "Deleted {n} transactions": "{n}টি লেনদেন মুছে ফেলা হয়েছে",
+  "Couldn't update transactions": "লেনদেনগুলো আপডেট করা যায়নি",
+  "Updated {n} transactions": "{n}টি লেনদেন আপডেট হয়েছে",
+  "Select {name}": "{name} নির্বাচন করুন",
+  "{n} selected": "{n}টি নির্বাচিত",
+  "Change category…": "ক্যাটাগরি বদলান…",
+  "Select only income or only expenses to change the category.": "ক্যাটাগরি বদলাতে শুধু আয় অথবা শুধু খরচ নির্বাচন করুন।",
+  "Clear": "বাতিল",
+  "Select all": "সব নির্বাচন করুন",
+  "Delete {n} transactions?": "{n}টি লেনদেন মুছবেন?",
+  "They will be permanently removed and your budgets will update.": "এগুলো স্থায়ীভাবে মুছে যাবে এবং আপনার বাজেট আপডেট হবে।",
 };

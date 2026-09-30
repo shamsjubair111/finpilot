@@ -79,6 +79,8 @@ interface FinanceContextValue {
   deleteTransaction: (id: string) => Promise<boolean>;
   /** Transactions saved on this device while offline, waiting to sync. */
   pendingSync: number;
+  bulkDeleteTransactions: (ids: string[]) => Promise<boolean>;
+  bulkCategorize: (ids: string[], category: string, type: "income" | "expense") => Promise<boolean>;
   importTransactions: (items: Omit<Transaction, "id">[]) => Promise<{ created: number; skipped: number } | null>;
 
   budgetCategories: BudgetCategory[];
@@ -477,6 +479,38 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       setPendingSync((n) => Math.max(0, n - 1));
       toast.success(t("Transaction deleted"));
       return true;
+    },
+    bulkDeleteTransactions: async (ids) => {
+      if (viewOnly("Couldn't delete transactions")) return false;
+      // Items still waiting to sync only exist on this device.
+      const offline = ids.filter(isOfflineId);
+      if (offline.length) writeOutbox(outboxKey, readOutbox(outboxKey).filter((e) => !offline.includes(e.tempId)));
+      const saved = ids.filter((id) => !isOfflineId(id));
+      return run(
+        async () => {
+          if (saved.length) await api("/transactions/bulk", { method: "POST", body: { action: "delete", ids: saved } });
+          setTransactions((prev) => prev.filter((x) => !ids.includes(x.id)));
+          setPendingSync(readOutbox(outboxKey).length);
+          return ids.length;
+        },
+        (n) => t("Deleted {n} transactions", { n }),
+        "Couldn't delete transactions"
+      );
+    },
+    bulkCategorize: async (ids, category, type) => {
+      if (viewOnly("Couldn't update transactions")) return false;
+      return run(
+        async () => {
+          const saved = ids.filter((id) => !isOfflineId(id));
+          const { count } = saved.length
+            ? await api<{ count: number }>("/transactions/bulk", { method: "POST", body: { action: "categorize", ids: saved, category, type } })
+            : { count: 0 };
+          setTransactions((prev) => prev.map((x) => (ids.includes(x.id) && x.type === type && !isOfflineId(x.id) ? { ...x, category: category as Transaction["category"] } : x)));
+          return count;
+        },
+        (n) => t("Updated {n} transactions", { n }),
+        "Couldn't update transactions"
+      );
     },
     importTransactions: async (items) => {
       if (viewOnly("Couldn't import transactions")) return null;

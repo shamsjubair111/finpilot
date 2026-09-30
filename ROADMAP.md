@@ -70,3 +70,4 @@ Status: ✅ done · 🟡 partial · ⬜ not started
 - ✅ Pro renewal reminder email 3 days before a trial or paid period ends (once per period)
 - ✅ Referral program: both get 30 days of Pro after the friend verifies their email (max 12 rewards a year); share card on Billing
 - ✅ Promo codes: % off Pro checkout, limits and expiry, 100% codes grant Pro directly; managed in /admin
+- ✅ Bulk select on Transactions: delete or change category for many at once

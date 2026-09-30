@@ -2,7 +2,9 @@
 
 import * as React from "react";
 import { formatDate } from "@/lib/format-date";
-import { ArrowDownLeft, ArrowLeftRight, ArrowUpRight, Paperclip, Receipt } from "lucide-react";
+import { ArrowDownLeft, ArrowLeftRight, ArrowUpRight, Paperclip, Receipt, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -28,7 +30,31 @@ function paymentLabel(method: string) {
 }
 
 export function TransactionList({ transactions, emptyAction }: { transactions: Transaction[]; emptyAction?: React.ReactNode }) {
-  const { deleteTransaction, accounts } = useFinance();
+  const { deleteTransaction, accounts, readOnly, bulkDeleteTransactions, bulkCategorize, categoriesFor } = useFinance();
+  const [selected, setSelected] = React.useState<Set<string>>(new Set());
+  const [bulkDeleting, setBulkDeleting] = React.useState(false);
+  // Selection only covers what's currently listed, so filtering never acts on hidden rows.
+  const visibleSelected = transactions.filter((x) => selected.has(x.id));
+  const toggle = (id: string) =>
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  const allSelected = transactions.length > 0 && visibleSelected.length === transactions.length;
+  const selectedTypes = new Set(visibleSelected.map((x) => x.type).filter((x) => x !== "transfer"));
+  const recategorizeType = selectedTypes.size === 1 ? ([...selectedTypes][0] as "income" | "expense") : null;
+  const checkbox = (id: string, label: string) =>
+    !readOnly && (
+      <input
+        type="checkbox"
+        className="size-4 shrink-0 accent-[var(--primary)]"
+        checked={selected.has(id)}
+        onChange={() => toggle(id)}
+        aria-label={tr("Select {name}", { name: label })}
+      />
+    );
   const accountName = (id?: string | null) => accounts.find((a) => a.id === id)?.name;
   const where = (t: Transaction) =>
     t.type === "transfer"
@@ -54,11 +80,50 @@ export function TransactionList({ transactions, emptyAction }: { transactions: T
 
   return (
     <>
+      {visibleSelected.length > 0 && (
+        <div className="sticky top-16 z-20 mb-3 flex flex-wrap items-center gap-2 rounded-xl border bg-card/95 p-2.5 shadow-card backdrop-blur">
+          <span className="px-1 text-sm font-medium">{tr("{n} selected", { n: visibleSelected.length })}</span>
+          {recategorizeType ? (
+            <Select
+              value=""
+              onValueChange={async (c) => {
+                if (await bulkCategorize(visibleSelected.map((x) => x.id), c, recategorizeType)) setSelected(new Set());
+              }}
+            >
+              <SelectTrigger className="h-8 w-44"><SelectValue placeholder={tr("Change category…")} /></SelectTrigger>
+              <SelectContent>
+                {categoriesFor(recategorizeType).map((c) => (
+                  <SelectItem key={c} value={c}>{tr(c)}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          ) : (
+            <span className="text-xs text-muted-foreground">{tr("Select only income or only expenses to change the category.")}</span>
+          )}
+          <Button size="sm" variant="outline" className="gap-1 text-destructive" onClick={() => setBulkDeleting(true)}>
+            <Trash2 className="size-3.5" />
+            {tr("Delete")}
+          </Button>
+          <Button size="sm" variant="ghost" className="ml-auto" onClick={() => setSelected(new Set())}>{tr("Clear")}</Button>
+        </div>
+      )}
+
       {/* Desktop table */}
       <div className="hidden overflow-x-auto rounded-xl border border-border md:block">
         <Table>
           <TableHeader>
             <TableRow className="hover:bg-transparent">
+              {!readOnly && (
+                <TableHead className="w-8">
+                  <input
+                    type="checkbox"
+                    className="size-4 accent-[var(--primary)]"
+                    checked={allSelected}
+                    onChange={() => setSelected(allSelected ? new Set() : new Set(transactions.map((x) => x.id)))}
+                    aria-label={tr("Select all")}
+                  />
+                </TableHead>
+              )}
               <TableHead>{tr("Transaction")}</TableHead>
               <TableHead>{tr("Category")}</TableHead>
               <TableHead>{tr("Date")}</TableHead>
@@ -71,7 +136,8 @@ export function TransactionList({ transactions, emptyAction }: { transactions: T
             {transactions.map((t) => {
               const iconName = CATEGORY_ICON_MAP[t.category] ?? "Receipt";
               return (
-                <TableRow key={t.id} className="group">
+                <TableRow key={t.id} className="group" data-state={selected.has(t.id) ? "selected" : undefined}>
+                  {!readOnly && <TableCell>{checkbox(t.id, t.title)}</TableCell>}
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <div
@@ -123,6 +189,7 @@ export function TransactionList({ transactions, emptyAction }: { transactions: T
           return (
             <div key={t.id} className="rounded-2xl border border-border bg-card p-3.5 transition-shadow hover:shadow-card">
               <div className="flex items-start gap-3">
+                {!readOnly && <div className="pt-2.5">{checkbox(t.id, t.title)}</div>}
                 <div
                   className={`flex size-9 shrink-0 items-center justify-center rounded-full ${tone(t)}`}
                 >
@@ -166,6 +233,17 @@ export function TransactionList({ transactions, emptyAction }: { transactions: T
         title={tr("Delete transaction?")}
         description={tr("\"{name}\" will be permanently removed and your budgets will update.", { name: deleting?.title ?? "" })}
         onConfirm={() => deleteTransaction(deleting!.id)}
+      />
+      <ConfirmDialog
+        open={bulkDeleting}
+        onOpenChange={setBulkDeleting}
+        title={tr("Delete {n} transactions?", { n: visibleSelected.length })}
+        description={tr("They will be permanently removed and your budgets will update.")}
+        onConfirm={async () => {
+          const ok = await bulkDeleteTransactions(visibleSelected.map((x) => x.id));
+          if (ok) setSelected(new Set());
+          return ok;
+        }}
       />
     </>
   );
