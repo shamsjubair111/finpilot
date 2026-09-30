@@ -72,3 +72,13 @@ Status: ✅ done · 🟡 partial · ⬜ not started
 - ✅ Promo codes: % off Pro checkout, limits and expiry, 100% codes grant Pro directly; managed in /admin
 - ✅ Bulk select on Transactions: delete or change category for many at once
 - ✅ Budget rollover: optional per budget, carries last month's unspent amount (one month)
+- ✅ Bill suggestions: detects payments that repeat monthly and offers to add them as bills
+- ✅ "Update balance" on accounts (corrects the opening balance; no fake transactions)
+- ✅ Real product screenshots on the landing page (`scripts/landing-shots.mjs` regenerates them)
+- ✅ Browser smoke test of every page in English, Bangla and mobile (`npm run test:e2e`)
+
+## Ideas not started
+- Accounts in a second currency (USD PayPal/Payoneer for freelancers) with exchange rates
+- Split one transaction across categories
+- Paginate transactions for very heavy users (everything loads at once today)
+- Native Android app (only if demand shows)
