@@ -21,6 +21,7 @@ export function toProfile(u: User) {
     onboarded: !!u.onboardedAt,
     isAdmin: isAdminEmail(u.email),
     weeklySummary: u.weeklySummary,
+    hasSampleData: !!u.sampleData,
     twoFactorEnabled: !!u.totpEnabledAt,
     passwordSet: u.passwordSet,
     googleLinked: !!u.googleId,

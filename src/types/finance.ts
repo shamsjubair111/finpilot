@@ -241,6 +241,7 @@ export interface UserProfile {
   onboarded: boolean;
   isAdmin?: boolean;
   weeklySummary?: boolean;
+  hasSampleData?: boolean;
   twoFactorEnabled?: boolean;
   passwordSet?: boolean;
   googleLinked?: boolean;

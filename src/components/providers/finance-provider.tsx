@@ -64,6 +64,8 @@ interface FinanceContextValue {
   deleteUserAccount: (password: string) => Promise<boolean>;
   resendVerification: () => Promise<boolean>;
   reloadUser: () => Promise<void>;
+  loadSampleData: () => Promise<boolean>;
+  removeSampleData: () => Promise<boolean>;
   signOutOtherDevices: () => Promise<boolean>;
   completeOnboarding: (data: {
     profile?: Partial<Pick<UserProfile, "monthlySalary" | "currentSavings" | "emergencyFundTarget">>;
@@ -413,6 +415,16 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       } catch (err) {
         if (!handleAuthFailure(err)) toast.error(t("Couldn't switch household"), { description: err instanceof Error ? err.message : undefined });
       }
+    },
+    loadSampleData: async () => {
+      const ok = await run(() => api("/sample-data", { method: "POST" }), "Sample data added", "Couldn't add sample data", t("Look around — you can remove it any time."));
+      if (ok) await load();
+      return ok;
+    },
+    removeSampleData: async () => {
+      const ok = await run(() => api("/sample-data", { method: "DELETE" }), "Sample data removed", "Couldn't remove sample data");
+      if (ok) await load();
+      return ok;
     },
     reloadUser: async () => {
       try {

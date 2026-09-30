@@ -37,7 +37,7 @@ const roundTo = (n: number, step: number) => Math.max(step, Math.round(n / step)
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const { user, completeOnboarding } = useFinance();
+  const { user, completeOnboarding, loadSampleData } = useFinance();
   const symbol = getCurrencySymbol(user.currency);
   const [step, setStep] = useState(0);
   const [pending, setPending] = useState(false);
@@ -60,6 +60,13 @@ export default function OnboardingPage() {
       setBudgets(Object.fromEntries(SUGGESTED_BUDGETS.map((b) => [b.category, { on: income > 0, amount: income > 0 ? String(roundTo(income * b.share, unit)) : "" }])));
     }
     setStep(2);
+  }
+
+  async function explore() {
+    setPending(true);
+    // Sample data first, then finish setup without changing anything else.
+    if ((await loadSampleData()) && (await completeOnboarding({}))) router.replace("/");
+    else setPending(false);
   }
 
   async function finish(skip = false) {
@@ -92,6 +99,9 @@ export default function OnboardingPage() {
       <div className="mb-6 text-center">
         <h1 className="text-2xl font-semibold tracking-tight">{t("Welcome, {name}!", { name: user.name.split(" ")[0] })}</h1>
         <p className="mt-1 text-sm text-muted-foreground">{t("Three quick steps and your dashboard is ready.")}</p>
+        <Button variant="link" size="sm" className="mt-1" disabled={pending} onClick={explore}>
+          {t("Or explore with sample data first")}
+        </Button>
       </div>
 
       <ol className="mb-6 flex items-center justify-center gap-2">

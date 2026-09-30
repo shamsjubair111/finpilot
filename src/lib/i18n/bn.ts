@@ -1327,4 +1327,13 @@ export const bn: Record<string, string> = {
   "Select all": "সব নির্বাচন করুন",
   "Delete {n} transactions?": "{n}টি লেনদেন মুছবেন?",
   "They will be permanently removed and your budgets will update.": "এগুলো স্থায়ীভাবে মুছে যাবে এবং আপনার বাজেট আপডেট হবে।",
+  // Sample data
+  "Sample data added": "নমুনা তথ্য যোগ হয়েছে",
+  "Couldn't add sample data": "নমুনা তথ্য যোগ করা যায়নি",
+  "Look around — you can remove it any time.": "ঘুরে দেখুন — যেকোনো সময় সরিয়ে ফেলতে পারবেন।",
+  "Sample data removed": "নমুনা তথ্য সরানো হয়েছে",
+  "Couldn't remove sample data": "নমুনা তথ্য সরানো যায়নি",
+  "Or explore with sample data first": "অথবা আগে নমুনা তথ্য দিয়ে ঘুরে দেখুন",
+  "You're exploring with sample data. Anything you add yourself stays when you remove it.": "আপনি নমুনা তথ্য দিয়ে ঘুরে দেখছেন। এটি সরালেও আপনার নিজের যোগ করা সবকিছু থাকবে।",
+  "Remove sample data": "নমুনা তথ্য সরান",
 };

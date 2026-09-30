@@ -8,6 +8,7 @@ import { Header } from "./header";
 import { VerifyEmailBanner } from "./verify-email-banner";
 import { SyncBanner } from "./sync-banner";
 import { HouseholdBanner } from "./household-switcher";
+import { SampleDataBanner } from "./sample-data-banner";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = React.useState(false);
@@ -34,6 +35,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <VerifyEmailBanner />
               <SyncBanner />
               <HouseholdBanner />
+              <SampleDataBanner />
             </div>
             {children}
           </div>

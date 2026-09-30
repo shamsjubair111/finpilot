@@ -31,6 +31,8 @@ model User {
   planExpiresAt        DateTime?
   // The planExpiresAt a renewal reminder was already sent for.
   planReminderFor      DateTime?
+  // IDs of rows created by "Explore with sample data", so they can be removed together.
+  sampleData           Json?
   emailVerifiedAt      DateTime?
   onboardedAt          DateTime?
   sessionVersion       Int      @default(0)
