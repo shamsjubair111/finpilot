@@ -67,6 +67,7 @@ export function BudgetCategoryCard({
           {remaining >= 0
             ? t("{amount} remaining", { amount: formatCurrency(remaining) })
             : t("{amount} over budget", { amount: formatCurrency(Math.abs(remaining)) })}
+          {!!category.carriedOver && <span className="text-primary"> · {t("includes {amount} rolled over", { amount: formatCurrency(category.carriedOver) })}</span>}
         </p>
       </div>
     </Card>

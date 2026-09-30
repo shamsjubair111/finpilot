@@ -79,6 +79,7 @@ export const transactionSchema = z.object({
 export const budgetSchema = z.object({
   category: text(40),
   budgeted: positiveMoney,
+  rollover: z.boolean().optional(),
   icon: z.string().max(40).optional(),
   color: z.string().max(40).optional(),
 });

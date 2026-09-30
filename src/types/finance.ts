@@ -74,8 +74,13 @@ export interface Account {
 export interface BudgetCategory {
   id: string;
   category: ExpenseCategory;
+  /** This month's budget, including anything rolled over from last month. */
   budgeted: number;
   spent: number;
+  /** The monthly amount the user set (without rollover). */
+  baseBudgeted?: number;
+  carriedOver?: number;
+  rollover?: boolean;
   icon: string; // lucide icon key
   color: string; // hex or css color token
 }

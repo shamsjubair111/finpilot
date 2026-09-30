@@ -2,7 +2,8 @@
 
 import * as React from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { format } from "date-fns";
+import { format, parse } from "date-fns";
+import { budgetsForMonth } from "@/lib/calculations/budget";
 import { toast } from "sonner";
 import type {
   Account,
@@ -358,14 +359,10 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   const accountBalances = React.useMemo(() => computeBalances(accounts, transactions), [accounts, transactions]);
   const netWorth = React.useMemo(() => netWorthOf(accounts, accountBalances), [accounts, accountBalances]);
 
-  const budgetCategories = React.useMemo<BudgetCategory[]>(() => {
-    const spentBy = new Map<string, number>();
-    for (const t of transactions) {
-      if (t.type === "expense" && monthKey(t.date) === selectedMonth)
-        spentBy.set(t.category, (spentBy.get(t.category) ?? 0) + t.amount);
-    }
-    return budgets.map((b) => ({ ...b, spent: spentBy.get(b.category) ?? 0 }));
-  }, [budgets, transactions, selectedMonth]);
+  const budgetCategories = React.useMemo<BudgetCategory[]>(
+    () => budgetsForMonth(budgets, transactions, parse(selectedMonth, "MMMM yyyy", new Date())) as BudgetCategory[],
+    [budgets, transactions, selectedMonth]
+  );
 
   if (!user || needsOnboarding) {
     return <FullPageLoader error={loadError} onRetry={load} />;

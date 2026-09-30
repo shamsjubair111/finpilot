@@ -14,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SubmitButton } from "@/components/shared/submit-button";
 import { DynamicIcon } from "@/components/shared/dynamic-icon";
@@ -40,11 +41,13 @@ export function BudgetEditDialog({
 
   const available = categoriesFor("expense").filter((c) => c === category?.category || !budgetCategories.some((b) => b.category === c));
 
+  const [rollover, setRollover] = React.useState(false);
   const [wasOpen, setWasOpen] = React.useState(false);
   if (open && !wasOpen) {
     setWasOpen(true);
     setName(category?.category ?? "");
-    setBudgeted(category ? String(category.budgeted) : "");
+    setBudgeted(category ? String(category.baseBudgeted ?? category.budgeted) : "");
+    setRollover(!!category?.rollover);
   } else if (!open && wasOpen) {
     setWasOpen(false);
   }
@@ -56,12 +59,13 @@ export function BudgetEditDialog({
     if (!isValid) return;
     setPending(true);
     const ok = isEdit
-      ? await updateBudgetCategory(category!.id, { budgeted: Number(budgeted) })
+      ? await updateBudgetCategory(category!.id, { budgeted: Number(budgeted), rollover })
       : await addBudgetCategory({
           category: name as ExpenseCategory,
           budgeted: Number(budgeted),
           icon: CATEGORY_ICON_MAP[name] ?? "Wallet",
           color: categoryColor(name),
+          rollover,
         });
     setPending(false);
     if (ok) onOpenChange(false);
@@ -113,6 +117,13 @@ export function BudgetEditDialog({
               required
             />
           </div>
+          <label className="flex items-center justify-between gap-3 rounded-xl border border-border p-3">
+            <div>
+              <p className="text-sm font-medium">{t("Roll over unspent money")}</p>
+              <p className="text-xs text-muted-foreground">{t("Whatever you don't spend this month is added to next month's budget.")}</p>
+            </div>
+            <Switch checked={rollover} onCheckedChange={setRollover} />
+          </label>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               {t("Cancel")}

@@ -1336,4 +1336,8 @@ export const bn: Record<string, string> = {
   "Or explore with sample data first": "অথবা আগে নমুনা তথ্য দিয়ে ঘুরে দেখুন",
   "You're exploring with sample data. Anything you add yourself stays when you remove it.": "আপনি নমুনা তথ্য দিয়ে ঘুরে দেখছেন। এটি সরালেও আপনার নিজের যোগ করা সবকিছু থাকবে।",
   "Remove sample data": "নমুনা তথ্য সরান",
+  // Rollover
+  "Roll over unspent money": "বাকি টাকা পরের মাসে নিন",
+  "Whatever you don't spend this month is added to next month's budget.": "এই মাসে যা খরচ হবে না, তা পরের মাসের বাজেটে যোগ হবে।",
+  "includes {amount} rolled over": "আগের মাসের {amount} সহ",
 };

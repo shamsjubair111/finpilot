@@ -25,3 +25,28 @@ export function getBudgetTotals(categories: BudgetCategory[]) {
     utilization: getBudgetUtilization(categories),
   };
 }
+
+/**
+ * Effective budgets for the month containing `month`: each budget's spending that month, and for
+ * rollover budgets, last month's unspent amount added on top (one month only, never negative).
+ */
+export function budgetsForMonth<B extends { category: string; budgeted: number; rollover?: boolean }>(
+  budgets: B[],
+  transactions: { type: string; category: string; amount: number; date: string }[],
+  month: Date
+) {
+  const key = (d: Date) => d.getFullYear() * 12 + d.getMonth();
+  const current = key(month);
+  const spent = new Map<string, number>();
+  const prevSpent = new Map<string, number>();
+  for (const t of transactions) {
+    if (t.type !== "expense") continue;
+    const k = key(new Date(t.date));
+    if (k === current) spent.set(t.category, (spent.get(t.category) ?? 0) + t.amount);
+    else if (k === current - 1) prevSpent.set(t.category, (prevSpent.get(t.category) ?? 0) + t.amount);
+  }
+  return budgets.map((b) => {
+    const carriedOver = b.rollover ? Math.max(0, b.budgeted - (prevSpent.get(b.category) ?? 0)) : 0;
+    return { ...b, baseBudgeted: b.budgeted, carriedOver, budgeted: b.budgeted + carriedOver, spent: spent.get(b.category) ?? 0 };
+  });
+}

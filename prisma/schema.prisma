@@ -110,6 +110,8 @@ model BudgetCategory {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   category  String
   budgeted  Float
+  // Carry last month's unspent amount into this month.
+  rollover  Boolean  @default(false)
   icon      String   @default("Wallet")
   color     String   @default("#6366f1")
   createdAt DateTime @default(now())
