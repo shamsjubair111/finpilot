@@ -8,6 +8,7 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { AccountCard } from "@/components/accounts/account-card";
 import { AccountFormDialog } from "@/components/accounts/account-form-dialog";
+import { AdjustBalanceDialog } from "@/components/accounts/adjust-balance-dialog";
 import { TransactionFormDialog } from "@/components/transactions/transaction-form-dialog";
 import { useFinance } from "@/components/providers/finance-provider";
 import { ACCOUNT_GROUPS, ACCOUNT_TYPE_META, netWorthHistory } from "@/lib/accounts";
@@ -20,6 +21,7 @@ import { t as tr } from "@/lib/i18n";
 
 export default function AccountsPage() {
   const { accounts, accountBalances, netWorth, deleteAccount, transactions } = useFinance();
+  const [adjusting, setAdjusting] = useState<Account | null>(null);
   const history = useMemo(() => netWorthHistory(accounts, transactions, 12), [accounts, transactions]);
   const change = history.length ? history[history.length - 1].netWorth - history[0].netWorth : 0;
   const [creating, setCreating] = useState(false);
@@ -112,7 +114,7 @@ export default function AccountsPage() {
                 </div>
                 <div className="stagger grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
                   {list.map((a) => (
-                    <AccountCard key={a.id} account={a} balance={accountBalances.get(a.id) ?? 0} onEdit={() => setEditing(a)} onDelete={() => setDeleting(a)} />
+                    <AccountCard key={a.id} account={a} balance={accountBalances.get(a.id) ?? 0} onEdit={() => setEditing(a)} onDelete={() => setDeleting(a)} onAdjust={() => setAdjusting(a)} />
                   ))}
                 </div>
               </section>
@@ -124,6 +126,7 @@ export default function AccountsPage() {
       <AccountFormDialog open={creating} onOpenChange={setCreating} />
       <AccountFormDialog account={editing} open={!!editing} onOpenChange={(o) => !o && setEditing(null)} />
       <TransactionFormDialog defaultType="transfer" open={transferring} onOpenChange={setTransferring} />
+      <AdjustBalanceDialog account={adjusting} onClose={() => setAdjusting(null)} />
       <ConfirmDialog
         open={!!deleting}
         onOpenChange={(o) => !o && setDeleting(null)}

@@ -1344,4 +1344,11 @@ export const bn: Record<string, string> = {
   "Looks like these repeat every month": "মনে হচ্ছে এগুলো প্রতি মাসে হয়",
   "Add them as bills to get reminders and see your fixed costs.": "রিমাইন্ডার পেতে ও নির্দিষ্ট খরচ দেখতে এগুলো বিল হিসেবে যোগ করুন।",
   "Around day {day} · seen {n} months in a row": "প্রায় {day} তারিখে · টানা {n} মাস দেখা গেছে",
+  // Adjust balance
+  "Update balance": "ব্যালেন্স হালনাগাদ",
+  "Enter how much you owe on {name} right now, as shown by your bank.": "ব্যাংক অনুযায়ী {name}-এ এখন কত বকেয়া আছে লিখুন।",
+  "Enter the balance {name} shows right now in your bank or wallet app.": "ব্যাংক বা ওয়ালেট অ্যাপে {name}-এর বর্তমান ব্যালেন্স লিখুন।",
+  "Actual balance": "প্রকৃত ব্যালেন্স",
+  "Sanchay shows {amount}.": "সঞ্চয় দেখাচ্ছে {amount}।",
+  "Difference: {amount}.": "পার্থক্য: {amount}।",
 };

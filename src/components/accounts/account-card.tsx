@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { DynamicIcon } from "@/components/shared/dynamic-icon";
+import { Scale } from "lucide-react";
 import { RowActions } from "@/components/shared/row-actions";
 import { ACCOUNT_TYPE_META, isLiability, maskNumber } from "@/lib/accounts";
 import { formatCurrency } from "@/lib/currency";
@@ -13,11 +14,13 @@ export function AccountCard({
   balance,
   onEdit,
   onDelete,
+  onAdjust,
 }: {
   account: Account;
   balance: number;
   onEdit: () => void;
   onDelete: () => void;
+  onAdjust?: () => void;
 }) {
   const meta = ACCOUNT_TYPE_META[account.type];
   const liability = isLiability(account.type);
@@ -43,7 +46,12 @@ export function AccountCard({
           </div>
         </div>
         <div className="[&_button]:text-white [&_button:hover]:bg-white/20">
-          <RowActions label={account.name} onEdit={onEdit} onDelete={onDelete} />
+          <RowActions
+            label={account.name}
+            onEdit={onEdit}
+            onDelete={onDelete}
+            extra={onAdjust ? [{ label: t("Update balance"), icon: Scale, onSelect: onAdjust }] : []}
+          />
         </div>
       </div>
 
