@@ -1351,4 +1351,8 @@ export const bn: Record<string, string> = {
   "Actual balance": "প্রকৃত ব্যালেন্স",
   "Sanchay shows {amount}.": "সঞ্চয় দেখাচ্ছে {amount}।",
   "Difference: {amount}.": "পার্থক্য: {amount}।",
+  // Landing preview
+  "Product preview": "পণ্যের প্রিভিউ",
+  "The Sanchay dashboard showing net worth, accounts, spending and savings": "নিট সম্পদ, অ্যাকাউন্ট, খরচ ও সঞ্চয় দেখানো সঞ্চয় ড্যাশবোর্ড",
+  "Sanchay on a phone, in Bangla": "ফোনে বাংলায় সঞ্চয়",
 };

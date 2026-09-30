@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Globe2, Landmark, MessageSquareText, ShieldCheck, Sparkles, Target, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -56,7 +57,30 @@ export function Landing() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 pb-20">
+      <section className="mx-auto max-w-6xl px-4 pb-20" aria-label={t("Product preview")}>
+        <div className="relative">
+          <div className="overflow-hidden rounded-2xl border bg-card shadow-2xl">
+            <div className="flex items-center gap-1.5 border-b bg-muted/60 px-4 py-2.5">
+              <span className="size-2.5 rounded-full bg-red-400" />
+              <span className="size-2.5 rounded-full bg-amber-400" />
+              <span className="size-2.5 rounded-full bg-emerald-400" />
+            </div>
+            <Image
+              src="/landing/dashboard.jpg"
+              alt={t("The Sanchay dashboard showing net worth, accounts, spending and savings")}
+              width={1440}
+              height={900}
+              priority
+              className="h-auto w-full"
+            />
+          </div>
+          <div className="absolute -bottom-10 right-4 hidden w-44 overflow-hidden rounded-[1.75rem] border-4 border-foreground/80 bg-card shadow-2xl sm:block lg:w-52">
+            <Image src="/landing/mobile-bn.jpg" alt={t("Sanchay on a phone, in Bangla")} width={390} height={844} className="h-auto w-full" />
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-4 pb-20 pt-6">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((f) => (
             <Card key={f.title} className="card-hover">
