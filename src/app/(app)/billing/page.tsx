@@ -213,7 +213,7 @@ export default function BillingPage() {
       </div>
 
       <form onSubmit={applyCode} className="flex max-w-sm gap-2">
-        <Input value={codeInput} onChange={(e) => setCodeInput(e.target.value)} placeholder={t("Have a promo code?")} aria-label={t("Promo code")} maxLength={40} className="uppercase" />
+        <Input value={codeInput} onChange={(e) => setCodeInput(e.target.value)} placeholder={t("Have a promo code?")} aria-label={t("Promo code")} maxLength={40} className="uppercase placeholder:normal-case" />
         <Button type="submit" variant="outline" disabled={!codeInput.trim()}>{t("Apply")}</Button>
       </form>
 

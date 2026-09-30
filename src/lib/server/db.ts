@@ -19,7 +19,9 @@ function createClient() {
     idleTimeoutMillis: 60_000,
     max: 10,
   });
-  return new PrismaClient({ adapter });
+  // Neon adds a network round trip per query, so multi-step transactions (payments, onboarding,
+  // sample data) need more than Prisma's 5-second default.
+  return new PrismaClient({ adapter, transactionOptions: { maxWait: 10_000, timeout: 20_000 } });
 }
 
 export const db = globalForPrisma.prisma ?? createClient();

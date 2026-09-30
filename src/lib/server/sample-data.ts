@@ -52,7 +52,21 @@ export async function addSampleData(userId: string) {
         externalId: `sample:${m}:${i}`,
       }))
     );
-    await tx.transaction.createMany({ data, skipDuplicates: true });
+    // Top up bKash from the bank each month, as people usually do, so the wallet stays positive.
+    const topUps = [2, 1, 0].map((m) => ({
+      userId,
+      title: "bKash top-up",
+      merchant: "",
+      category: "Transfer",
+      amount: 7000,
+      type: "transfer",
+      date: at(m, 2),
+      accountId: bank.id,
+      toAccountId: bkash.id,
+      paymentMethod: "bank_transfer",
+      externalId: `sample:${m}:topup`,
+    }));
+    await tx.transaction.createMany({ data: [...data, ...topUps], skipDuplicates: true });
 
     for (const [category, budgeted] of [["Housing", 18000], ["Food", 10000], ["Bills", 3500], ["Transport", 2500], ["Shopping", 3000]] as const) {
       const existing = await tx.budgetCategory.findFirst({ where: { userId, category } });
