@@ -36,9 +36,13 @@ export async function checkCommitment(data: Row, userId: string) {
     throw new ApiError(400, "Selected account was not found.");
 }
 
-/** Posts every overdue occurrence of auto-post commitments and moves them to their next due date. */
+/**
+ * Posts every overdue occurrence of auto-post commitments and moves them to their next due date.
+ * Returns how many commitments were processed (0 almost always), so callers know whether to re-read.
+ */
 export async function processAutoPost(userId: string, now = new Date()) {
   const due = await db.commitment.findMany({ where: { userId, autoPost: true, recurring: true, dueDate: { lte: now } } });
+  let processed = 0;
   for (const c of due) {
     const { dates, next } = dueDatesUntil(c.dueDate, now, freq(c), c.anchorDay);
     if (!dates.length) continue;
@@ -47,7 +51,9 @@ export async function processAutoPost(userId: string, now = new Date()) {
       // Only advance if nobody else advanced it first (two tabs loading at once).
       db.commitment.updateMany({ where: { id: c.id, dueDate: c.dueDate }, data: { dueDate: next } }),
     ]);
+    processed++;
   }
+  return processed;
 }
 
 /** "Mark as paid": records this occurrence, then advances a recurring commitment or removes a one-off. */

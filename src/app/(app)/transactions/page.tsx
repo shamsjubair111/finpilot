@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useDeferredValue, useMemo, useState } from "react";
 import { categoryParts } from "@/lib/splits";
 import { useSearchParams } from "next/navigation";
 import { Plus, ArrowUpRight, ArrowDownRight, Wallet } from "lucide-react";
@@ -35,8 +35,12 @@ function TransactionsView() {
     account: params.get("account") ?? "all",
   });
 
+  // The inputs update immediately; the (possibly long) list re-filters in the background.
+  const applied = useDeferredValue(filters);
   const filtered = useMemo(() => {
-    return [...transactions]
+    const filters = applied;
+    // Transactions arrive newest first, so no re-sort is needed.
+    return transactions
       .filter((t) => {
         if (filters.type !== "all" && t.type !== filters.type) return false;
         if (filters.category !== "all" && !categoryParts(t).some((p) => p.category === filters.category)) return false;
@@ -46,9 +50,8 @@ function TransactionsView() {
           if (!t.title.toLowerCase().includes(q) && !t.merchant.toLowerCase().includes(q)) return false;
         }
         return true;
-      })
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  }, [transactions, filters]);
+      });
+  }, [transactions, applied]);
 
   const totalIncome = filtered.filter((t) => t.type === "income").reduce((s, t) => s + t.amount, 0);
   const totalExpense = filtered.filter((t) => t.type === "expense").reduce((s, t) => s + t.amount, 0);
@@ -111,6 +114,8 @@ function TransactionsView() {
         <CardContent className="space-y-5">
           <TransactionFilters filters={filters} onChange={setFilters} />
           <TransactionList
+            // A new search or filter starts again from the first page.
+            key={JSON.stringify(applied)}
             transactions={filtered}
             emptyAction={
               transactions.length === 0 ? (

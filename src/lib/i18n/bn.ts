@@ -1380,4 +1380,7 @@ export const bn: Record<string, string> = {
   "The parts must add up to the total amount.": "অংশগুলোর যোগফল মোট পরিমাণের সমান হতে হবে।",
   // Accessibility
   "Month": "মাস",
+  // Paging
+  "Show {n} more": "আরও {n}টি দেখুন",
+  "Showing {shown} of {total}": "{total}টির মধ্যে {shown}টি দেখানো হচ্ছে",
 };

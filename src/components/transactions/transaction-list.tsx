@@ -35,6 +35,8 @@ function categoryLabel(t: Transaction) {
   );
 }
 
+const PAGE_SIZE = 100;
+
 function paymentLabel(method: string) {
   return tr(PAYMENT_METHODS.find((m) => m.value === method)?.label ?? method);
 }
@@ -42,6 +44,9 @@ function paymentLabel(method: string) {
 export function TransactionList({ transactions, emptyAction }: { transactions: Transaction[]; emptyAction?: React.ReactNode }) {
   const { deleteTransaction, accounts, readOnly, bulkDeleteTransactions, bulkCategorize, categoriesFor } = useFinance();
   const [selected, setSelected] = React.useState<Set<string>>(new Set());
+  // Draw a page at a time: thousands of rows (each with a menu) make the page unresponsive.
+  const [limit, setLimit] = React.useState(PAGE_SIZE);
+  const shown = transactions.slice(0, limit);
   const [bulkDeleting, setBulkDeleting] = React.useState(false);
   // Selection only covers what's currently listed, so filtering never acts on hidden rows.
   const visibleSelected = transactions.filter((x) => selected.has(x.id));
@@ -143,7 +148,7 @@ export function TransactionList({ transactions, emptyAction }: { transactions: T
             </TableRow>
           </TableHeader>
           <TableBody>
-            {transactions.map((t) => {
+            {shown.map((t) => {
               const iconName = CATEGORY_ICON_MAP[t.category] ?? "Receipt";
               return (
                 <TableRow key={t.id} className="group" data-state={selected.has(t.id) ? "selected" : undefined}>
@@ -193,7 +198,7 @@ export function TransactionList({ transactions, emptyAction }: { transactions: T
 
       {/* Mobile cards */}
       <div className="space-y-2.5 md:hidden">
-        {transactions.map((t) => {
+        {shown.map((t) => {
           const isIncome = t.type === "income";
           const iconName = CATEGORY_ICON_MAP[t.category] ?? "Receipt";
           return (
@@ -236,6 +241,14 @@ export function TransactionList({ transactions, emptyAction }: { transactions: T
           );
         })}
       </div>
+      {transactions.length > shown.length && (
+        <div className="mt-4 flex flex-col items-center gap-1">
+          <Button variant="outline" onClick={() => setLimit((l) => l + PAGE_SIZE)}>
+            {tr("Show {n} more", { n: Math.min(PAGE_SIZE, transactions.length - shown.length) })}
+          </Button>
+          <p className="text-xs text-muted-foreground">{tr("Showing {shown} of {total}", { shown: shown.length, total: transactions.length })}</p>
+        </div>
+      )}
       <TransactionFormDialog transaction={editing} open={!!editing} onOpenChange={(o) => !o && setEditing(null)} />
       <ConfirmDialog
         open={!!deleting}

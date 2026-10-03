@@ -81,6 +81,7 @@ Status: ✅ done · 🟡 partial · ⬜ not started
 - ✅ Split transactions: one payment across several categories; budgets, reports, insights, filters and emails count each part
 
 ## Ideas not started
-- Paginate transactions for very heavy users (everything loads at once today)
+- Load transaction history in pages for extremely large accounts (all transactions still load at startup; fine at 5,000)
 - Native Android app (only if demand shows)
 - ✅ Accessibility: axe-core audit of main pages passes WCAG A/AA in light and dark mode (`npm run test:a11y`, `A11Y_DARK=1` for dark); labelled progress bars and pickers, stronger contrast
+- ✅ Performance for big accounts (tested with 5,000 transactions): faster startup query, auto-post in parallel, transactions list draws 100 at a time with Show more, deferred search; Server-Timing header on /api/bootstrap
