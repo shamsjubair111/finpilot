@@ -1450,4 +1450,11 @@ export const bn: Record<string, string> = {
   "Follows the balance: {amount}": "ব্যালেন্স অনুসরণ করে: {amount}",
   "This goal follows the balance of {account}. Add money to that account to grow it.": "এই লক্ষ্যটি {account}-এর ব্যালেন্স অনুসরণ করে। লক্ষ্য বাড়াতে ওই অ্যাকাউন্টে টাকা যোগ করুন।",
   "an account": "একটি অ্যাকাউন্ট",
+  // Forecast
+  "Next 30 days": "আগামী ৩০ দিন",
+  "Spendable now": "এখন খরচযোগ্য",
+  "Lowest point": "সর্বনিম্ন অবস্থা",
+  "In 30 days": "৩০ দিন পর",
+  "Your bills may outrun your money around {date}. Move some savings or delay a payment.": "{date}-এর দিকে বিলের তুলনায় টাকা কম পড়তে পারে। কিছু সঞ্চয় সরান বা কোনো পেমেন্ট পিছিয়ে দিন।",
+  "Add your bills and salary on the Bills page to see what's coming.": "সামনে কী আসছে দেখতে বিল পেজে আপনার বিল ও বেতন যোগ করুন।",
 };

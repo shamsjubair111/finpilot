@@ -17,6 +17,12 @@ const at = (monthsAgo: number, day: number) => {
   return d > now ? new Date(now.getFullYear(), now.getMonth(), Math.max(1, now.getDate() - 1), 12) : d;
 };
 
+/** The next time this day of the month comes round (today counts). */
+const nextOn = (day: number) => {
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth() + (day >= now.getDate() ? 0 : 1), day, 12);
+};
+
 /** Seeds three months of realistic example data; returns false if the user already has sample data. */
 export async function addSampleData(userId: string) {
   const user = await db.user.findUniqueOrThrow({ where: { id: userId }, select: { sampleData: true } });
@@ -78,8 +84,8 @@ export async function addSampleData(userId: string) {
       data: { userId, name: "Emergency fund (sample)", goalAmount: 200000, currentAmount: 60000, monthlyContribution: 8000, targetDate: at(-18, 1), priority: "high", category: "emergency", icon: "ShieldCheck" },
     });
     ids.goals.push(goal.id);
-    const c1 = await tx.commitment.create({ data: { userId, title: "Internet bill (sample)", category: "Bills", amount: 1200, dueDate: at(-1, 10), recurring: true, frequency: "monthly", anchorDay: 10, icon: "Receipt" } });
-    const c2 = await tx.commitment.create({ data: { userId, title: "House rent (sample)", category: "Housing", amount: 18000, dueDate: at(-1, 3), recurring: true, frequency: "monthly", anchorDay: 3, icon: "Home" } });
+    const c1 = await tx.commitment.create({ data: { userId, title: "Internet bill (sample)", category: "Bills", amount: 1200, dueDate: nextOn(10), recurring: true, frequency: "monthly", anchorDay: 10, icon: "Receipt" } });
+    const c2 = await tx.commitment.create({ data: { userId, title: "House rent (sample)", category: "Housing", amount: 18000, dueDate: nextOn(3), recurring: true, frequency: "monthly", anchorDay: 3, icon: "Home" } });
     ids.commitments.push(c1.id, c2.id);
     await tx.user.update({ where: { id: userId }, data: { sampleData: ids as unknown as object } });
   });

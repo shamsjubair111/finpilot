@@ -90,3 +90,4 @@ Status: ✅ done · 🟡 partial · ⬜ not started
 - ✅ Help page: common questions (EN/BN) and a contact form; messages listed in /admin with resolve, forwarded to SUPPORT_INBOX
 - ✅ AI assistant monthly cap (300 messages per household, `ASSISTANT_MONTHLY_LIMIT`) with usage shown on the page
 - ✅ Goals can follow an account's balance (e.g. an emergency fund tied to a savings account)
+- ✅ 30-day cash-flow forecast on the dashboard: spendable balance, upcoming bills and income, lowest point, shortfall warning

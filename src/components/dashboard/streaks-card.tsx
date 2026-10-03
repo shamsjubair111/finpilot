@@ -27,7 +27,7 @@ export function StreaksCard() {
       <CardHeader>
         <CardTitle>{t("Your streaks")}</CardTitle>
       </CardHeader>
-      <CardContent className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <CardContent className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-2">
         {items.map((i) => (
           <div key={i.label} className={cn("rounded-xl border p-3", i.active && "border-primary/40 bg-primary/5")}>
             <i.icon className={cn("size-5", i.active ? "text-primary" : "text-muted-foreground")} />
