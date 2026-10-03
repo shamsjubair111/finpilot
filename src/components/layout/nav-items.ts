@@ -20,6 +20,7 @@ import {
   LineChart,
   Sparkles,
   LifeBuoy,
+  Handshake,
 } from "lucide-react";
 
 export interface NavItem {
@@ -43,6 +44,7 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Wishlist", href: "/wishlist", icon: ListChecks, section: "Planning" },
   { label: "Scenario Lab", href: "/scenario-lab", icon: FlaskConical, section: "Planning" },
   { label: "Timeline", href: "/timeline", icon: GanttChartSquare, section: "Planning" },
+  { label: "Lent & borrowed", href: "/lending", icon: Handshake, section: "Planning" },
   { label: "Debt payoff", href: "/debt", icon: HandCoins, section: "Planning" },
   { label: "Zakat", href: "/zakat", icon: Scale, section: "Planning" },
   { label: "Money assistant", href: "/assistant", icon: Sparkles, section: "Planning" },

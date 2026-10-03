@@ -10,7 +10,7 @@ Personal finance for Bangladesh and the world, sold as a SaaS with Free and Pro 
 - Budgets (with rollover), split transactions, custom categories, receipt photos, bulk edit
 - Bills and regular income with reminders, auto-posting, and a 30-day cash-flow forecast
 - Goals (optionally tied to an account), wishlist with affordability checks, scenario lab, debt payoff planner,
-  investments (Sanchayapatra, FDR, DPS, shares, gold), zakat calculator, net worth history
+  investments (Sanchayapatra, FDR, DPS, shares, gold), money lent to and borrowed from friends, zakat calculator, net worth history
 - Insights, spending alerts, streaks, monthly statements and year in review (print to PDF), weekly summary email
 - An AI money assistant (Pro) grounded in the user's own data
 - Shared households (Pro) with editor or viewer access

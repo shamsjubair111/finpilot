@@ -77,6 +77,7 @@ Status: ✅ done · 🟡 partial · ⬜ not started
 - ✅ Real product screenshots on the landing page (`scripts/landing-shots.mjs` regenerates them)
 - ✅ Browser smoke test of every page in English, Bangla and mobile (`npm run test:e2e`)
 
+- ✅ Lent & borrowed (ধার): money between you and friends/family, part repayments, due dates, settle and reopen
 - ✅ Foreign-currency accounts (PayPal, Payoneer, foreign banks): balances in their own currency, user-set exchange rates, converted net worth, foreign amounts on transactions and imports
 - ✅ Split transactions: one payment across several categories; budgets, reports, insights, filters and emails count each part
 

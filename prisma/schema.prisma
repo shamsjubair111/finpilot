@@ -52,6 +52,7 @@ model User {
   budgets      BudgetCategory[]
   goals        Goal[]
   purchases    Purchase[]
+  personalLoans PersonalLoan[]
   commitments  Commitment[]
   accounts     Account[]
   authTokens   AuthToken[]
@@ -383,4 +384,22 @@ model AssistantUsage {
   count  Int    @default(0)
 
   @@id([userId, month])
+}
+
+/// Money lent to or borrowed from friends and family (ধার), tracked apart from account balances.
+model PersonalLoan {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  person    String
+  direction String    @default("lent") // "lent" (they owe you) | "borrowed" (you owe them)
+  amount    Float
+  repaid    Float     @default(0)
+  date      DateTime
+  dueDate   DateTime?
+  note      String?
+  settledAt DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
 }

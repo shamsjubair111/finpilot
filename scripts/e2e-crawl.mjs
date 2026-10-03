@@ -6,7 +6,7 @@ import { chromium } from "playwright";
 
 const BASE = process.env.E2E_BASE_URL ?? "http://localhost:3000";
 const email = `smoketest-e2e${Date.now()}@example.com`;
-const PAGES = ["/", "/accounts", "/transactions", "/import", "/import?tab=csv", "/budget", "/recurring", "/investments", "/goals", "/wishlist",
+const PAGES = ["/", "/accounts", "/transactions", "/import", "/import?tab=csv", "/budget", "/recurring", "/investments", "/goals", "/wishlist", "/lending",
   "/scenario-lab", "/timeline", "/debt", "/zakat", "/assistant", "/insights", "/reports", "/reports/statement", "/reports/statement?period=year",
   "/billing", "/settings", "/help", "/invite?token=abc"];
 const PUBLIC = ["/pricing", "/privacy", "/terms", "/login", "/register", "/forgot-password", "/reset-password?token=x"];

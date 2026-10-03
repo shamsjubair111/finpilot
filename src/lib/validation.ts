@@ -113,6 +113,18 @@ export const purchaseSchema = z.object({
   notes: optionalText(),
 });
 
+export const personalLoanSchema = z
+  .object({
+    person: text(80),
+    direction: z.enum(["lent", "borrowed"]).default("lent"),
+    amount: positiveMoney,
+    repaid: money.default(0),
+    date,
+    dueDate: date.optional().nullable(),
+    note: optionalText(),
+    settledAt: date.optional().nullable(),
+  });
+
 export const commitmentSchema = z.object({
   title: text(),
   category: text(40).default("Bills"),

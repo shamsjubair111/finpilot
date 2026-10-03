@@ -142,6 +142,24 @@ try {
     await page.keyboard.press("Escape");
   });
 
+  await step("lend money, record a part repayment, then settle", async () => {
+    await open("/lending");
+    await page.getByRole("button", { name: "Add a loan" }).first().click();
+    await dialog().getByRole("textbox", { name: "Lent to" }).fill("Karim");
+    await dialog().getByRole("spinbutton", { name: "Amount" }).fill("3000");
+    await dialog().getByRole("button", { name: "Save" }).click();
+    await page.getByText("Karim").waitFor();
+    await page.getByRole("button", { name: "Record repayment" }).click();
+    await dialog().getByRole("spinbutton", { name: "Amount repaid" }).fill("1000");
+    await dialog().getByRole("button", { name: "Save" }).click();
+    await expectText("1,000 of");
+    await page.getByRole("button", { name: "Record repayment" }).click();
+    await dialog().getByRole("button", { name: "Save" }).click();
+    await expectText("Everything is settled.");
+    await page.getByRole("tab", { name: "Settled" }).click();
+    await page.getByText("Karim").waitFor();
+  });
+
   await step("bulk delete transactions", async () => {
     await open("/transactions");
     const before = await page.locator("tbody tr").count();
