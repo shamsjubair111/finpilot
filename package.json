@@ -13,7 +13,8 @@
     "typecheck": "tsc --noEmit",
     "db:deploy": "prisma migrate deploy",
     "test:e2e": "node scripts/e2e-crawl.mjs",
-    "test:a11y": "node scripts/a11y-audit.mjs"
+    "test:a11y": "node scripts/a11y-audit.mjs",
+    "test:flows": "node scripts/e2e-flows.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.129.0",

@@ -85,3 +85,4 @@ Status: ✅ done · 🟡 partial · ⬜ not started
 - Native Android app (only if demand shows)
 - ✅ Accessibility: axe-core audit of main pages passes WCAG A/AA in light and dark mode (`npm run test:a11y`, `A11Y_DARK=1` for dark); labelled progress bars and pickers, stronger contrast
 - ✅ Performance for big accounts (tested with 5,000 transactions): faster startup query, auto-post in parallel, transactions list draws 100 at a time with Show more, deferred search; Server-Timing header on /api/bootstrap
+- ✅ Interactive browser test of everyday tasks: accounts, transactions, splits, balance update, budgets, bills, categories, bulk delete (`npm run test:flows`)
