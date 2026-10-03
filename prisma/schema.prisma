@@ -371,3 +371,12 @@ model SupportMessage {
 
   @@index([createdAt])
 }
+
+// AI assistant messages per household per month ("2026-10"), for the monthly cap.
+model AssistantUsage {
+  userId String
+  month  String
+  count  Int    @default(0)
+
+  @@id([userId, month])
+}

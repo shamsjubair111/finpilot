@@ -1441,4 +1441,7 @@ export const bn: Record<string, string> = {
   "Tell us what happened or what you need…": "কী হয়েছে বা কী দরকার আমাদের জানান…",
   "Send message": "বার্তা পাঠান",
   "must be at least 10 characters": "অন্তত ১০ অক্ষর হতে হবে",
+  // Assistant usage
+  "{used} of {limit} messages this month": "এই মাসে {limit}টির মধ্যে {used}টি বার্তা",
+  "You've used this month's {n} assistant messages. They reset at the start of next month.": "এই মাসের {n}টি সহকারী বার্তা ব্যবহার হয়ে গেছে। পরের মাসের শুরুতে আবার পাবেন।",
 };

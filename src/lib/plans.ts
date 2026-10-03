@@ -3,6 +3,9 @@ export type LimitedResource = "accounts" | "goals" | "budgets" | "purchases";
 
 export const TRIAL_DAYS = 14;
 
+/** AI assistant messages per household per month on Pro; keeps API costs predictable. */
+export const ASSISTANT_MONTHLY_LIMIT = 300;
+
 export const PLANS: Record<PlanId, { name: string; priceMonthly: number; priceYearly: number; limits: Record<LimitedResource, number> }> = {
   free: {
     name: "Free",

@@ -88,3 +88,4 @@ Status: ✅ done · 🟡 partial · ⬜ not started
 - ✅ Interactive browser test of everyday tasks: accounts, transactions, splits, balance update, budgets, bills, categories, bulk delete (`npm run test:flows`)
 - ✅ Change sign-in email (password check, confirmation link to the new address, notice to the old one, security log)
 - ✅ Help page: common questions (EN/BN) and a contact form; messages listed in /admin with resolve, forwarded to SUPPORT_INBOX
+- ✅ AI assistant monthly cap (300 messages per household, `ASSISTANT_MONTHLY_LIMIT`) with usage shown on the page

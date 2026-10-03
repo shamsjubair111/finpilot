@@ -5,7 +5,7 @@ import { ApiError, handleError, requireUserId, resolveLedger } from "@/lib/serve
 import { serialize } from "@/lib/server/crud";
 import { rateLimit } from "@/lib/server/rate-limit";
 import { buildFinancialSummary, type AssistantData } from "@/lib/assistant-context";
-import { effectivePlan } from "@/lib/plans";
+import { ASSISTANT_MONTHLY_LIMIT, effectivePlan } from "@/lib/plans";
 
 const MODEL = "claude-opus-5-5";
 
@@ -41,6 +41,17 @@ export async function POST(req: Request) {
     if (effectivePlan(user.plan, user.planExpiresAt) !== "pro") throw new ApiError(402, "The AI assistant is part of Sanchay Pro.");
     await rateLimit("assistant", 40, 60 * 60 * 1000, actorId);
     const { messages } = bodySchema.parse(await req.json());
+    // Count this message against the household's monthly allowance before spending anything.
+    const month = new Date().toISOString().slice(0, 7);
+    const usage = await db.assistantUsage.upsert({
+      where: { userId_month: { userId, month } },
+      create: { userId, month, count: 1 },
+      update: { count: { increment: 1 } },
+    });
+    if (usage.count > ASSISTANT_MONTHLY_LIMIT) {
+      await db.assistantUsage.update({ where: { userId_month: { userId, month } }, data: { count: { decrement: 1 } } });
+      throw new ApiError(429, `You've used this month's ${ASSISTANT_MONTHLY_LIMIT} assistant messages. They reset at the start of next month.`);
+    }
 
     const summary = buildFinancialSummary({
       ...user,
