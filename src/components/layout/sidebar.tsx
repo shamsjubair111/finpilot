@@ -10,6 +10,7 @@ import { Logo } from "./logo";
 import { NAV_ITEMS } from "./nav-items";
 import { useFinance } from "@/components/providers/finance-provider";
 import { SidebarUser } from "./sidebar-user";
+import { InstallAppButton } from "@/components/pwa/install-prompt";
 import {
   Tooltip,
   TooltipContent,
@@ -101,6 +102,7 @@ export function Sidebar({
       </nav>
 
       <div className="relative space-y-2 border-t border-sidebar-border p-3">
+        {!collapsed && <InstallAppButton className="border-sidebar-border text-sidebar-foreground hover:bg-sidebar-accent" />}
         <SidebarUser collapsed={collapsed} />
         <button
           onClick={onToggle}

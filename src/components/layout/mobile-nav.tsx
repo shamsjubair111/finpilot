@@ -10,6 +10,7 @@ import { Logo } from "./logo";
 import { NAV_ITEMS } from "./nav-items";
 import { useFinance } from "@/components/providers/finance-provider";
 import { SidebarUser } from "./sidebar-user";
+import { InstallAppButton } from "@/components/pwa/install-prompt";
 import { MonthSelector } from "./month-selector";
 
 const SECTIONS: Array<"Overview" | "Planning"> = ["Overview", "Planning"];
@@ -68,7 +69,8 @@ export function MobileNav({
             </div>
           ))}
         </nav>
-        <div className="border-t border-sidebar-border p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+        <div className="space-y-2 border-t border-sidebar-border p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+          <InstallAppButton className="border-sidebar-border text-sidebar-foreground hover:bg-sidebar-accent" />
           <SidebarUser />
         </div>
       </SheetContent>

@@ -93,3 +93,4 @@ Status: ✅ done · 🟡 partial · ⬜ not started
 - ✅ 30-day cash-flow forecast on the dashboard: spendable balance, upcoming bills and income, lowest point, shortfall warning
 - ✅ Transactions: date filter (this/last month, 3 months, this/last year) and search by note or amount
 - ✅ Export the filtered transaction list as CSV from the Transactions page
+- ✅ "Install Sanchay on this device" button (sidebar and mobile menu) when the browser offers installation

@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
+// Loaded at startup so the install prompt is captured whenever the browser offers it.
+import "./install-prompt";
 
 /** Registers /sw.js in production builds (a service worker caching dev assets gets in the way while developing). */
 export function ServiceWorkerRegistration() {

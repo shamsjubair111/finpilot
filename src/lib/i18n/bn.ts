@@ -1467,4 +1467,6 @@ export const bn: Record<string, string> = {
   "Search by name, note or amount…": "নাম, নোট বা পরিমাণ দিয়ে খুঁজুন…",
   // Export filtered
   "Export these {n} (CSV)": "এই {n}টি এক্সপোর্ট করুন (CSV)",
+  // Install
+  "Install Sanchay on this device": "এই ডিভাইসে সঞ্চয় ইনস্টল করুন",
 };
