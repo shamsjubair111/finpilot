@@ -90,6 +90,20 @@ try {
     await expectText("৳9,000");
   });
 
+  await step("link a goal to an account", async () => {
+    await open("/goals");
+    await page.getByRole("button", { name: "Add Goal" }).first().click();
+    await dialog().locator("#goal-name").fill("Rainy day");
+    await dialog().locator("#goal-amount").fill("50000");
+    await dialog().locator("#goal-date").fill("2027-12-31");
+    await pick(dialog().locator("#goal-account"), "Flow Bank");
+    await dialog().getByText("Follows the balance: ৳9,000").waitFor();
+    await dialog().getByRole("button", { name: "Create Goal" }).click();
+    await dialog().waitFor({ state: "detached" });
+    await expectText("Rainy day");
+    await expectText("৳9,000");
+  });
+
   await step("create a budget and see spending against it", async () => {
     await open("/budget");
     await page.getByRole("button", { name: /Add Budget|Create your first budget/ }).first().click();

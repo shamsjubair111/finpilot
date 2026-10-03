@@ -367,6 +367,14 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   const accountBalances = React.useMemo(() => computeBalances(accounts, transactions, fx), [accounts, transactions, fx]);
   const converted = React.useMemo(() => baseBalances(accounts, accountBalances, fx), [accounts, accountBalances, fx]);
   const netWorth = React.useMemo(() => netWorthOf(accounts, accountBalances, fx), [accounts, accountBalances, fx]);
+  // Goals linked to an account show that account's balance (in the main currency) as their progress.
+  const linkedGoals = React.useMemo(
+    () =>
+      goals.map((g) =>
+        g.accountId && converted.balances.has(g.accountId) ? { ...g, currentAmount: Math.max(0, Math.round(converted.balances.get(g.accountId)! * 100) / 100) } : g
+      ),
+    [goals, converted]
+  );
 
   const budgetCategories = React.useMemo<BudgetCategory[]>(
     () => budgetsForMonth(budgets, transactions, parse(selectedMonth, "MMMM yyyy", new Date())) as BudgetCategory[],
@@ -552,7 +560,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     updateBudgetCategory: budgetCrud.update,
     deleteBudgetCategory: budgetCrud.remove,
 
-    goals,
+    goals: linkedGoals,
     addGoal: goalCrud.add,
     updateGoal: goalCrud.update,
     deleteGoal: goalCrud.remove,

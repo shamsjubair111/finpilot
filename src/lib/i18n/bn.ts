@@ -1444,4 +1444,10 @@ export const bn: Record<string, string> = {
   // Assistant usage
   "{used} of {limit} messages this month": "এই মাসে {limit}টির মধ্যে {used}টি বার্তা",
   "You've used this month's {n} assistant messages. They reset at the start of next month.": "এই মাসের {n}টি সহকারী বার্তা ব্যবহার হয়ে গেছে। পরের মাসের শুরুতে আবার পাবেন।",
+  // Goal account
+  "Track with an account": "একটি অ্যাকাউন্ট দিয়ে ট্র্যাক করুন",
+  "No, I'll update it myself": "না, আমি নিজে হালনাগাদ করব",
+  "Follows the balance: {amount}": "ব্যালেন্স অনুসরণ করে: {amount}",
+  "This goal follows the balance of {account}. Add money to that account to grow it.": "এই লক্ষ্যটি {account}-এর ব্যালেন্স অনুসরণ করে। লক্ষ্য বাড়াতে ওই অ্যাকাউন্টে টাকা যোগ করুন।",
+  "an account": "একটি অ্যাকাউন্ট",
 };

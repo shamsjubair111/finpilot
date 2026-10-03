@@ -143,6 +143,8 @@ model Goal {
   monthlyContribution Float    @default(0)
   priority            String   @default("medium")
   category            String   @default("other")
+  // When set, progress follows this account's balance instead of currentAmount.
+  accountId           String?
   createdAt           DateTime @default(now())
 
   @@index([userId])

@@ -1,6 +1,6 @@
 "use client";
 
-import { getCurrencySymbol } from "@/lib/currency";
+import { formatCurrency, getCurrencySymbol } from "@/lib/currency";
 
 import * as React from "react";
 import {
@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/select";
 import { useFinance } from "@/components/providers/finance-provider";
 import { SubmitButton } from "@/components/shared/submit-button";
+import { isLiability } from "@/lib/accounts";
 import { GOAL_PRIORITIES } from "@/lib/constants";
 import type { FinancialGoal, GoalPriority } from "@/types/finance";
 import { t } from "@/lib/i18n";
@@ -37,6 +38,8 @@ const GOAL_CATEGORY_OPTIONS: { value: "emergency" | "purchase" | "education" | "
   { value: "other", label: "Other", icon: "Target", color: "var(--chart-5)" },
 ];
 
+const NO_ACCOUNT = "__none__";
+
 export function GoalFormDialog({
   goal,
   trigger,
@@ -48,7 +51,9 @@ export function GoalFormDialog({
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 }) {
-  const { addGoal, updateGoal } = useFinance();
+  const { addGoal, updateGoal, accounts, accountBaseBalances } = useFinance();
+  const savingAccounts = accounts.filter((a) => !a.archived && !isLiability(a.type));
+  const [accountId, setAccountId] = React.useState(NO_ACCOUNT);
   const isEdit = !!goal;
   const [pending, setPending] = React.useState(false);
   const [internalOpen, setInternalOpen] = React.useState(false);
@@ -73,6 +78,7 @@ export function GoalFormDialog({
     setDescription(goal?.description ?? "");
     setGoalAmount(goal ? String(goal.goalAmount) : "");
     setCurrentAmount(goal ? String(goal.currentAmount) : "");
+    setAccountId(goal?.accountId ?? NO_ACCOUNT);
     setTargetDate(goal ? goal.targetDate.slice(0, 10) : "");
     setMonthlyContribution(goal ? String(goal.monthlyContribution) : "");
     setPriority(goal?.priority ?? "medium");
@@ -92,6 +98,7 @@ export function GoalFormDialog({
       color: GOAL_CATEGORY_OPTIONS.find((c) => c.value === category)!.color,
       goalAmount: Number(goalAmount),
       currentAmount: Number(currentAmount) || 0,
+      accountId: accountId === NO_ACCOUNT ? null : accountId,
       targetDate,
       monthlyContribution: Number(monthlyContribution) || 0,
       priority,
@@ -124,8 +131,27 @@ export function GoalFormDialog({
             </div>
 
             <div className="space-y-1.5">
+              <Label htmlFor="goal-account">{t("Track with an account")}</Label>
+              <Select value={accountId} onValueChange={setAccountId}>
+                <SelectTrigger id="goal-account" className="w-full"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={NO_ACCOUNT}>{t("No, I'll update it myself")}</SelectItem>
+                  {savingAccounts.map((a) => (
+                    <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-1.5">
               <Label htmlFor="goal-current">{`${t("Current Saved")} (${getCurrencySymbol()})`}</Label>
-              <Input id="goal-current" type="number" min={0} step="any" inputMode="decimal" value={currentAmount} onChange={(e) => setCurrentAmount(e.target.value)} />
+              {accountId === NO_ACCOUNT ? (
+                <Input id="goal-current" type="number" min={0} step="any" inputMode="decimal" value={currentAmount} onChange={(e) => setCurrentAmount(e.target.value)} />
+              ) : (
+                <p className="flex h-9 items-center rounded-lg border bg-muted px-3 text-sm text-muted-foreground">
+                  {t("Follows the balance: {amount}", { amount: formatCurrency(Math.max(0, accountBaseBalances.get(accountId) ?? 0)) })}
+                </p>
+              )}
             </div>
 
             <div className="space-y-1.5">

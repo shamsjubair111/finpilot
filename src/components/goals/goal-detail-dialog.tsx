@@ -46,7 +46,7 @@ export function GoalDetailDialog({
   onEdit: () => void;
   onDelete: () => void;
 }) {
-  const { updateGoal } = useFinance();
+  const { updateGoal, accounts } = useFinance();
   if (!goal) return null;
 
   const progress = calculateGoalProgress(goal.currentAmount, goal.goalAmount);
@@ -118,7 +118,11 @@ export function GoalDetailDialog({
             <span className="font-medium">{t({ high: "High", medium: "Medium", low: "Low" }[goal.priority])}</span>
           </div>
 
-          {status !== "completed" && (
+          {goal.accountId ? (
+            <p className="rounded-xl bg-muted/50 p-3 text-xs text-muted-foreground">
+              {t("This goal follows the balance of {account}. Add money to that account to grow it.", { account: accounts.find((x) => x.id === goal.accountId)?.name ?? t("an account") })}
+            </p>
+          ) : status !== "completed" && (
             <div className="space-y-2 rounded-xl bg-muted/50 p-3">
               <p className="text-xs font-medium text-muted-foreground">{t("Contribute to this goal")}</p>
               <AddFunds

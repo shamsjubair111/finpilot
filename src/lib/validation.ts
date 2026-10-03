@@ -100,6 +100,7 @@ export const goalSchema = z.object({
   monthlyContribution: money.default(0),
   priority: priority.default("medium"),
   category: z.enum(["emergency", "purchase", "education", "travel", "other"]).default("other"),
+  accountId: optionalId,
 });
 
 export const purchaseSchema = z.object({

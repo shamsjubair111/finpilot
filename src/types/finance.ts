@@ -108,6 +108,8 @@ export interface FinancialGoal {
   monthlyContribution: number;
   priority: GoalPriority;
   category: "emergency" | "purchase" | "education" | "travel" | "other";
+  /** When set, progress follows this account's balance. */
+  accountId?: string | null;
   createdAt: string;
 }
 
