@@ -82,7 +82,7 @@ export function GoalDetailDialog({
             <span className="text-2xl font-bold tabular-nums text-primary">{progress}%</span>
           </div>
 
-          <ProgressBar value={progress} className="h-2" />
+          <ProgressBar value={progress} className="h-2" label={goal.name} />
 
           <div className="grid grid-cols-2 gap-4 rounded-xl border border-border p-4">
             <div>

@@ -144,7 +144,7 @@ export default function BillingPage() {
                     {unlimited ? t("{n} · unlimited", { n: usage[r] }) : `${usage[r]} / ${limit}`}
                   </span>
                 </div>
-                <Progress value={unlimited ? 0 : Math.min(100, (usage[r] / limit) * 100)} />
+                <Progress value={unlimited ? 0 : Math.min(100, (usage[r] / limit) * 100)} aria-label={t(RESOURCE_LABELS[r])} />
               </div>
             );
           })}

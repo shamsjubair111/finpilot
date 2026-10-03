@@ -45,7 +45,7 @@ export function Sidebar({
         {SECTIONS.map((section) => (
           <div key={section}>
             {!collapsed && (
-              <p className="px-2.5 pb-1.5 text-[11px] font-medium uppercase tracking-wider text-sidebar-foreground/40">
+              <p className="px-2.5 pb-1.5 text-[11px] font-medium uppercase tracking-wider text-sidebar-foreground/65">
                 {t(section)}
               </p>
             )}

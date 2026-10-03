@@ -12,7 +12,8 @@
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "db:deploy": "prisma migrate deploy",
-    "test:e2e": "node scripts/e2e-crawl.mjs"
+    "test:e2e": "node scripts/e2e-crawl.mjs",
+    "test:a11y": "node scripts/a11y-audit.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.129.0",
@@ -42,6 +43,7 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/pg": "^8.23.1",

@@ -83,3 +83,4 @@ Status: ✅ done · 🟡 partial · ⬜ not started
 ## Ideas not started
 - Paginate transactions for very heavy users (everything loads at once today)
 - Native Android app (only if demand shows)
+- ✅ Accessibility: axe-core audit of main pages passes WCAG A/AA (`npm run test:a11y`); labelled progress bars and pickers, stronger contrast

@@ -85,7 +85,7 @@ export function PurchaseCard({
           <span className="font-semibold tabular-nums">{formatCurrency(purchase.savedAmount)}</span>
           <span className="text-xs text-muted-foreground">{t("of")} {formatCurrency(purchase.price)}</span>
         </div>
-        <ProgressBar value={progress} />
+        <ProgressBar value={progress} label={purchase.name} />
       </div>
 
       <div className="flex items-center justify-between border-t border-border pt-3 text-xs text-muted-foreground">

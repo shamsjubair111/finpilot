@@ -178,7 +178,7 @@ export function SummaryCards({
             {formatCurrency(emergencyCurrent, { compact: true })}
             <span className="text-sm font-normal text-muted-foreground"> / {formatCurrency(emergencyTarget, { compact: true })}</span>
           </p>
-          <Progress value={emergencyCoverage} className="h-1.5" />
+          <Progress value={emergencyCoverage} className="h-1.5" aria-label={t("Emergency Fund")} />
         </div>
       </Card>
     </div>

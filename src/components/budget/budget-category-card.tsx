@@ -62,7 +62,7 @@ export function BudgetCategoryCard({
           <span className="font-semibold tabular-nums">{formatCurrency(category.spent)}</span>
           <span className="text-xs text-muted-foreground">{t("of")} {formatCurrency(category.budgeted)}</span>
         </div>
-        <ProgressBar value={pct} status={status} />
+        <ProgressBar value={pct} status={status} label={t(category.category)} />
         <p className={cn("text-xs", remaining < 0 ? "text-destructive" : "text-muted-foreground")}>
           {remaining >= 0
             ? t("{amount} remaining", { amount: formatCurrency(remaining) })

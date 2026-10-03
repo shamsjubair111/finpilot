@@ -1378,4 +1378,6 @@ export const bn: Record<string, string> = {
   "A split needs at least two parts.": "ভাগ করতে অন্তত দুটি অংশ লাগবে।",
   "Each part needs a category and an amount.": "প্রতিটি অংশে ক্যাটাগরি ও পরিমাণ লাগবে।",
   "The parts must add up to the total amount.": "অংশগুলোর যোগফল মোট পরিমাণের সমান হতে হবে।",
+  // Accessibility
+  "Month": "মাস",
 };

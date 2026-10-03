@@ -49,7 +49,7 @@ export function GoalCard({ goal, onClick }: { goal: FinancialGoal; onClick: () =
         <span className="text-lg font-bold tabular-nums text-primary">{progress}%</span>
       </div>
 
-      <ProgressBar value={progress} />
+      <ProgressBar value={progress} label={goal.name} />
 
       <div className="grid grid-cols-2 gap-x-3 gap-y-2 text-xs">
         <div>

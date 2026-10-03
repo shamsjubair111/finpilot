@@ -39,7 +39,7 @@ export function BudgetProgressSection({ categories }: { categories: BudgetCatego
                   {formatCurrency(c.spent)} / {formatCurrency(c.budgeted)}
                 </span>
               </div>
-              <ProgressBar value={pct} status={status} />
+              <ProgressBar value={pct} status={status} label={t(c.category)} />
             </div>
           );
         })}
