@@ -11,12 +11,14 @@ import {
 } from "@/components/ui/select";
 import { useFinance } from "@/components/providers/finance-provider";
 import { t } from "@/lib/i18n";
+import { PERIOD_LABELS, PERIODS, type Period } from "@/lib/transaction-filter";
 
 export interface TransactionFilterState {
   search: string;
   category: string;
   type: string;
   account: string;
+  period: Period;
 }
 
 
@@ -34,7 +36,7 @@ export function TransactionFilters({
       <div className="relative flex-1">
         <Search className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input
-          placeholder={t("Search transactions...")}
+          placeholder={t("Search by name, note or amount…")}
           className="pl-8"
           value={filters.search}
           onChange={(e) => onChange({ ...filters, search: e.target.value })}
@@ -43,6 +45,17 @@ export function TransactionFilters({
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:flex">
+        <Select value={filters.period} onValueChange={(v) => onChange({ ...filters, period: v as Period })}>
+          <SelectTrigger className="w-full sm:w-40" aria-label={t("Filter by date")}>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {PERIODS.map((p) => (
+              <SelectItem key={p} value={p}>{t(PERIOD_LABELS[p])}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
         <Select value={filters.type} onValueChange={(v) => onChange({ ...filters, type: v })}>
           <SelectTrigger className="w-full sm:w-36" aria-label={t("Filter by type")}>
             <SelectValue placeholder={t("Type")} />

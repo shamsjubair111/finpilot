@@ -2,6 +2,7 @@
 
 import { Suspense, useDeferredValue, useMemo, useState } from "react";
 import { categoryParts } from "@/lib/splits";
+import { matchesSearch, periodRange } from "@/lib/transaction-filter";
 import { useSearchParams } from "next/navigation";
 import { Plus, ArrowUpRight, ArrowDownRight, Wallet } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
@@ -33,23 +34,25 @@ function TransactionsView() {
     category: "all",
     type: "all",
     account: params.get("account") ?? "all",
+    period: "all",
   });
 
   // The inputs update immediately; the (possibly long) list re-filters in the background.
   const applied = useDeferredValue(filters);
   const filtered = useMemo(() => {
     const filters = applied;
+    const range = periodRange(filters.period);
     // Transactions arrive newest first, so no re-sort is needed.
     return transactions
       .filter((t) => {
         if (filters.type !== "all" && t.type !== filters.type) return false;
         if (filters.category !== "all" && !categoryParts(t).some((p) => p.category === filters.category)) return false;
         if (filters.account !== "all" && t.accountId !== filters.account && t.toAccountId !== filters.account) return false;
-        if (filters.search) {
-          const q = filters.search.toLowerCase();
-          if (!t.title.toLowerCase().includes(q) && !t.merchant.toLowerCase().includes(q)) return false;
+        if (range) {
+          const d = new Date(t.date);
+          if (d < range[0] || d >= range[1]) return false;
         }
-        return true;
+        return matchesSearch(t, filters.search);
       });
   }, [transactions, applied]);
 

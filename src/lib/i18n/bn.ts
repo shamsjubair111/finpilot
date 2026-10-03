@@ -1457,4 +1457,12 @@ export const bn: Record<string, string> = {
   "In 30 days": "৩০ দিন পর",
   "Your bills may outrun your money around {date}. Move some savings or delay a payment.": "{date}-এর দিকে বিলের তুলনায় টাকা কম পড়তে পারে। কিছু সঞ্চয় সরান বা কোনো পেমেন্ট পিছিয়ে দিন।",
   "Add your bills and salary on the Bills page to see what's coming.": "সামনে কী আসছে দেখতে বিল পেজে আপনার বিল ও বেতন যোগ করুন।",
+  // Transaction filters
+  "All time": "সব সময়",
+  "This month": "এই মাস",
+  "Last month": "গত মাস",
+  "Last 3 months": "গত ৩ মাস",
+  "Last year": "গত বছর",
+  "Filter by date": "তারিখ অনুযায়ী ফিল্টার",
+  "Search by name, note or amount…": "নাম, নোট বা পরিমাণ দিয়ে খুঁজুন…",
 };
