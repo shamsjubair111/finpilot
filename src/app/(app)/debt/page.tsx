@@ -48,15 +48,15 @@ function Chart({ series }: { series: { label: string; values: number[]; classNam
 }
 
 export default function DebtPage() {
-  const { accounts, accountBalances } = useFinance();
+  const { accounts, accountBaseBalances } = useFinance();
   const symbol = getCurrencySymbol();
   const liabilities = useMemo(
     () =>
       accounts
         .filter((a) => !a.archived && isLiability(a.type))
-        .map((a) => ({ account: a, balance: Math.max(0, accountBalances.get(a.id) ?? 0) }))
+        .map((a) => ({ account: a, balance: Math.max(0, accountBaseBalances.get(a.id) ?? 0) }))
         .filter((x) => x.balance > 0),
-    [accounts, accountBalances]
+    [accounts, accountBaseBalances]
   );
 
   const [mins, setMins] = useState<Record<string, string>>({});

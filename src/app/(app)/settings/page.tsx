@@ -26,6 +26,7 @@ import { TwoFactorCard } from "@/components/settings/two-factor-card";
 import { PushCard } from "@/components/settings/push-card";
 import { HouseholdCard } from "@/components/settings/household-card";
 import { CategoriesCard } from "@/components/settings/categories-card";
+import { ExchangeRatesCard } from "@/components/settings/exchange-rates-card";
 import { SecurityActivity } from "@/components/settings/security-activity";
 import { useFinance } from "@/components/providers/finance-provider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -306,6 +307,8 @@ export default function SettingsPage() {
           </label>
         </CardContent>
       </Card>
+
+      <ExchangeRatesCard />
 
       <CategoriesCard />
 

@@ -1355,4 +1355,17 @@ export const bn: Record<string, string> = {
   "Product preview": "পণ্যের প্রিভিউ",
   "The Sanchay dashboard showing net worth, accounts, spending and savings": "নিট সম্পদ, অ্যাকাউন্ট, খরচ ও সঞ্চয় দেখানো সঞ্চয় ড্যাশবোর্ড",
   "Sanchay on a phone, in Bangla": "ফোনে বাংলায় সঞ্চয়",
+  // Foreign currency
+  "Add an exchange rate for {list} so those accounts count towards your totals.": "{list}-এর বিনিময় হার যোগ করুন, যাতে ওই অ্যাকাউন্টগুলো মোট হিসাবে যোগ হয়।",
+  "Set rates": "হার ঠিক করুন",
+  "The currency can't be changed after the account is created.": "অ্যাকাউন্ট তৈরির পর মুদ্রা বদলানো যায় না।",
+  "For PayPal, Payoneer or foreign bank accounts. Set its exchange rate in Settings.": "PayPal, Payoneer বা বিদেশি ব্যাংক অ্যাকাউন্টের জন্য। সেটিংসে এর বিনিময় হার ঠিক করুন।",
+  "Your main currency.": "আপনার প্রধান মুদ্রা।",
+  "1 {code} = {rate} {base}": "১ {code} = {rate} {base}",
+  "No rate set for {code}; enter the {base} amount yourself.": "{code}-এর কোনো হার ঠিক করা নেই; {base} পরিমাণ নিজে লিখুন।",
+  "What it's worth in your main currency, used in budgets and reports.": "প্রধান মুদ্রায় এর মূল্য, বাজেট ও রিপোর্টে ব্যবহার হয়।",
+  "Exchange rates": "বিনিময় হার",
+  "Used to count foreign-currency accounts in your totals and to suggest amounts when you record transactions. Update them when the rate changes.": "বিদেশি মুদ্রার অ্যাকাউন্ট মোট হিসাবে ধরতে ও লেনদেন লেখার সময় পরিমাণ প্রস্তাব করতে ব্যবহার হয়। হার বদলালে হালনাগাদ করুন।",
+  "Save rates": "হার সেভ করুন",
+  "Exchange rates saved": "বিনিময় হার সেভ হয়েছে",
 };

@@ -39,6 +39,9 @@ export interface Transaction {
   toAccountId?: string | null;
   /** Provider transaction ID (e.g. a bKash TrxID) for imported rows; used to skip duplicates. */
   externalId?: string | null;
+  /** Amount in the foreign account's currency, when the transaction touches one. */
+  originalAmount?: number | null;
+  originalCurrency?: Currency | null;
   /** A receipt photo is attached (fetched separately). */
   hasReceipt?: boolean;
 }
@@ -64,6 +67,8 @@ export interface Account {
   institution?: string | null;
   accountNumber?: string | null;
   openingBalance: number;
+  /** Null/undefined = the user's main currency. */
+  currency?: Currency | null;
   creditLimit?: number | null;
   interestRate?: number | null;
   color: string;
@@ -247,6 +252,8 @@ export interface UserProfile {
   isAdmin?: boolean;
   weeklySummary?: boolean;
   hasSampleData?: boolean;
+  /** 1 unit of each foreign currency in the main currency. */
+  exchangeRates?: Partial<Record<Currency, number>>;
   twoFactorEnabled?: boolean;
   passwordSet?: boolean;
   googleLinked?: boolean;

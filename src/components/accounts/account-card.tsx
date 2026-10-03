@@ -57,14 +57,14 @@ export function AccountCard({
 
       <div className="relative z-0 pointer-events-none">
         <p className="text-[11px] font-medium uppercase tracking-wider text-white/60">{liability ? t("Outstanding") : t("Balance")}</p>
-        <p className="text-2xl font-semibold tabular-nums tracking-tight sm:text-[1.7rem]">{formatCurrency(balance)}</p>
+        <p className="text-2xl font-semibold tabular-nums tracking-tight sm:text-[1.7rem]">{formatCurrency(balance, { currency: account.currency ?? undefined })}</p>
         {utilization !== null ? (
           <div className="mt-2 space-y-1">
             <div className="h-1.5 overflow-hidden rounded-full bg-white/20">
               <div className="h-full rounded-full bg-white" style={{ width: `${Math.max(0, utilization)}%` }} />
             </div>
             <p className="text-[11px] text-white/70">
-              {t("{pct}% of {limit} limit used", { pct: utilization, limit: formatCurrency(account.creditLimit!, { compact: true }) })}
+              {t("{pct}% of {limit} limit used", { pct: utilization, limit: formatCurrency(account.creditLimit!, { compact: true, currency: account.currency ?? undefined }) })}
             </p>
           </div>
         ) : (

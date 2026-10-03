@@ -57,11 +57,11 @@ export function AdjustBalanceDialog({ account, onClose }: { account: Account | n
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-1.5">
-            <Label htmlFor="adj-balance">{t("Actual balance")} ({getCurrencySymbol()})</Label>
+            <Label htmlFor="adj-balance">{t("Actual balance")} ({getCurrencySymbol(account?.currency ?? undefined)})</Label>
             <Input id="adj-balance" type="number" step="any" value={value} onChange={(e) => setValue(e.target.value)} autoFocus />
             <p className="text-xs text-muted-foreground">
-              {t("Sanchay shows {amount}.", { amount: formatCurrency(current, { showDecimals: true }) })}
-              {valid && Math.abs(diff) >= 0.01 && ` ${t("Difference: {amount}.", { amount: formatCurrency(diff, { showDecimals: true, signDisplay: "always" }) })}`}
+              {t("Sanchay shows {amount}.", { amount: formatCurrency(current, { showDecimals: true, currency: account?.currency ?? undefined }) })}
+              {valid && Math.abs(diff) >= 0.01 && ` ${t("Difference: {amount}.", { amount: formatCurrency(diff, { showDecimals: true, signDisplay: "always", currency: account?.currency ?? undefined }) })}`}
             </p>
           </div>
           <DialogFooter>

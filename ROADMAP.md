@@ -77,8 +77,9 @@ Status: ✅ done · 🟡 partial · ⬜ not started
 - ✅ Real product screenshots on the landing page (`scripts/landing-shots.mjs` regenerates them)
 - ✅ Browser smoke test of every page in English, Bangla and mobile (`npm run test:e2e`)
 
+- ✅ Foreign-currency accounts (PayPal, Payoneer, foreign banks): balances in their own currency, user-set exchange rates, converted net worth, foreign amounts on transactions and imports
+
 ## Ideas not started
-- Accounts in a second currency (USD PayPal/Payoneer for freelancers) with exchange rates
 - Split one transaction across categories
 - Paginate transactions for very heavy users (everything loads at once today)
 - Native Android app (only if demand shows)

@@ -22,6 +22,7 @@ export function toProfile(u: User) {
     isAdmin: isAdminEmail(u.email),
     weeklySummary: u.weeklySummary,
     hasSampleData: !!u.sampleData,
+    exchangeRates: (u.exchangeRates ?? {}) as Partial<Record<import("@/types/finance").Currency, number>>,
     twoFactorEnabled: !!u.totpEnabledAt,
     passwordSet: u.passwordSet,
     googleLinked: !!u.googleId,

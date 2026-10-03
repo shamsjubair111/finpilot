@@ -1,6 +1,7 @@
 import type { Account, Transaction } from "@/types/finance";
 import { computeBalances, isLiability, netWorthOf } from "@/lib/accounts";
 import { valueInvestment, type InvestmentInput } from "@/lib/calculations/investments";
+import type { Rates } from "@/lib/fx";
 
 export interface AssistantData {
   name: string;
@@ -17,6 +18,7 @@ export interface AssistantData {
   purchases: { name: string; price: number; savedAmount: number; desiredDate: string }[];
   commitments: { title: string; amount: number; dueDate: string; recurring: boolean; frequency: string; type: string }[];
   investments: (InvestmentInput & { name: string })[];
+  exchangeRates?: unknown;
 }
 
 const r = (n: number) => Math.round(n).toLocaleString("en-US");
@@ -37,14 +39,15 @@ export function buildFinancialSummary(data: AssistantData, now = new Date()) {
     `Profile: monthly take-home income ${r(data.monthlySalary)}, savings ${r(data.currentSavings)}, emergency fund ${r(data.emergencyFundCurrent)} of ${r(data.emergencyFundTarget)} target, savings target ${data.defaultSavingsTarget}% of income.`
   );
 
-  const balances = computeBalances(data.accounts, data.transactions);
-  const nw = netWorthOf(data.accounts, balances);
+  const fx = { base: cur, rates: (data.exchangeRates ?? {}) as Rates };
+  const balances = computeBalances(data.accounts, data.transactions, fx);
+  const nw = netWorthOf(data.accounts, balances, fx);
   lines.push(`Net worth ${r(nw.netWorth)} (assets ${r(nw.assets)}, debts ${r(nw.liabilities)}).`);
   const active = data.accounts.filter((a) => !a.archived);
   if (active.length) {
     lines.push("Accounts:");
     for (const a of active.slice(0, 20))
-      lines.push(`- ${a.name} (${a.type}${isLiability(a.type) ? ", owed" : ""}${a.interestRate ? `, ${a.interestRate}%/yr` : ""}): ${r(balances.get(a.id) ?? 0)}`);
+      lines.push(`- ${a.name} (${a.type}${isLiability(a.type) ? ", owed" : ""}${a.interestRate ? `, ${a.interestRate}%/yr` : ""}): ${r(balances.get(a.id) ?? 0)}${a.currency && a.currency !== cur ? ` ${a.currency}` : ""}`);
   }
 
   const month = (from: Date, to: Date) => {

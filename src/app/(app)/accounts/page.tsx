@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { ArrowLeftRight, Landmark, Plus, Scale, TrendingDown, TrendingUp } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
@@ -20,9 +21,9 @@ import type { Account } from "@/types/finance";
 import { t as tr } from "@/lib/i18n";
 
 export default function AccountsPage() {
-  const { accounts, accountBalances, netWorth, deleteAccount, transactions } = useFinance();
+  const { accounts, accountBalances, accountBaseBalances, netWorth, deleteAccount, transactions, fx, missingRates } = useFinance();
   const [adjusting, setAdjusting] = useState<Account | null>(null);
-  const history = useMemo(() => netWorthHistory(accounts, transactions, 12), [accounts, transactions]);
+  const history = useMemo(() => netWorthHistory(accounts, transactions, 12, new Date(), fx), [accounts, transactions, fx]);
   const change = history.length ? history[history.length - 1].netWorth - history[0].netWorth : 0;
   const [creating, setCreating] = useState(false);
   const [editing, setEditing] = useState<Account | null>(null);
@@ -80,6 +81,13 @@ export default function AccountsPage() {
             ))}
           </div>
 
+          {missingRates.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-2.5 text-sm">
+              {tr("Add an exchange rate for {list} so those accounts count towards your totals.", { list: missingRates.join(", ") })}
+              <Link href="/settings#exchange-rates" className="font-medium text-primary hover:underline">{tr("Set rates")}</Link>
+            </div>
+          )}
+
           {history.some((p) => p.netWorth !== 0) && (
             <Card className="animate-in-up">
               <CardHeader>
@@ -105,7 +113,7 @@ export default function AccountsPage() {
           {ACCOUNT_GROUPS.map((group) => {
             const list = accounts.filter((a) => ACCOUNT_TYPE_META[a.type].group === group);
             if (!list.length) return null;
-            const total = list.reduce((s, a) => s + (accountBalances.get(a.id) ?? 0), 0);
+            const total = list.reduce((s, a) => s + (accountBaseBalances.get(a.id) ?? 0), 0);
             return (
               <section key={group} className="space-y-3">
                 <div className="flex items-baseline justify-between">

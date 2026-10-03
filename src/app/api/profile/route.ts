@@ -6,7 +6,7 @@ import { destroySession, setLangCookie } from "@/lib/server/session";
 import { toProfile } from "@/lib/server/user";
 import { profileSchema } from "@/lib/validation";
 
-const HOUSEHOLD_FIELDS = ["currency", "monthlySalary", "currentSavings", "emergencyFundTarget", "emergencyFundCurrent", "defaultSavingsTarget"] as const;
+const HOUSEHOLD_FIELDS = ["currency", "monthlySalary", "currentSavings", "emergencyFundTarget", "emergencyFundCurrent", "defaultSavingsTarget", "exchangeRates"] as const;
 
 export const PATCH = authed(async ({ userId, req }) => {
   const data = profileSchema.parse(await req.json());

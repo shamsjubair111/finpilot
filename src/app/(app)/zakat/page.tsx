@@ -27,14 +27,14 @@ const num = (v: string) => {
 const str = (n: number) => (n ? String(Math.round(n * 100) / 100) : "");
 
 export default function ZakatPage() {
-  const { accounts, accountBalances } = useFinance();
+  const { accounts, accountBaseBalances } = useFinance();
   const symbol = getCurrencySymbol();
 
   const fromAccounts = useMemo(() => {
     let cash = 0, savings = 0, investments = 0, cardDebt = 0;
     for (const a of accounts) {
       if (a.archived) continue;
-      const b = accountBalances.get(a.id) ?? 0;
+      const b = accountBaseBalances.get(a.id) ?? 0;
       if (a.type === "credit_card") cardDebt += Math.max(0, b);
       else if (isLiability(a.type)) continue;
       else if (a.type === "savings") savings += Math.max(0, b);
@@ -42,7 +42,7 @@ export default function ZakatPage() {
       else cash += Math.max(0, b);
     }
     return { cash, savings, investments, cardDebt };
-  }, [accounts, accountBalances]);
+  }, [accounts, accountBaseBalances]);
 
   const [standard, setStandard] = useState<"gold" | "silver">("silver");
   const [f, setF] = useState<Fields>(() => ({

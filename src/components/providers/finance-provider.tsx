@@ -18,7 +18,8 @@ import type {
 import { api, ApiClientError } from "@/lib/api-client";
 import { clearOfflineCache } from "@/components/pwa/service-worker";
 import { isOfflineId, newTempId, readOutbox, writeOutbox } from "@/lib/outbox";
-import { computeBalances, netWorthOf } from "@/lib/accounts";
+import { baseBalances, computeBalances, netWorthOf, type FxContext } from "@/lib/accounts";
+import type { Rates } from "@/lib/fx";
 import { EXPENSE_CATEGORIES, INCOME_CATEGORIES } from "@/lib/constants";
 import { t } from "@/lib/i18n";
 import { useI18n } from "@/lib/i18n/provider";
@@ -102,7 +103,13 @@ interface FinanceContextValue {
   deletePurchase: (id: string) => Promise<boolean>;
 
   accounts: Account[];
+  /** Each account's balance in its own currency. */
   accountBalances: Map<string, number>;
+  /** Balances converted to the main currency, for totals. */
+  accountBaseBalances: Map<string, number>;
+  /** Foreign currencies used by accounts that have no exchange rate yet. */
+  missingRates: string[];
+  fx: FxContext;
   netWorth: { assets: number; liabilities: number; netWorth: number };
   addAccount: (a: Omit<Account, "id" | "createdAt">) => Promise<boolean>;
   updateAccount: (id: string, patch: Partial<Account>) => Promise<boolean>;
@@ -356,8 +363,10 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   const investmentCrud = crud<Investment, Omit<Investment, "id" | "createdAt">>("/investments", investments, setInvestments, "Investment", (i) => `${i.name} — ${fmt(i.principal)}`);
   const categoryCrud = crud<CustomCategory, Omit<CustomCategory, "id">>("/categories", customCategories, setCustomCategories, "Category", (c) => c.name);
   const accountCrud = crud<Account, Omit<Account, "id" | "createdAt">>("/accounts", accounts, setAccounts, "Account", (a) => a.name);
-  const accountBalances = React.useMemo(() => computeBalances(accounts, transactions), [accounts, transactions]);
-  const netWorth = React.useMemo(() => netWorthOf(accounts, accountBalances), [accounts, accountBalances]);
+  const fx = React.useMemo<FxContext>(() => ({ base: user?.currency ?? "BDT", rates: (user?.exchangeRates ?? {}) as Rates }), [user?.currency, user?.exchangeRates]);
+  const accountBalances = React.useMemo(() => computeBalances(accounts, transactions, fx), [accounts, transactions, fx]);
+  const converted = React.useMemo(() => baseBalances(accounts, accountBalances, fx), [accounts, accountBalances, fx]);
+  const netWorth = React.useMemo(() => netWorthOf(accounts, accountBalances, fx), [accounts, accountBalances, fx]);
 
   const budgetCategories = React.useMemo<BudgetCategory[]>(
     () => budgetsForMonth(budgets, transactions, parse(selectedMonth, "MMMM yyyy", new Date())) as BudgetCategory[],
@@ -555,6 +564,9 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
 
     accounts,
     accountBalances,
+    accountBaseBalances: converted.balances,
+    missingRates: converted.missingRates,
+    fx,
     netWorth,
     addAccount: accountCrud.add,
     updateAccount: accountCrud.update,

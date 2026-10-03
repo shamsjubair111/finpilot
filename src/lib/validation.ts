@@ -38,6 +38,7 @@ export const profileSchema = z
     emergencyFundCurrent: money,
     defaultSavingsTarget: z.coerce.number().min(0).max(100),
     weeklySummary: z.boolean(),
+    exchangeRates: z.partialRecord(z.enum(CURRENCY_CODES), z.coerce.number().finite().gt(0).max(1e6)),
   })
   .partial();
 
@@ -57,6 +58,7 @@ export const accountSchema = z.object({
   institution: optionalText(80),
   accountNumber: optionalText(40),
   openingBalance: z.coerce.number().finite().min(-1e12).max(1e12).transform(roundMoney).default(0),
+  currency: z.enum(CURRENCY_CODES).optional().nullable(),
   creditLimit: z.coerce.number().finite().min(0).max(1e12).transform(roundMoney).optional().nullable(),
   interestRate: z.coerce.number().finite().min(0).max(100).optional().nullable(),
   color: z.string().max(40).optional(),
@@ -74,6 +76,8 @@ export const transactionSchema = z.object({
   type: z.enum(["income", "expense", "transfer"]),
   paymentMethod: z.enum(["cash", "card", "bank_transfer", "mobile_banking", "other"]).default("card"),
   notes: optionalText(),
+  originalAmount: z.coerce.number().finite().min(0.01).max(1e12).transform(roundMoney).optional().nullable(),
+  originalCurrency: z.enum(CURRENCY_CODES).optional().nullable(),
 });
 
 export const budgetSchema = z.object({

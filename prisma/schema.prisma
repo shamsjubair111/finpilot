@@ -33,6 +33,8 @@ model User {
   planReminderFor      DateTime?
   // IDs of rows created by "Explore with sample data", so they can be removed together.
   sampleData           Json?
+  // Rates for foreign-currency accounts: { "USD": 121.5 } means 1 USD = 121.5 in the main currency.
+  exchangeRates        Json?
   emailVerifiedAt      DateTime?
   onboardedAt          DateTime?
   sessionVersion       Int      @default(0)
@@ -68,6 +70,8 @@ model Account {
   institution    String?
   accountNumber  String?
   openingBalance Float    @default(0)
+  // Null = the user's main currency. Otherwise the balance is kept in this currency (see src/lib/fx.ts).
+  currency       String?
   creditLimit    Float?
   interestRate   Float?
   color          String   @default("#6366f1")
@@ -97,6 +101,9 @@ model Transaction {
   toAccountId   String?
   toAccount     Account? @relation("TxnToAccount", fields: [toAccountId], references: [id], onDelete: SetNull)
   externalId    String?
+  // For transactions on a foreign-currency account: the amount in that account's currency.
+  originalAmount   Float?
+  originalCurrency String?
   receipt       Receipt?
   createdAt     DateTime @default(now())
 

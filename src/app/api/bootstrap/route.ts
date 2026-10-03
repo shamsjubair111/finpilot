@@ -40,6 +40,7 @@ export const GET = authed(
           emergencyFundTarget: owner.emergencyFundTarget,
           emergencyFundCurrent: owner.emergencyFundCurrent,
           defaultSavingsTarget: owner.defaultSavingsTarget,
+          exchangeRates: toProfile(owner).exchangeRates,
         }
       : toProfile(owner);
 

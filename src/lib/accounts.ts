@@ -1,4 +1,5 @@
 import type { Account, AccountType, Transaction } from "@/types/finance";
+import { amountInAccountCurrency, isForeign, toBase, type Rates } from "@/lib/fx";
 
 export const ACCOUNT_TYPE_META: Record<
   AccountType,
@@ -26,15 +27,27 @@ export const isLiability = (type: AccountType) => !!ACCOUNT_TYPE_META[type].liab
  * Asset accounts: balance = money held. Liability accounts (credit card, loan):
  * balance = amount owed, so spending raises it and payments into it lower it.
  */
-export function computeBalances(accounts: Account[], transactions: Transaction[]) {
+/** Currency context for foreign-currency accounts; omit when every account uses the main currency. */
+export interface FxContext {
+  base: string;
+  rates: Rates;
+}
+
+/** Each account's balance in its own currency (the main currency unless the account says otherwise). */
+export function computeBalances(accounts: Account[], transactions: Transaction[], fx?: FxContext) {
+  const currencyOf = new Map(accounts.map((a) => [a.id, a.currency]));
   const flow = new Map<string, number>();
-  const add = (id: string | null | undefined, v: number) => id && flow.set(id, (flow.get(id) ?? 0) + v);
+  const add = (id: string | null | undefined, sign: number, t: Transaction) => {
+    if (!id) return;
+    const v = fx ? amountInAccountCurrency(t, currencyOf.get(id), fx.base, fx.rates) : t.amount;
+    flow.set(id, (flow.get(id) ?? 0) + sign * v);
+  };
   for (const t of transactions) {
-    if (t.type === "income") add(t.accountId, t.amount);
-    else if (t.type === "expense") add(t.accountId, -t.amount);
+    if (t.type === "income") add(t.accountId, 1, t);
+    else if (t.type === "expense") add(t.accountId, -1, t);
     else {
-      add(t.accountId, -t.amount);
-      add(t.toAccountId, t.amount);
+      add(t.accountId, -1, t);
+      add(t.toAccountId, 1, t);
     }
   }
   const balances = new Map<string, number>();
@@ -45,12 +58,29 @@ export function computeBalances(accounts: Account[], transactions: Transaction[]
   return balances;
 }
 
-export function netWorthOf(accounts: Account[], balances: Map<string, number>) {
+/** Balances converted to the main currency; foreign accounts without a rate count as 0 and are listed. */
+export function baseBalances(accounts: Account[], balances: Map<string, number>, fx?: FxContext) {
+  const out = new Map<string, number>();
+  const missingRates = new Set<string>();
+  for (const a of accounts) {
+    const b = balances.get(a.id) ?? 0;
+    if (!fx || !isForeign(a.currency, fx.base)) out.set(a.id, b);
+    else {
+      const converted = toBase(b, a.currency!, fx.base, fx.rates);
+      if (converted === null) missingRates.add(a.currency!);
+      out.set(a.id, converted ?? 0);
+    }
+  }
+  return { balances: out, missingRates: [...missingRates] };
+}
+
+export function netWorthOf(accounts: Account[], balances: Map<string, number>, fx?: FxContext) {
+  const inBase = baseBalances(accounts, balances, fx).balances;
   let assets = 0;
   let liabilities = 0;
   for (const a of accounts) {
     if (a.archived) continue;
-    const b = balances.get(a.id) ?? 0;
+    const b = inBase.get(a.id) ?? 0;
     if (isLiability(a.type)) liabilities += b;
     else assets += b;
   }
@@ -66,13 +96,13 @@ export function maskNumber(n?: string | null) {
  * Net worth at the end of each of the last `months` months (oldest first), found by replaying
  * each account's opening balance plus every transaction dated up to that month's end.
  */
-export function netWorthHistory(accounts: Account[], transactions: Transaction[], months = 12, now = new Date()) {
+export function netWorthHistory(accounts: Account[], transactions: Transaction[], months = 12, now = new Date(), fx?: FxContext) {
   const sorted = [...transactions].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   const points: { monthEnd: Date; assets: number; liabilities: number; netWorth: number }[] = [];
   for (let i = months - 1; i >= 0; i--) {
     const monthEnd = i === 0 ? now : new Date(now.getFullYear(), now.getMonth() - i + 1, 0, 23, 59, 59, 999);
     const upTo = sorted.filter((t) => new Date(t.date) <= monthEnd);
-    points.push({ monthEnd, ...netWorthOf(accounts, computeBalances(accounts, upTo)) });
+    points.push({ monthEnd, ...netWorthOf(accounts, computeBalances(accounts, upTo, fx), fx) });
   }
   return points;
 }

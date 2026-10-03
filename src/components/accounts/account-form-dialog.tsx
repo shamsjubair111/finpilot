@@ -1,6 +1,6 @@
 "use client";
 
-import { getCurrencySymbol } from "@/lib/currency";
+import { CURRENCIES, getCurrencySymbol } from "@/lib/currency";
 
 import * as React from "react";
 import {
@@ -14,11 +14,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SubmitButton } from "@/components/shared/submit-button";
 import { DynamicIcon } from "@/components/shared/dynamic-icon";
 import { useFinance } from "@/components/providers/finance-provider";
 import { ACCOUNT_TYPE_META, isLiability } from "@/lib/accounts";
-import type { Account, AccountType } from "@/types/finance";
+import type { Account, AccountType, Currency } from "@/types/finance";
 import { cn } from "cn";
 import { t as tr } from "@/lib/i18n";
 
@@ -33,7 +34,8 @@ export function AccountFormDialog({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
-  const { addAccount, updateAccount } = useFinance();
+  const { addAccount, updateAccount, user } = useFinance();
+  const [currency, setCurrency] = React.useState<Currency>(user.currency);
   const isEdit = !!account;
   const [type, setType] = React.useState<AccountType>("bank");
   const [name, setName] = React.useState("");
@@ -54,6 +56,7 @@ export function AccountFormDialog({
     setInstitution(account?.institution ?? "");
     setAccountNumber(account?.accountNumber ?? "");
     setOpeningBalance(account ? String(account.openingBalance) : "");
+    setCurrency(account?.currency ?? user.currency);
     setCreditLimit(account?.creditLimit ? String(account.creditLimit) : "");
     setInterestRate(account?.interestRate ? String(account.interestRate) : "");
   } else if (!open && wasOpen) {
@@ -80,6 +83,8 @@ export function AccountFormDialog({
       institution: institution.trim() || null,
       accountNumber: accountNumber.trim() || null,
       openingBalance: Number(openingBalance) || 0,
+      // Main-currency accounts store null so they follow the user's currency setting.
+      ...(account ? {} : { currency: currency === user.currency ? null : currency }),
       creditLimit: type === "credit_card" && creditLimit ? Number(creditLimit) : null,
       interestRate: liability && interestRate ? Number(interestRate) : null,
       color: meta.color,
@@ -149,7 +154,21 @@ export function AccountFormDialog({
               </div>
             )}
             <div className="space-y-1.5">
-              <Label htmlFor="acc-open">{liability ? `${tr("Amount currently owed")} (${getCurrencySymbol()})` : `${tr("Current balance")} (${getCurrencySymbol()})`}</Label>
+              <Label htmlFor="acc-currency">{tr("Currency")}</Label>
+              <Select value={currency} onValueChange={(v) => setCurrency(v as Currency)} disabled={!!account}>
+                <SelectTrigger id="acc-currency" className="w-full"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {CURRENCIES.map((c) => (
+                    <SelectItem key={c.code} value={c.code}>{c.code} — {c.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                {account ? tr("The currency can't be changed after the account is created.") : currency !== user.currency ? tr("For PayPal, Payoneer or foreign bank accounts. Set its exchange rate in Settings.") : tr("Your main currency.")}
+              </p>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="acc-open">{liability ? `${tr("Amount currently owed")} (${getCurrencySymbol(currency)})` : `${tr("Current balance")} (${getCurrencySymbol(currency)})`}</Label>
               <Input id="acc-open" type="number" step="any" inputMode="decimal" placeholder="0" value={openingBalance} onChange={(e) => setOpeningBalance(e.target.value)} />
               <p className="text-xs text-muted-foreground">
                 {liability ? tr("Spending on it increases what you owe; payments reduce it.") : tr("Balance before the transactions you record here.")}
@@ -157,7 +176,7 @@ export function AccountFormDialog({
             </div>
             {type === "credit_card" && (
               <div className="space-y-1.5">
-                <Label htmlFor="acc-limit">{`${tr("Credit limit")} (${getCurrencySymbol()})`}</Label>
+                <Label htmlFor="acc-limit">{`${tr("Credit limit")} (${getCurrencySymbol(currency)})`}</Label>
                 <Input id="acc-limit" type="number" min={0} step="any" inputMode="decimal" value={creditLimit} onChange={(e) => setCreditLimit(e.target.value)} />
               </div>
             )}

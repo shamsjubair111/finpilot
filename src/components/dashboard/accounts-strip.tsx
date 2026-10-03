@@ -43,7 +43,7 @@ export function AccountsStrip() {
                   <span className="block truncate text-xs text-muted-foreground">{a.name}</span>
                   <span className={`block text-sm font-semibold tabular-nums ${isLiability(a.type) ? "text-destructive" : ""}`}>
                     {isLiability(a.type) ? "-" : ""}
-                    {formatCurrency(bal)}
+                    {formatCurrency(bal, { currency: a.currency ?? undefined })}
                   </span>
                 </span>
                 <ChevronRight className="size-4 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />

@@ -69,7 +69,7 @@ function AccountSelect({
             <SelectItem key={a.id} value={a.id}>
               <DynamicIcon name={ACCOUNT_TYPE_META[a.type].icon} className="size-4" style={{ color: ACCOUNT_TYPE_META[a.type].color }} />
               <span className="truncate">{a.name}</span>
-              <span className="ml-auto pl-2 text-xs tabular-nums text-muted-foreground">{formatCurrency(balances.get(a.id) ?? 0, { compact: true })}</span>
+              <span className="ml-auto pl-2 text-xs tabular-nums text-muted-foreground">{formatCurrency(balances.get(a.id) ?? 0, { compact: true, currency: a.currency ?? undefined })}</span>
             </SelectItem>
           ))}
       </SelectContent>
@@ -92,7 +92,10 @@ export function TransactionFormDialog({
   open: controlledOpen,
   onOpenChange,
 }: TransactionFormDialogProps) {
-  const { addTransaction, updateTransaction, accounts, accountBalances, transactions, categoriesFor } = useFinance();
+  const { addTransaction, updateTransaction, accounts, accountBalances, transactions, categoriesFor, fx } = useFinance();
+  // Amount in a foreign-currency account's own currency; the main-currency amount follows the rate until edited.
+  const [foreignAmount, setForeignAmount] = React.useState("");
+  const [amountTouched, setAmountTouched] = React.useState(false);
   const categoryModel = React.useMemo(() => buildCategoryModel(transactions), [transactions]);
   // Suggestions only fill the category until the user picks one themselves.
   const [categoryPicked, setCategoryPicked] = React.useState(false);
@@ -128,6 +131,8 @@ export function TransactionFormDialog({
     setCategoryPicked(!!t);
     setSuggested(false);
     setAmount(t ? String(t.amount) : "");
+    setForeignAmount(t?.originalAmount != null ? String(t.originalAmount) : "");
+    setAmountTouched(!!t);
     setDate((t?.date ?? new Date().toISOString()).slice(0, 10));
     const firstId = activeAccounts[0]?.id;
     setAccountId(t ? t.accountId ?? NO_ACCOUNT : firstId ?? NO_ACCOUNT);
@@ -151,8 +156,19 @@ export function TransactionFormDialog({
   const categories = categoriesFor(type === "income" ? "income" : "expense");
   const fromAccount = accounts.find((a) => a.id === accountId);
   const toAccount = accounts.find((a) => a.id === toAccountId);
+  // The account (either side of a transfer) that keeps a foreign currency, if any.
+  const foreignAccount = [fromAccount, isTransfer ? toAccount : undefined].find((a) => a?.currency && a.currency !== fx.base);
+  const foreignCurrency = foreignAccount?.currency ?? null;
+  const rate = foreignCurrency ? fx.rates[foreignCurrency] : undefined;
+
+  function changeForeign(v: string) {
+    setForeignAmount(v);
+    if (!amountTouched && rate && Number(v) > 0) setAmount(String(Math.round(Number(v) * rate * 100) / 100));
+  }
+
   const isValid =
     Number(amount) > 0 &&
+    (!foreignCurrency || Number(foreignAmount) > 0) &&
     (isTransfer ? accountId !== NO_ACCOUNT && !!toAccountId && accountId !== toAccountId : title.trim() && category);
 
   function changeAccount(id: string) {
@@ -176,6 +192,8 @@ export function TransactionFormDialog({
       notes: notes.trim() || undefined,
       accountId: accountId === NO_ACCOUNT ? null : accountId,
       toAccountId: isTransfer ? toAccountId : null,
+      originalAmount: foreignCurrency ? Number(foreignAmount) : null,
+      originalCurrency: foreignCurrency,
     };
     const ok = isEdit ? await updateTransaction(transaction!.id, data) : await addTransaction(data);
     setPending(false);
@@ -254,9 +272,34 @@ export function TransactionFormDialog({
               </div>
             )}
 
+            {foreignCurrency && (
+              <div className="space-y-1.5">
+                <Label htmlFor="txn-foreign">{`${tr("Amount")} (${foreignCurrency})`}</Label>
+                <Input id="txn-foreign" type="number" min={0} step="any" inputMode="decimal" placeholder="0" value={foreignAmount} onChange={(e) => changeForeign(e.target.value)} required />
+                <p className="text-xs text-muted-foreground">
+                  {rate
+                    ? tr("1 {code} = {rate} {base}", { code: foreignCurrency, rate: String(rate), base: fx.base })
+                    : tr("No rate set for {code}; enter the {base} amount yourself.", { code: foreignCurrency, base: fx.base })}
+                </p>
+              </div>
+            )}
             <div className="space-y-1.5">
               <Label htmlFor="txn-amount">{`${tr("Amount")} (${getCurrencySymbol()})`}</Label>
-              <Input id="txn-amount" type="number" min={0} step="any" inputMode="decimal" placeholder="0" value={amount} onChange={(e) => setAmount(e.target.value)} required />
+              <Input
+                id="txn-amount"
+                type="number"
+                min={0}
+                step="any"
+                inputMode="decimal"
+                placeholder="0"
+                value={amount}
+                onChange={(e) => {
+                  setAmount(e.target.value);
+                  setAmountTouched(true);
+                }}
+                required
+              />
+              {foreignCurrency && <p className="text-xs text-muted-foreground">{tr("What it's worth in your main currency, used in budgets and reports.")}</p>}
             </div>
 
             <div className="space-y-1.5">
