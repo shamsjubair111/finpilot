@@ -44,6 +44,7 @@ All migrations so far are additive (new tables/columns only), so they are safe t
 | `NEXT_PUBLIC_GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Optional | Google sign-in. Redirect URI: `<APP_URL>/api/auth/google/callback` |
 | `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` | Optional | Push notifications. Generate once with `npx web-push generate-vapid-keys`; keep them stable or existing subscriptions stop working |
 | `ANTHROPIC_API_KEY` | Optional | The AI money assistant (Pro). Each message is a paid API call |
+| `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | Recommended on Vercel | Shares login/import rate limits across instances. Without them limits are per instance and reset on restart |
 
 `NEXT_PUBLIC_*` values are built into the browser bundle, so redeploy after changing them.
 

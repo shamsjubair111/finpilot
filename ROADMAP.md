@@ -7,7 +7,7 @@ Status: ✅ done · 🟡 partial · ⬜ not started
 - ✅ CI on every push: lint, type check, tests, build (`.github/workflows/ci.yml`)
 - 🟡 Money precision: amounts are rounded to cents on input. Full move to integer minor units still to do.
 - ✅ Security headers (`next.config.ts`)
-- ✅ Rate limiting on login, register, password change, import and export (in-memory; move to Redis for multi-instance hosting)
+- ✅ Rate limiting on login, register, password change, import and export (shared through Upstash Redis when configured, in-memory otherwise)
 - ✅ Staging: Neon branch + Vercel Preview, documented in DEPLOY.md; `npm run db:deploy` for migrations
 - ✅ Monitoring: `/api/health` for uptime checks; server and browser errors logged to the admin dashboard (30-day retention). Sentry optional later
 - ✅ Security activity log (sign-ins, failed attempts, password/2FA changes, exports) shown in Settings; 180-day retention; removed on account deletion
