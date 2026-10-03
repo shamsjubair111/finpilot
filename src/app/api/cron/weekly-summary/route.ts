@@ -22,6 +22,8 @@ export async function GET(req: Request) {
     where: {
       weeklySummary: true,
       emailVerifiedAt: { not: null },
+      // At most one summary every 6 days, so a retried job never sends twice.
+      OR: [{ weeklySummarySentAt: null }, { weeklySummarySentAt: { lt: new Date(now.getTime() - 6 * DAY) } }],
       transactions: { some: { createdAt: { gte: new Date(now.getTime() - 30 * DAY) } } },
     },
     select: { id: true, email: true, name: true, language: true, currency: true },
@@ -60,6 +62,7 @@ export async function GET(req: Request) {
           base
         ),
       });
+      await db.user.update({ where: { id: user.id }, data: { weeklySummarySentAt: now } });
       sent += 1;
     } catch (err) {
       console.error("[weekly-summary]", user.id, err);

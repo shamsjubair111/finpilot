@@ -1,4 +1,5 @@
 import { findUnusualExpenses, projectMonthEnd } from "@/lib/alerts";
+import { budgetsForMonth } from "@/lib/calculations/budget";
 import { categoryParts } from "@/lib/splits";
 import { addMonths, differenceInCalendarDays, format, startOfMonth, subMonths } from "date-fns";
 import type {
@@ -220,8 +221,13 @@ export function generateInsights(args: {
     });
   }
 
-  // Budget
-  for (const b of budgets) {
+  // Budget: always judged on the current month, whichever month the user is viewing.
+  const currentBudgets = budgetsForMonth(
+    budgets.map((b) => ({ ...b, budgeted: b.baseBudgeted ?? b.budgeted })),
+    transactions,
+    now
+  );
+  for (const b of currentBudgets) {
     const status = getBudgetStatus(b.spent, b.budgeted);
     const projected = projectMonthEnd(b.spent, now);
     if (status === "on_track" && projected !== null && projected > b.budgeted * 1.1) {
