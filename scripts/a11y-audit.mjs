@@ -8,7 +8,7 @@ const PAGES = ["/", "/accounts", "/transactions", "/budget", "/recurring", "/goa
 const PUBLIC = ["/pricing", "/login", "/register"];
 
 const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || undefined, headless: true });
-const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 }, colorScheme: process.env.A11Y_DARK ? "dark" : "light" });
 const page = await ctx.newPage();
 const found = new Map();
 

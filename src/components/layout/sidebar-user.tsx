@@ -18,7 +18,7 @@ export function SidebarUser({ collapsed = false }: { collapsed?: boolean }) {
         <>
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-medium text-sidebar-foreground">{user.name}</p>
-            <p className="truncate text-xs text-sidebar-foreground/50">{user.email}</p>
+            <p className="truncate text-xs text-sidebar-foreground/70">{user.email}</p>
           </div>
           <button
             onClick={signOut}
