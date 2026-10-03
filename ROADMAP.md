@@ -92,3 +92,4 @@ Status: ✅ done · 🟡 partial · ⬜ not started
 - ✅ Goals can follow an account's balance (e.g. an emergency fund tied to a savings account)
 - ✅ 30-day cash-flow forecast on the dashboard: spendable balance, upcoming bills and income, lowest point, shortfall warning
 - ✅ Transactions: date filter (this/last month, 3 months, this/last year) and search by note or amount
+- ✅ Export the filtered transaction list as CSV from the Transactions page

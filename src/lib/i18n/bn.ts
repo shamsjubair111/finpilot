@@ -1465,4 +1465,6 @@ export const bn: Record<string, string> = {
   "Last year": "গত বছর",
   "Filter by date": "তারিখ অনুযায়ী ফিল্টার",
   "Search by name, note or amount…": "নাম, নোট বা পরিমাণ দিয়ে খুঁজুন…",
+  // Export filtered
+  "Export these {n} (CSV)": "এই {n}টি এক্সপোর্ট করুন (CSV)",
 };

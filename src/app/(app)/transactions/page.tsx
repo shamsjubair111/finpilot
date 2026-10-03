@@ -4,7 +4,8 @@ import { Suspense, useDeferredValue, useMemo, useState } from "react";
 import { categoryParts } from "@/lib/splits";
 import { matchesSearch, periodRange } from "@/lib/transaction-filter";
 import { useSearchParams } from "next/navigation";
-import { Plus, ArrowUpRight, ArrowDownRight, Wallet } from "lucide-react";
+import { Plus, ArrowUpRight, ArrowDownRight, Download, Wallet } from "lucide-react";
+import { transactionsCsv } from "@/lib/csv-export";
 import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -28,7 +29,7 @@ export default function TransactionsPage() {
 
 function TransactionsView() {
   const params = useSearchParams();
-  const { transactions } = useFinance();
+  const { transactions, accounts } = useFinance();
   const [filters, setFilters] = useState<TransactionFilterState>({
     search: "",
     category: "all",
@@ -55,6 +56,14 @@ function TransactionsView() {
         return matchesSearch(t, filters.search);
       });
   }, [transactions, applied]);
+
+  function exportFiltered() {
+    const csv = transactionsCsv(filtered, new Map(accounts.map((a) => [a.id, a.name])));
+    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+    const a = Object.assign(document.createElement("a"), { href: url, download: `sanchay-transactions-${new Date().toISOString().slice(0, 10)}.csv` });
+    a.click();
+    URL.revokeObjectURL(url);
+  }
 
   const totalIncome = filtered.filter((t) => t.type === "income").reduce((s, t) => s + t.amount, 0);
   const totalExpense = filtered.filter((t) => t.type === "expense").reduce((s, t) => s + t.amount, 0);
@@ -116,6 +125,14 @@ function TransactionsView() {
       <Card>
         <CardContent className="space-y-5">
           <TransactionFilters filters={filters} onChange={setFilters} />
+          {filtered.length > 0 && (
+            <div className="-mt-2 flex justify-end">
+              <Button variant="ghost" size="sm" className="gap-1.5 text-xs" onClick={exportFiltered}>
+                <Download className="size-3.5" />
+                {tr("Export these {n} (CSV)", { n: filtered.length })}
+              </Button>
+            </div>
+          )}
           <TransactionList
             // A new search or filter starts again from the first page.
             key={JSON.stringify(applied)}
