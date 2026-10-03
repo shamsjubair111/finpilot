@@ -13,7 +13,8 @@ export type AuditAction =
   | "2fa_enabled"
   | "2fa_disabled"
   | "data_exported"
-  | "google_linked";
+  | "google_linked"
+  | "email_changed";
 
 /** Records a security event. Never throws: auditing must not break the action being audited. */
 export async function audit(userId: string, action: AuditAction) {

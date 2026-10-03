@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { SubmitButton } from "@/components/shared/submit-button";
 import { TwoFactorCard } from "@/components/settings/two-factor-card";
+import { ChangeEmailDialog } from "@/components/settings/change-email-dialog";
 import { PushCard } from "@/components/settings/push-card";
 import { HouseholdCard } from "@/components/settings/household-card";
 import { CategoriesCard } from "@/components/settings/categories-card";
@@ -154,7 +155,7 @@ export default function SettingsPage() {
                   <Input id="settings-email" type="email" value={user.email} readOnly disabled className="pr-9" />
                   <Lock className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                 </div>
-                <p className="text-xs text-muted-foreground">{t("Your sign-in email is permanent and can't be changed.")}</p>
+                <ChangeEmailDialog />
               </div>
               <div className="space-y-1.5 sm:col-span-2">
                 <Label htmlFor="settings-avatar">{t("Avatar image URL (optional)")}</Label>

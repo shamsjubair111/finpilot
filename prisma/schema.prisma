@@ -193,6 +193,8 @@ model AuthToken {
   userId    String
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   type      String
+  // Extra context for the token, e.g. the new address for an email change.
+  data      String?
   tokenHash String    @unique
   expiresAt DateTime
   usedAt    DateTime?

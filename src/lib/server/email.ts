@@ -158,3 +158,19 @@ export function planEndingEmail(lang: Lang, name: string, p: { trial: boolean; d
     ),
   };
 }
+
+export function changeEmailEmail(lang: Lang, name: string, newEmail: string, url: string) {
+  const tr = (s: string, v?: Record<string, string | number>) => translate(lang, s, v);
+  return {
+    subject: tr("Confirm your new email for Sanchay"),
+    ...layout(lang, tr("Confirm your new email"), [tr("Hi {name}, confirm that you want to use {email} to sign in to Sanchay. This link expires in 24 hours.", { name, email: newEmail }), tr("If you didn't ask for this, you can ignore this email.")], { label: tr("Confirm new email"), url }),
+  };
+}
+
+export function emailChangedNotice(lang: Lang, name: string, newEmail: string) {
+  const tr = (s: string, v?: Record<string, string | number>) => translate(lang, s, v);
+  return {
+    subject: tr("Your Sanchay email was changed"),
+    ...layout(lang, tr("Your sign-in email was changed"), [tr("Hi {name}, your Sanchay account now uses {email}.", { name, email: newEmail }), tr("If this wasn't you, reply to this email or contact support right away.")]),
+  };
+}

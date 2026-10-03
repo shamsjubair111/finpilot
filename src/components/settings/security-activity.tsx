@@ -27,6 +27,7 @@ const LABELS: Record<string, string> = {
   "2fa_disabled": "Two-step verification turned off",
   data_exported: "Data downloaded",
   google_linked: "Google account linked",
+  email_changed: "Sign-in email changed",
 };
 
 /** Rough "Chrome on Android" style summary; good enough to recognise your own devices. */
