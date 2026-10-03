@@ -254,6 +254,8 @@ function AdminDashboard() {
         </CardContent>
       </Card>
 
+      <SupportCard />
+
       <CouponsCard />
 
       <ErrorsCard />
@@ -449,6 +451,65 @@ function CouponsCard() {
           ))}
           {!coupons.length && <p className="py-2 text-muted-foreground">No codes yet.</p>}
         </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+interface SupportRow {
+  id: string;
+  email: string;
+  name: string;
+  topic: string;
+  message: string;
+  page: string | null;
+  resolvedAt: string | null;
+  createdAt: string;
+}
+
+function SupportCard() {
+  const [all, setAll] = useState(false);
+  const [rows, setRows] = useState<SupportRow[]>([]);
+  const load = useCallback(() => api<SupportRow[]>(`/admin/support${all ? "?all=1" : ""}`).then(setRows).catch(() => {}), [all]);
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  async function toggle(r: SupportRow) {
+    await api(`/admin/support/${r.id}`, { method: "PATCH", body: { resolved: !r.resolvedAt } }).catch(() => toast.error("Couldn't update"));
+    load();
+  }
+
+  return (
+    <Card>
+      <CardHeader className="gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <CardTitle className="text-base">Support messages</CardTitle>
+          <CardDescription>{all ? "All messages" : "Open messages"} from the Help page. Reply by email.</CardDescription>
+        </div>
+        <Button size="sm" variant="outline" onClick={() => setAll(!all)}>{all ? "Show open only" : "Show all"}</Button>
+      </CardHeader>
+      <CardContent className="divide-y text-sm">
+        {!rows.length && <p className="py-3 text-muted-foreground">Nothing here.</p>}
+        {rows.map((r) => (
+          <div key={r.id} className="space-y-1 py-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <span className="font-medium">
+                {r.name} <span className="font-normal text-muted-foreground">· {r.email}</span>
+              </span>
+              <span className="text-xs text-muted-foreground">{format(new Date(r.createdAt), "d MMM, HH:mm")}</span>
+            </div>
+            <p className="whitespace-pre-wrap">{r.message}</p>
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge variant="secondary">{r.topic}</Badge>
+              {r.page && <span className="text-xs text-muted-foreground">from {r.page}</span>}
+              <Button asChild size="sm" variant="ghost" className="ml-auto">
+                <a href={`mailto:${r.email}?subject=${encodeURIComponent("Re: your message to Sanchay")}`}>Reply</a>
+              </Button>
+              <Button size="sm" variant="outline" onClick={() => toggle(r)}>{r.resolvedAt ? "Reopen" : "Mark resolved"}</Button>
+            </div>
+          </div>
+        ))}
       </CardContent>
     </Card>
   );

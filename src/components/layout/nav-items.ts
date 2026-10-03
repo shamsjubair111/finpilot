@@ -19,6 +19,7 @@ import {
   HandCoins,
   LineChart,
   Sparkles,
+  LifeBuoy,
 } from "lucide-react";
 
 export interface NavItem {
@@ -49,5 +50,6 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Reports", href: "/reports", icon: FileBarChart, section: "Planning" },
   { label: "Plan & billing", href: "/billing", icon: Crown, section: "Planning" },
   { label: "Settings", href: "/settings", icon: Settings, section: "Planning" },
+  { label: "Help", href: "/help", icon: LifeBuoy, section: "Planning" },
   { label: "Admin", href: "/admin", icon: ShieldCheck, section: "Planning", adminOnly: true },
 ];

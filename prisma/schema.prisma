@@ -355,3 +355,18 @@ model Coupon {
   active     Boolean   @default(true)
   createdAt  DateTime  @default(now())
 }
+
+// A message sent from the Help page; handled in /admin.
+model SupportMessage {
+  id         String    @id @default(cuid())
+  userId     String?
+  email      String
+  name       String
+  topic      String
+  message    String
+  page       String?
+  resolvedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([createdAt])
+}
