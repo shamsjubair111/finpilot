@@ -11,7 +11,7 @@ const importSchema = z.object({
     .array(
       transactionSchema
         .extend({ type: z.enum(["income", "expense"]), externalId: z.string().trim().max(64).optional().nullable().transform((v) => v || null) })
-        .omit({ toAccountId: true })
+        .omit({ toAccountId: true, splits: true })
     )
     .min(1, "is required")
     .max(500, "must be 500 items or fewer"),

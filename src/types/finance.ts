@@ -42,6 +42,8 @@ export interface Transaction {
   /** Amount in the foreign account's currency, when the transaction touches one. */
   originalAmount?: number | null;
   originalCurrency?: Currency | null;
+  /** Split across categories; parts add up to `amount`. */
+  splits?: { category: string; amount: number }[] | null;
   /** A receipt photo is attached (fetched separately). */
   hasReceipt?: boolean;
 }

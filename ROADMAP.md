@@ -78,8 +78,8 @@ Status: ✅ done · 🟡 partial · ⬜ not started
 - ✅ Browser smoke test of every page in English, Bangla and mobile (`npm run test:e2e`)
 
 - ✅ Foreign-currency accounts (PayPal, Payoneer, foreign banks): balances in their own currency, user-set exchange rates, converted net worth, foreign amounts on transactions and imports
+- ✅ Split transactions: one payment across several categories; budgets, reports, insights, filters and emails count each part
 
 ## Ideas not started
-- Split one transaction across categories
 - Paginate transactions for very heavy users (everything loads at once today)
 - Native Android app (only if demand shows)

@@ -1,4 +1,5 @@
 import { db } from "@/lib/server/db";
+import { categoryParts, type SplitPart } from "@/lib/splits";
 import { json } from "@/lib/server/api";
 import { cronGuard } from "@/lib/server/cron";
 import { appUrl, sendEmail, weeklySummaryEmail } from "@/lib/server/email";
@@ -7,6 +8,7 @@ import { translate } from "@/lib/i18n";
 import type { Currency } from "@/types/finance";
 
 const DAY = 24 * 60 * 60 * 1000;
+const parts = (t: { category: string; amount: number; splits: unknown }) => categoryParts({ ...t, splits: Array.isArray(t.splits) ? (t.splits as SplitPart[]) : null });
 
 // Runs weekly (vercel.json). Emails verified users who opted in and used Sanchay in the last 30 days.
 export async function GET(req: Request) {
@@ -30,7 +32,7 @@ export async function GET(req: Request) {
   for (const user of users) {
     try {
       const [txns, budgets, bills] = await Promise.all([
-        db.transaction.findMany({ where: { userId: user.id, date: { gte: monthStart < weekAgo ? monthStart : weekAgo, lte: now } }, select: { date: true, amount: true, type: true, category: true } }),
+        db.transaction.findMany({ where: { userId: user.id, date: { gte: monthStart < weekAgo ? monthStart : weekAgo, lte: now } }, select: { date: true, amount: true, type: true, category: true, splits: true } }),
         db.budgetCategory.findMany({ where: { userId: user.id }, select: { category: true, budgeted: true } }),
         db.commitment.findMany({ where: { userId: user.id, type: "expense", dueDate: { gte: now, lte: new Date(now.getTime() + 7 * DAY) } }, select: { amount: true } }),
       ]);
@@ -38,9 +40,9 @@ export async function GET(req: Request) {
       const money = (n: number) => formatCurrency(n, { currency: user.currency as Currency });
       const week = txns.filter((t) => t.date >= weekAgo);
       const byCat = new Map<string, number>();
-      for (const t of week) if (t.type === "expense") byCat.set(t.category, (byCat.get(t.category) ?? 0) + t.amount);
+      for (const t of week) if (t.type === "expense") for (const p of parts(t)) byCat.set(p.category, (byCat.get(p.category) ?? 0) + p.amount);
       const monthSpend = new Map<string, number>();
-      for (const t of txns) if (t.type === "expense" && t.date >= monthStart) monthSpend.set(t.category, (monthSpend.get(t.category) ?? 0) + t.amount);
+      for (const t of txns) if (t.type === "expense" && t.date >= monthStart) for (const p of parts(t)) monthSpend.set(p.category, (monthSpend.get(p.category) ?? 0) + p.amount);
       const billsTotal = bills.reduce((s, b) => s + b.amount, 0);
 
       await sendEmail({

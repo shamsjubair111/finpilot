@@ -1,4 +1,5 @@
 import { findUnusualExpenses, projectMonthEnd } from "@/lib/alerts";
+import { categoryParts } from "@/lib/splits";
 import { addMonths, differenceInCalendarDays, format, startOfMonth, subMonths } from "date-fns";
 import type {
   BudgetCategory,
@@ -146,7 +147,7 @@ export function generateInsights(args: {
     const key = format(subMonths(now, offset), "yyyy-MM");
     const m = new Map<string, number>();
     for (const t of transactions)
-      if (t.type === "expense" && format(new Date(t.date), "yyyy-MM") === key) m.set(t.category, (m.get(t.category) ?? 0) + t.amount);
+      if (t.type === "expense" && format(new Date(t.date), "yyyy-MM") === key) for (const p of categoryParts(t)) m.set(p.category, (m.get(p.category) ?? 0) + p.amount);
     return m;
   };
   const thisMonth = catSpend(0);

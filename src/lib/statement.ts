@@ -1,4 +1,5 @@
 import type { BudgetCategory, Transaction } from "@/types/finance";
+import { categoryParts } from "@/lib/splits";
 
 export interface PeriodStatement {
   income: number;
@@ -33,7 +34,7 @@ export function buildStatement(transactions: Transaction[], budgets: Pick<Budget
 
   const group = (type: Transaction["type"]) => {
     const m = new Map<string, number>();
-    for (const t of current) if (t.type === type) m.set(t.category, (m.get(t.category) ?? 0) + t.amount);
+    for (const t of current) if (t.type === type) for (const p of categoryParts(t)) m.set(p.category, (m.get(p.category) ?? 0) + p.amount);
     return [...m.entries()].sort((a, b) => b[1] - a[1]);
   };
   const spending = group("expense");

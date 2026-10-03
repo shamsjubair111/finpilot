@@ -1368,4 +1368,14 @@ export const bn: Record<string, string> = {
   "Used to count foreign-currency accounts in your totals and to suggest amounts when you record transactions. Update them when the rate changes.": "বিদেশি মুদ্রার অ্যাকাউন্ট মোট হিসাবে ধরতে ও লেনদেন লেখার সময় পরিমাণ প্রস্তাব করতে ব্যবহার হয়। হার বদলালে হালনাগাদ করুন।",
   "Save rates": "হার সেভ করুন",
   "Exchange rates saved": "বিনিময় হার সেভ হয়েছে",
+  // Splits
+  "Split across categories": "বিভিন্ন ক্যাটাগরিতে ভাগ করুন",
+  "Don't split": "ভাগ করবেন না",
+  "Add part": "অংশ যোগ করুন",
+  "Adds up": "মিলে গেছে",
+  "{amount} left to assign": "আরও {amount} ভাগ করা বাকি",
+  "{amount} too much": "{amount} বেশি হয়েছে",
+  "A split needs at least two parts.": "ভাগ করতে অন্তত দুটি অংশ লাগবে।",
+  "Each part needs a category and an amount.": "প্রতিটি অংশে ক্যাটাগরি ও পরিমাণ লাগবে।",
+  "The parts must add up to the total amount.": "অংশগুলোর যোগফল মোট পরিমাণের সমান হতে হবে।",
 };

@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { ArrowDown } from "lucide-react";
+import { ArrowDown, X } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -95,6 +95,9 @@ export function TransactionFormDialog({
   const { addTransaction, updateTransaction, accounts, accountBalances, transactions, categoriesFor, fx } = useFinance();
   // Amount in a foreign-currency account's own currency; the main-currency amount follows the rate until edited.
   const [foreignAmount, setForeignAmount] = React.useState("");
+  // Split across categories: rows of category + amount that must add up to the total.
+  const [splitting, setSplitting] = React.useState(false);
+  const [parts, setParts] = React.useState<{ category: string; amount: string }[]>([]);
   const [amountTouched, setAmountTouched] = React.useState(false);
   const categoryModel = React.useMemo(() => buildCategoryModel(transactions), [transactions]);
   // Suggestions only fill the category until the user picks one themselves.
@@ -132,6 +135,8 @@ export function TransactionFormDialog({
     setSuggested(false);
     setAmount(t ? String(t.amount) : "");
     setForeignAmount(t?.originalAmount != null ? String(t.originalAmount) : "");
+    setSplitting(!!t?.splits?.length);
+    setParts(t?.splits?.length ? t.splits.map((p) => ({ category: p.category, amount: String(p.amount) })) : []);
     setAmountTouched(!!t);
     setDate((t?.date ?? new Date().toISOString()).slice(0, 10));
     const firstId = activeAccounts[0]?.id;
@@ -166,10 +171,23 @@ export function TransactionFormDialog({
     if (!amountTouched && rate && Number(v) > 0) setAmount(String(Math.round(Number(v) * rate * 100) / 100));
   }
 
+  const partsTotal = Math.round(parts.reduce((sum, p) => sum + (Number(p.amount) || 0), 0) * 100) / 100;
+  const remaining = Math.round((Number(amount) - partsTotal) * 100) / 100;
+  const splitValid = parts.length >= 2 && parts.every((p) => p.category && Number(p.amount) > 0) && remaining === 0;
+
+  function startSplit() {
+    setSplitting(true);
+    setParts([
+      { category: category || "", amount: amount || "" },
+      { category: "", amount: "" },
+    ]);
+  }
+
   const isValid =
     Number(amount) > 0 &&
+    (!splitting || isTransfer || splitValid) &&
     (!foreignCurrency || Number(foreignAmount) > 0) &&
-    (isTransfer ? accountId !== NO_ACCOUNT && !!toAccountId && accountId !== toAccountId : title.trim() && category);
+    (isTransfer ? accountId !== NO_ACCOUNT && !!toAccountId && accountId !== toAccountId : title.trim() && (splitting || category));
 
   function changeAccount(id: string) {
     setAccountId(id);
@@ -194,6 +212,7 @@ export function TransactionFormDialog({
       toAccountId: isTransfer ? toAccountId : null,
       originalAmount: foreignCurrency ? Number(foreignAmount) : null,
       originalCurrency: foreignCurrency,
+      splits: splitting && !isTransfer ? parts.map((p) => ({ category: p.category, amount: Number(p.amount) })) : null,
     };
     const ok = isEdit ? await updateTransaction(transaction!.id, data) : await addTransaction(data);
     setPending(false);
@@ -309,6 +328,51 @@ export function TransactionFormDialog({
 
             {!isTransfer && (
               <>
+                {splitting ? (
+                  <div className="space-y-2 sm:col-span-2">
+                    <div className="flex items-center justify-between">
+                      <Label>{tr("Split across categories")}</Label>
+                      <Button type="button" variant="ghost" size="sm" onClick={() => { setSplitting(false); setParts([]); }}>{tr("Don't split")}</Button>
+                    </div>
+                    {parts.map((p, i) => (
+                      <div key={i} className="flex gap-2">
+                        <Select value={p.category} onValueChange={(v) => setParts(parts.map((x, j) => (j === i ? { ...x, category: v } : x)))}>
+                          <SelectTrigger className="flex-1" aria-label={tr("Category")}><SelectValue placeholder={tr("Select category")} /></SelectTrigger>
+                          <SelectContent>
+                            {categories.map((c) => (
+                              <SelectItem key={c} value={c}>{tr(c)}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <Input
+                          type="number"
+                          min={0}
+                          step="any"
+                          inputMode="decimal"
+                          className="w-28"
+                          value={p.amount}
+                          onChange={(e) => setParts(parts.map((x, j) => (j === i ? { ...x, amount: e.target.value } : x)))}
+                          aria-label={tr("Amount")}
+                        />
+                        {parts.length > 2 && (
+                          <Button type="button" variant="ghost" size="icon" aria-label={tr("Remove")} onClick={() => setParts(parts.filter((_, j) => j !== i))}>
+                            <X className="size-4" />
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+                    <div className="flex items-center justify-between text-xs">
+                      {parts.length < 10 ? (
+                        <Button type="button" variant="outline" size="sm" onClick={() => setParts([...parts, { category: "", amount: remaining > 0 ? String(remaining) : "" }])}>
+                          {tr("Add part")}
+                        </Button>
+                      ) : <span />}
+                      <span className={remaining === 0 ? "text-success" : "text-destructive"}>
+                        {remaining === 0 ? tr("Adds up") : remaining > 0 ? tr("{amount} left to assign", { amount: formatCurrency(remaining, { showDecimals: true }) }) : tr("{amount} too much", { amount: formatCurrency(-remaining, { showDecimals: true }) })}
+                      </span>
+                    </div>
+                  </div>
+                ) : (
                 <div className="space-y-1.5">
                   <Label htmlFor="txn-category" className="flex items-center gap-1.5">
                     {tr("Category")}
@@ -330,7 +394,11 @@ export function TransactionFormDialog({
                       ))}
                     </SelectContent>
                   </Select>
+                  <button type="button" className="text-xs text-primary hover:underline" onClick={startSplit}>
+                    {tr("Split across categories")}
+                  </button>
                 </div>
+                )}
 
                 <div className="space-y-1.5">
                   <Label htmlFor="txn-account">{type === "income" ? tr("Received in") : tr("Paid from")}</Label>

@@ -1,4 +1,5 @@
 import type { Account, Transaction } from "@/types/finance";
+import { categoryParts } from "@/lib/splits";
 import { computeBalances, isLiability, netWorthOf } from "@/lib/accounts";
 import { valueInvestment, type InvestmentInput } from "@/lib/calculations/investments";
 import type { Rates } from "@/lib/fx";
@@ -59,7 +60,7 @@ export function buildFinancialSummary(data: AssistantData, now = new Date()) {
       if (t.type === "income") income += t.amount;
       else if (t.type === "expense") {
         expenses += t.amount;
-        cats.set(t.category, (cats.get(t.category) ?? 0) + t.amount);
+        for (const p of categoryParts(t)) cats.set(p.category, (cats.get(p.category) ?? 0) + p.amount);
       }
     }
     return { income, expenses, cats };

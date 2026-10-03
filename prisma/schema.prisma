@@ -104,6 +104,8 @@ model Transaction {
   // For transactions on a foreign-currency account: the amount in that account's currency.
   originalAmount   Float?
   originalCurrency String?
+  // Optional split across categories: [{ category, amount }], parts add up to `amount`.
+  splits        Json?
   receipt       Receipt?
   createdAt     DateTime @default(now())
 

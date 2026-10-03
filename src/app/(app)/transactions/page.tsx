@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useMemo, useState } from "react";
+import { categoryParts } from "@/lib/splits";
 import { useSearchParams } from "next/navigation";
 import { Plus, ArrowUpRight, ArrowDownRight, Wallet } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
@@ -38,7 +39,7 @@ function TransactionsView() {
     return [...transactions]
       .filter((t) => {
         if (filters.type !== "all" && t.type !== filters.type) return false;
-        if (filters.category !== "all" && t.category !== filters.category) return false;
+        if (filters.category !== "all" && !categoryParts(t).some((p) => p.category === filters.category)) return false;
         if (filters.account !== "all" && t.accountId !== filters.account && t.toAccountId !== filters.account) return false;
         if (filters.search) {
           const q = filters.search.toLowerCase();

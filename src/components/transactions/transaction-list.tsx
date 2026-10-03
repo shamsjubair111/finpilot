@@ -25,6 +25,16 @@ import { TransactionFormDialog } from "./transaction-form-dialog";
 import { useFinance } from "@/components/providers/finance-provider";
 import { t as tr } from "@/lib/i18n";
 
+/** "Food" or, for split transactions, "Food +2" with every part in the tooltip. */
+function categoryLabel(t: Transaction) {
+  if (!t.splits || t.splits.length < 2) return tr(t.category);
+  return (
+    <span title={t.splits.map((p) => `${tr(p.category)}: ${formatCurrency(p.amount)}`).join("\n")}>
+      {tr(t.category)} +{t.splits.length - 1}
+    </span>
+  );
+}
+
 function paymentLabel(method: string) {
   return tr(PAYMENT_METHODS.find((m) => m.value === method)?.label ?? method);
 }
@@ -156,7 +166,7 @@ export function TransactionList({ transactions, emptyAction }: { transactions: T
                   </TableCell>
                   <TableCell>
                     <Badge variant="secondary" className="font-normal">
-                      {tr(t.category)}
+                      {categoryLabel(t)}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-sm text-muted-foreground">
@@ -209,7 +219,7 @@ export function TransactionList({ transactions, emptyAction }: { transactions: T
                   <p className="truncate text-xs text-muted-foreground">{t.merchant || paymentLabel(t.paymentMethod)}</p>
                   <div className="mt-2 flex flex-wrap items-center gap-1.5">
                     <Badge variant="secondary" className="font-normal">
-                      {tr(t.category)}
+                      {categoryLabel(t)}
                     </Badge>
                     <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
                       {t.type === "transfer" ? <ArrowLeftRight className="size-3" /> : isIncome ? <ArrowUpRight className="size-3" /> : <ArrowDownLeft className="size-3" />}

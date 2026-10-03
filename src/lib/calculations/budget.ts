@@ -1,4 +1,5 @@
 import type { BudgetCategory, BudgetStatus } from "@/types/finance";
+import { categoryParts } from "@/lib/splits";
 
 export function getBudgetStatus(spent: number, budgeted: number): BudgetStatus {
   if (budgeted <= 0) return "on_track";
@@ -32,7 +33,7 @@ export function getBudgetTotals(categories: BudgetCategory[]) {
  */
 export function budgetsForMonth<B extends { category: string; budgeted: number; rollover?: boolean }>(
   budgets: B[],
-  transactions: { type: string; category: string; amount: number; date: string }[],
+  transactions: { type: string; category: string; amount: number; date: string; splits?: { category: string; amount: number }[] | null }[],
   month: Date
 ) {
   const key = (d: Date) => d.getFullYear() * 12 + d.getMonth();
@@ -42,8 +43,8 @@ export function budgetsForMonth<B extends { category: string; budgeted: number; 
   for (const t of transactions) {
     if (t.type !== "expense") continue;
     const k = key(new Date(t.date));
-    if (k === current) spent.set(t.category, (spent.get(t.category) ?? 0) + t.amount);
-    else if (k === current - 1) prevSpent.set(t.category, (prevSpent.get(t.category) ?? 0) + t.amount);
+    const target = k === current ? spent : k === current - 1 ? prevSpent : null;
+    if (target) for (const p of categoryParts(t)) target.set(p.category, (target.get(p.category) ?? 0) + p.amount);
   }
   return budgets.map((b) => {
     const carriedOver = b.rollover ? Math.max(0, b.budgeted - (prevSpent.get(b.category) ?? 0)) : 0;

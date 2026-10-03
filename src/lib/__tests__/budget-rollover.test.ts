@@ -19,3 +19,12 @@ describe("budgetsForMonth", () => {
     expect(food.carriedOver).toBe(0);
   });
 });
+
+describe("budgetsForMonth with splits", () => {
+  it("counts each split part towards its own budget", () => {
+    const split = { date: new Date("2026-09-08").toISOString(), amount: 5000, category: "Food", type: "expense", splits: [{ category: "Food", amount: 3500 }, { category: "Shopping", amount: 1500 }] };
+    const [food, shopping] = budgetsForMonth([{ category: "Food", budgeted: 10000 }, { category: "Shopping", budgeted: 3000 }], [split], new Date(2026, 8, 15));
+    expect(food.spent).toBe(3500);
+    expect(shopping.spent).toBe(1500);
+  });
+});

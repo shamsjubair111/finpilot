@@ -78,6 +78,7 @@ export const transactionSchema = z.object({
   notes: optionalText(),
   originalAmount: z.coerce.number().finite().min(0.01).max(1e12).transform(roundMoney).optional().nullable(),
   originalCurrency: z.enum(CURRENCY_CODES).optional().nullable(),
+  splits: z.array(z.object({ category: text(40), amount: positiveMoney })).max(10).optional().nullable(),
 });
 
 export const budgetSchema = z.object({
