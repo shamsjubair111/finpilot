@@ -121,8 +121,9 @@ export const commitmentSchema = z.object({
   icon: z.string().max(40).optional(),
   recurring: z.boolean().default(false),
   frequency: z.enum(FREQUENCIES).default("monthly"),
-  type: z.enum(["income", "expense"]).default("expense"),
+  type: z.enum(["income", "expense", "transfer"]).default("expense"),
   accountId: optionalId,
+  toAccountId: optionalId,
   autoPost: z.boolean().default(false),
 });
 

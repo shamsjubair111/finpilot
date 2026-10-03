@@ -45,9 +45,10 @@ export default function RecurringPage() {
     { key: "later", title: t("Later"), items: withDays.filter((x) => x.days > 7) },
   ].filter((g) => g.items.length);
 
-  const monthlyOut = commitments.filter((c) => c.type !== "income").reduce((s, c) => s + monthlyOf(c), 0);
+  // Transfers (DPS, savings) are money kept, not costs.
+  const monthlyOut = commitments.filter((c) => (c.type ?? "expense") === "expense").reduce((s, c) => s + monthlyOf(c), 0);
   const monthlyIn = commitments.filter((c) => c.type === "income").reduce((s, c) => s + monthlyOf(c), 0);
-  const dueSoon = withDays.filter((x) => x.days <= 7 && x.c.type !== "income").reduce((s, x) => s + x.c.amount, 0);
+  const dueSoon = withDays.filter((x) => x.days <= 7 && (x.c.type ?? "expense") === "expense").reduce((s, x) => s + x.c.amount, 0);
 
   async function quickPay(c: UpcomingCommitment) {
     setBusyId(c.id);
@@ -142,7 +143,7 @@ export default function RecurringPage() {
                       <div className="flex items-center gap-1">
                         <Button size="sm" variant="outline" className="gap-1" disabled={busyId === c.id} onClick={() => quickPay(c)}>
                           <Check className="size-3.5" />
-                          {c.type === "income" ? t("Received") : t("Paid")}
+                          {c.type === "income" ? t("Received") : c.type === "transfer" ? t("Done") : t("Paid")}
                         </Button>
                         <Button size="sm" variant="ghost" onClick={() => setPaying(c)}>
                           {t("Other amount")}

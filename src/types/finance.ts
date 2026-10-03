@@ -276,8 +276,9 @@ export interface UpcomingCommitment {
   icon: string;
   recurring: boolean;
   frequency?: "weekly" | "monthly" | "quarterly" | "yearly";
-  type?: "income" | "expense";
+  type?: "income" | "expense" | "transfer";
   accountId?: string | null;
+  toAccountId?: string | null;
   autoPost?: boolean;
 }
 

@@ -180,8 +180,10 @@ model Commitment {
   frequency       String    @default("monthly")
   // Day of month the schedule is anchored to, so a 31st bill returns to the 31st after short months.
   anchorDay       Int?
+  // income | expense | transfer (transfer moves money from accountId to toAccountId)
   type            String    @default("expense")
   accountId       String?
+  toAccountId     String?
   // Post the transaction automatically when it falls due.
   autoPost        Boolean   @default(false)
   lastRemindedFor DateTime?

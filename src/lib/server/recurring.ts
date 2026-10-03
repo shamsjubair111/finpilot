@@ -7,7 +7,7 @@ import { dueDatesUntil, nextDueDate, transactionCategoryFor, type Frequency } fr
 type Row = Record<string, unknown>;
 
 const freq = (c: Pick<Commitment, "frequency">) => c.frequency as Frequency;
-const txnType = (c: Pick<Commitment, "type">) => (c.type === "income" ? "income" : "expense");
+const txnType = (c: Pick<Commitment, "type">) => (c.type === "income" ? "income" : c.type === "transfer" ? "transfer" : "expense");
 
 /** Deterministic ID per commitment occurrence, so the same due date can never be posted twice. */
 export const occurrenceId = (commitmentId: string, due: Date) => `rec:${commitmentId}:${due.toISOString().slice(0, 10)}`;
@@ -18,22 +18,30 @@ function transactionFor(c: Commitment, due: Date, amount = c.amount, date = due)
     userId: c.userId,
     title: c.title,
     merchant: "",
-    category: transactionCategoryFor(c.category, type),
+    category: type === "transfer" ? "Transfer" : transactionCategoryFor(c.category, type),
     date,
     amount,
     type,
     paymentMethod: "other",
     accountId: c.accountId,
+    toAccountId: type === "transfer" ? c.toAccountId : null,
     notes: null,
     externalId: occurrenceId(c.id, due),
   };
 }
 
 /** crud "check" hook: anchor the schedule to the due date's day and make sure the account is the user's. */
-export async function checkCommitment(data: Row, userId: string) {
+export async function checkCommitment(data: Row, userId: string, existing?: Row) {
   if (data.dueDate instanceof Date) data.anchorDay = data.dueDate.getUTCDate();
-  if (typeof data.accountId === "string" && !(await db.account.count({ where: { id: data.accountId, userId } })))
+  const merged = { ...existing, ...data };
+  const ids = [merged.accountId, merged.toAccountId].filter((v): v is string => typeof v === "string");
+  if (ids.length && (await db.account.count({ where: { userId, id: { in: ids } } })) !== new Set(ids).size)
     throw new ApiError(400, "Selected account was not found.");
+  // A transfer needs two different accounts; other types don't use a destination.
+  if (merged.type === "transfer") {
+    if (!merged.accountId || !merged.toAccountId) throw new ApiError(400, "A transfer needs both a from and a to account.");
+    if (merged.accountId === merged.toAccountId) throw new ApiError(400, "Choose two different accounts for a transfer.");
+  } else if ("type" in data || "toAccountId" in data) data.toAccountId = null;
 }
 
 /**

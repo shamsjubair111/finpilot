@@ -60,7 +60,8 @@ export function CommitmentFormDialog({
   const [dueDate, setDueDate] = React.useState("");
   const [recurring, setRecurring] = React.useState(true);
   const [frequency, setFrequency] = React.useState<Frequency>("monthly");
-  const [type, setType] = React.useState<"income" | "expense">("expense");
+  const [type, setType] = React.useState<"income" | "expense" | "transfer">("expense");
+  const [toAccountId, setToAccountId] = React.useState(NO_ACCOUNT);
   const [accountId, setAccountId] = React.useState(NO_ACCOUNT);
   const [autoPost, setAutoPost] = React.useState(false);
   const [pending, setPending] = React.useState(false);
@@ -75,13 +76,19 @@ export function CommitmentFormDialog({
     setRecurring(commitment?.recurring ?? true);
     setFrequency(commitment?.frequency ?? "monthly");
     setType(commitment?.type ?? "expense");
+    setToAccountId(commitment?.toAccountId ?? NO_ACCOUNT);
     setAccountId(commitment?.accountId ?? NO_ACCOUNT);
     setAutoPost(commitment?.autoPost ?? false);
   } else if (!open && wasOpen) {
     setWasOpen(false);
   }
 
-  const isValid = title.trim() && Number(amount) > 0 && dueDate;
+  const isTransfer = type === "transfer";
+  const isValid =
+    title.trim() &&
+    Number(amount) > 0 &&
+    dueDate &&
+    (!isTransfer || (accountId !== NO_ACCOUNT && toAccountId !== NO_ACCOUNT && accountId !== toAccountId));
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -96,6 +103,7 @@ export function CommitmentFormDialog({
       frequency,
       type,
       accountId: accountId === NO_ACCOUNT ? null : accountId,
+      toAccountId: isTransfer && toAccountId !== NO_ACCOUNT ? toAccountId : null,
       autoPost: recurring && autoPost,
       icon: KINDS.find((k) => k.value === category)?.icon ?? "CalendarClock",
     };
@@ -141,26 +149,41 @@ export function CommitmentFormDialog({
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="cm-direction">{t("Money")}</Label>
-              <Select value={type} onValueChange={(v) => setType(v as "income" | "expense")}>
+              <Select value={type} onValueChange={(v) => setType(v as "income" | "expense" | "transfer")}>
                 <SelectTrigger id="cm-direction" className="w-full"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="expense">{t("Going out")}</SelectItem>
                   <SelectItem value="income">{t("Coming in")}</SelectItem>
+                  <SelectItem value="transfer">{t("Moving between my accounts")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="cm-account">{t("Account")}</Label>
+              <Label htmlFor="cm-account">{isTransfer ? t("From") : t("Account")}</Label>
               <Select value={accountId} onValueChange={setAccountId}>
                 <SelectTrigger id="cm-account" className="w-full"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={NO_ACCOUNT}>{t("No account")}</SelectItem>
+                  {!isTransfer && <SelectItem value={NO_ACCOUNT}>{t("No account")}</SelectItem>}
                   {accounts.filter((a) => !a.archived).map((a) => (
                     <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
+            {isTransfer && (
+              <div className="col-span-2 space-y-1.5">
+                <Label htmlFor="cm-to">{t("To")}</Label>
+                <Select value={toAccountId} onValueChange={setToAccountId}>
+                  <SelectTrigger id="cm-to" className="w-full"><SelectValue placeholder={t("Select account")} /></SelectTrigger>
+                  <SelectContent>
+                    {accounts.filter((a) => !a.archived && a.id !== accountId).map((a) => (
+                      <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">{t("For DPS instalments, savings deposits or wallet top-ups. It isn't counted as spending.")}</p>
+              </div>
+            )}
             <div className="col-span-2 space-y-3 rounded-xl border border-border p-3">
               <label className="flex items-center justify-between gap-3">
                 <div>

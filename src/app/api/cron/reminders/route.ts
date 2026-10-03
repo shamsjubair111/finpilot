@@ -20,7 +20,7 @@ export async function GET(req: Request) {
   const now = new Date();
   const until = new Date(now.getTime() + REMIND_DAYS_AHEAD * DAY);
   const due = await db.commitment.findMany({
-    where: { type: "expense", autoPost: false, dueDate: { gte: new Date(now.getTime() - DAY), lte: until } },
+    where: { type: { in: ["expense", "transfer"] }, autoPost: false, dueDate: { gte: new Date(now.getTime() - DAY), lte: until } },
     include: { user: { select: { id: true, email: true, name: true, language: true, currency: true } } },
     orderBy: { dueDate: "asc" },
   });

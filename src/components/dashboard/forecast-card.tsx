@@ -36,15 +36,26 @@ export function ForecastCard() {
   const { accounts, accountBaseBalances, commitments } = useFinance();
   const spendable = accounts.filter((a) => !a.archived && SPENDABLE.includes(a.type));
   const start = spendable.reduce((s, a) => s + (accountBaseBalances.get(a.id) ?? 0), 0);
+  const spendableIds = new Set(spendable.map((a) => a.id));
 
   const forecast = React.useMemo(
     () =>
       forecastCashflow(
         start,
-        commitments.map((c) => ({ title: c.title, amount: c.amount, type: c.type ?? "expense", dueDate: c.dueDate, recurring: c.recurring, frequency: c.frequency })),
+        commitments.flatMap((c) => {
+          const base = { title: c.title, amount: c.amount, dueDate: c.dueDate, recurring: c.recurring, frequency: c.frequency };
+          if (c.type !== "transfer") return [{ ...base, type: c.type ?? "expense" }];
+          // A transfer only changes spendable money when it crosses into or out of savings (e.g. a DPS instalment).
+          const fromSpendable = spendableIds.has(c.accountId ?? "");
+          const toSpendable = spendableIds.has(c.toAccountId ?? "");
+          if (fromSpendable === toSpendable) return [];
+          return [{ ...base, type: fromSpendable ? ("expense" as const) : ("income" as const) }];
+        }),
         30
       ),
-    [start, commitments]
+    // spendableIds is derived from accounts, which `start` already tracks.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [start, commitments, accounts]
   );
   if (!spendable.length) return null;
 

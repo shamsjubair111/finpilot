@@ -1469,4 +1469,8 @@ export const bn: Record<string, string> = {
   "Export these {n} (CSV)": "এই {n}টি এক্সপোর্ট করুন (CSV)",
   // Install
   "Install Sanchay on this device": "এই ডিভাইসে সঞ্চয় ইনস্টল করুন",
+  // Recurring transfers
+  "Moving between my accounts": "নিজের অ্যাকাউন্টের মধ্যে স্থানান্তর",
+  "Select account": "অ্যাকাউন্ট বেছে নিন",
+  "For DPS instalments, savings deposits or wallet top-ups. It isn't counted as spending.": "DPS কিস্তি, সঞ্চয়ে জমা বা ওয়ালেট টপ-আপের জন্য। এটি খরচ হিসেবে ধরা হয় না।",
 };
